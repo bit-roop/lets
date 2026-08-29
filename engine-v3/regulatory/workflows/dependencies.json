@@ -1,0 +1,47 @@
+{
+  "S-02": {
+    "depends_on": [
+      {
+        "requirement_id": "S-01",
+        "dependency_type": "LEGAL",
+        "basis": "Factories Act 1948 s.6 - previous permission for the site and plans is a precondition to the licence.",
+        "verification_status": "SECONDARY"
+      }
+    ]
+  },
+  "V-02": {
+    "depends_on": [
+      {
+        "requirement_id": "V-01",
+        "dependency_type": "LEGAL",
+        "basis": "Consent to Operate presupposes a valid Consent to Establish for the same unit.",
+        "verification_status": "SECONDARY"
+      }
+    ]
+  },
+  "F-02": {
+    "depends_on": [],
+    "candidate_dependencies": [
+      {
+        "requirement_id": "V-02",
+        "dependency_type": "UNVERIFIED",
+        "basis": "PREVIOUSLY ASSERTED AS A DEPENDENCY - NOW RETRACTED. FSS Act s.31 and the licensing regulations require premises proof and a local body NOC. They do not condition the licence on a Water Act consent. Some FDA offices ask for it in practice; that is a process convention, not a legal precondition.",
+        "verification_status": "UNVERIFIED",
+        "action": "Domain lead to confirm against the FoSCoS document checklist before this edge enters the DAG."
+      },
+      {
+        "requirement_id": "S-02",
+        "dependency_type": "UNVERIFIED",
+        "basis": "No provision found conditioning an FSSAI licence on a factory licence.",
+        "verification_status": "UNVERIFIED"
+      }
+    ],
+    "note": "Empty depends_on is deliberate. An unverified edge is worse than a missing one - it produces a critical path that is elegant and legally wrong."
+  },
+  "S-03": {
+    "depends_on": []
+  },
+  "E-05": {
+    "depends_on": []
+  }
+}

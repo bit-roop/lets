@@ -1,0 +1,38 @@
+[
+  {
+    "rule_id": "MPCB-CTE-001",
+    "version": 1,
+    "requirement_id": "V-01",
+    "name": "Consent to Establish applicability",
+    "condition": {"all": [
+      {"fact": "mpcb_category", "op": "in", "value": ["Red","Orange","Green","Blue"]}
+    ]},
+    "effect": {"requires": ["V-01"]},
+    "source": {
+      "source_id": "SRC-MPCB-001",
+      "statute": "Water Act 1974 s.25; Air Act 1981 s.21",
+      "effective_from": "2025-06-16",
+      "effective_to": null
+    },
+    "verification_status": "UNVERIFIED",
+    "last_verified": null,
+    "note": "White category is exempt (intimation only). Category derivation itself is UNVERIFIED."
+  },
+  {
+    "rule_id": "MPCB-CTO-001",
+    "version": 1,
+    "requirement_id": "V-02",
+    "name": "Consent to Operate applicability",
+    "condition": {"all": [
+      {"fact": "mpcb_category", "op": "in", "value": ["Red","Orange","Green","Blue"]}
+    ]},
+    "effect": {"requires": ["V-02"]},
+    "source": {
+      "source_id": "SRC-MPCB-001",
+      "effective_from": "2025-06-16",
+      "effective_to": null
+    },
+    "verification_status": "UNVERIFIED",
+    "last_verified": null
+  }
+]

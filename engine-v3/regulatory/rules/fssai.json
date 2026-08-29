@@ -1,0 +1,125 @@
+[
+  {
+    "rule_id": "FSSAI-CAT-REG",
+    "version": 2,
+    "requirement_id": "F-01",
+    "name": "FSSAI Registration by turnover (post 2026-04-01)",
+    "condition": {"all": [
+      {"fact": "annual_turnover", "op": "<=", "value": 15000000},
+      {"fact": "is_food_business", "op": "==", "value": true}
+    ]},
+    "effect": {"requires": ["F-01"], "excludes": ["F-02", "F-03"]},
+    "source": {
+      "source_id": "SRC-FSSAI-001",
+      "statute": "FSS Act, 2006 s.31(2)",
+      "instrument": "FSSAI Order dt. 13.03.2026",
+      "effective_from": "2026-04-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "supersedes": "FSSAI-CAT-REG@v1"
+  },
+  {
+    "rule_id": "FSSAI-CAT-REG",
+    "version": 1,
+    "requirement_id": "F-01",
+    "name": "FSSAI Registration by turnover (pre 2026-04-01)",
+    "condition": {"all": [
+      {"fact": "annual_turnover", "op": "<=", "value": 1200000},
+      {"fact": "is_food_business", "op": "==", "value": true}
+    ]},
+    "effect": {"requires": ["F-01"], "excludes": ["F-02", "F-03"]},
+    "source": {
+      "source_id": "SRC-FSSAI-000",
+      "statute": "FSS Act, 2006 s.31(2)",
+      "effective_from": "2011-08-05",
+      "effective_to": "2026-03-31"
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29"
+  },
+  {
+    "rule_id": "FSSAI-CAT-STATE",
+    "version": 2,
+    "requirement_id": "F-02",
+    "name": "FSSAI State Licence by turnover (post 2026-04-01)",
+    "condition": {"all": [
+      {"fact": "annual_turnover", "op": ">", "value": 15000000},
+      {"fact": "annual_turnover", "op": "<=", "value": 500000000},
+      {"fact": "is_food_business", "op": "==", "value": true},
+      {"fact": "export", "op": "==", "value": false},
+      {"fact": "multi_state_operation", "op": "==", "value": false}
+    ]},
+    "effect": {"requires": ["F-02"], "excludes": ["F-01", "F-03"]},
+    "source": {
+      "source_id": "SRC-FSSAI-001",
+      "statute": "FSS Act, 2006 s.31(1)",
+      "instrument": "FSSAI Order dt. 13.03.2026",
+      "effective_from": "2026-04-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "supersedes": "FSSAI-CAT-STATE@v1"
+  },
+  {
+    "rule_id": "FSSAI-CAT-STATE",
+    "version": 1,
+    "requirement_id": "F-02",
+    "name": "FSSAI State Licence by turnover (pre 2026-04-01)",
+    "condition": {"all": [
+      {"fact": "annual_turnover", "op": ">", "value": 1200000},
+      {"fact": "annual_turnover", "op": "<=", "value": 200000000},
+      {"fact": "is_food_business", "op": "==", "value": true},
+      {"fact": "export", "op": "==", "value": false},
+      {"fact": "multi_state_operation", "op": "==", "value": false}
+    ]},
+    "effect": {"requires": ["F-02"], "excludes": ["F-01", "F-03"]},
+    "source": {
+      "source_id": "SRC-FSSAI-000",
+      "effective_from": "2011-08-05",
+      "effective_to": "2026-03-31"
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29"
+  },
+  {
+    "rule_id": "FSSAI-CAT-CENTRAL",
+    "version": 2,
+    "requirement_id": "F-03",
+    "name": "FSSAI Central Licence (post 2026-04-01)",
+    "condition": {"any": [
+      {"fact": "annual_turnover", "op": ">", "value": 500000000},
+      {"fact": "export", "op": "==", "value": true},
+      {"fact": "multi_state_operation", "op": "==", "value": true}
+    ]},
+    "effect": {"requires": ["F-03"], "excludes": ["F-01", "F-02"]},
+    "source": {
+      "source_id": "SRC-FSSAI-001",
+      "effective_from": "2026-04-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29"
+  },
+  {
+    "rule_id": "FSSAI-FOSTAC-001",
+    "version": 1,
+    "requirement_id": "F-09",
+    "name": "FoSTaC supervisor ratio",
+    "condition": {"all": [
+      {"fact": "is_food_business", "op": "==", "value": true},
+      {"fact": "food_handlers", "op": ">", "value": 0}
+    ]},
+    "effect": {"requires": ["F-09"]},
+    "source": {
+      "statute": "FSS (Licensing and Registration) Regulations, Schedule 4",
+      "effective_from": "2011-08-05",
+      "effective_to": null
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29",
+    "note": "One trained supervisor per 25 food handlers."
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "rule_id": "EPF-REG-001",
+    "version": 1,
+    "requirement_id": "E-08",
+    "name": "EPFO registration by employee count",
+    "condition": {
+      "all": [
+        {"fact": "employees_total", "op": ">=", "value": 20}
+      ]
+    },
+    "effect": {"requires": ["E-08"]},
+    "source": {
+      "source_id": "SRC-EPF-001",
+      "statute": "EPF and MP Act, 1952 s.1(3)",
+      "effective_from": "1952-11-15",
+      "effective_to": null
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29",
+    "note": "20 employees, uniform nationwide per multiple secondary sources. Not confirmed from EPFO directly. Contract workers under direct supervision reportedly count toward the threshold — unconfirmed."
+  },
+  {
+    "rule_id": "ESIC-REG-001",
+    "version": 1,
+    "requirement_id": "E-09",
+    "name": "ESIC registration by employee count (Maharashtra) — DISPUTED",
+    "condition": {
+      "all": [
+        {"fact": "employees_total", "op": ">=", "value": 10},
+        {"fact": "in_esic_implemented_area", "op": "==", "value": true}
+      ]
+    },
+    "effect": {"requires": ["E-09"]},
+    "source": {
+      "source_id": "SRC-ESIC-001",
+      "statute": "ESI Act, 1948 s.1(5)",
+      "effective_from": "2020-10-01",
+      "effective_to": null
+    },
+    "verification_status": "UNVERIFIED",
+    "last_verified": null,
+    "note": "THRESHOLD DISPUTED. Sources give both 10 and 20 for Maharashtra. Coverage is district dependent (partially implemented state) and a wage condition applies. The in_esic_implemented_area fact will normally be missing, which correctly yields UNKNOWN rather than a wrong answer. Do not use in any demo claim."
+  }
+]

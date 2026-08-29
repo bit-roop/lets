@@ -1,0 +1,91 @@
+[
+  {
+    "rule_id": "MSME-UDYAM-001",
+    "version": 2,
+    "requirement_id": "E-05",
+    "name": "Udyam registration eligibility (composite criterion)",
+    "condition": {
+      "all": [
+        {
+          "fact": "investment_plant_machinery",
+          "op": "<=",
+          "value": 1250000000
+        },
+        {
+          "fact": "annual_turnover",
+          "op": "<=",
+          "value": 5000000000
+        }
+      ]
+    },
+    "effect": {
+      "requires": [
+        "E-05"
+      ]
+    },
+    "source": {
+      "source_id": "SRC-MSME-001",
+      "statute": "MSMED Act, 2006",
+      "instrument": "Notification S.O. 1364(E) dt. 21.03.2025",
+      "effective_from": "2025-04-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "note": "Composite: BOTH investment and turnover must be within limits."
+  },
+  {
+    "rule_id": "LABOUR-CLRA-001",
+    "version": 1,
+    "requirement_id": "S-10",
+    "name": "CLRA principal employer registration",
+    "condition": {
+      "all": [
+        {
+          "fact": "contract_labourers",
+          "op": ">=",
+          "value": 20
+        }
+      ]
+    },
+    "effect": {
+      "requires": [
+        "S-10"
+      ]
+    },
+    "source": {
+      "statute": "Contract Labour (Regulation and Abolition) Act, 1970 s.7",
+      "effective_from": "1971-02-10",
+      "effective_to": null
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29"
+  },
+  {
+    "rule_id": "POSH-IC-001",
+    "version": 1,
+    "requirement_id": "S-14",
+    "name": "POSH Internal Committee constitution",
+    "condition": {
+      "all": [
+        {
+          "fact": "employees_total",
+          "op": ">=",
+          "value": 10
+        }
+      ]
+    },
+    "effect": {
+      "requires": [
+        "S-14"
+      ]
+    },
+    "source": {
+      "statute": "POSH Act, 2013 s.4",
+      "effective_from": "2013-12-09",
+      "effective_to": null
+    },
+    "verification_status": "SECONDARY",
+    "last_verified": "2026-08-29"
+  }
+]

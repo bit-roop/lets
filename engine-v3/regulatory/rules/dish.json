@@ -1,0 +1,91 @@
+[
+  {
+    "rule_id": "DISH-FACTORY-001",
+    "version": 1,
+    "requirement_id": "S-02",
+    "name": "Factory licence applicability, Maharashtra thresholds",
+    "condition": {
+      "any": [
+        {
+          "all": [
+            {
+              "fact": "uses_power",
+              "op": "==",
+              "value": true
+            },
+            {
+              "fact": "workers_for_threshold",
+              "op": ">=",
+              "value": 20
+            }
+          ]
+        },
+        {
+          "all": [
+            {
+              "fact": "uses_power",
+              "op": "==",
+              "value": false
+            },
+            {
+              "fact": "workers_for_threshold",
+              "op": ">=",
+              "value": 40
+            }
+          ]
+        }
+      ]
+    },
+    "effect": {
+      "requires": [
+        "S-02",
+        "S-01"
+      ]
+    },
+    "source": {
+      "source_id": "SRC-DISH-001",
+      "statute": "Factories Act, 1948 s.2(m) as applied in Maharashtra",
+      "instrument": "Maharashtra Factories Rules 1963; Second Amendment Rules 2025",
+      "effective_from": "2025-10-03",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "note": "Maharashtra uses 20/40, NOT central 10/20. Contract labourers count toward the threshold."
+  },
+  {
+    "rule_id": "DISH-FACTORY-002",
+    "version": 1,
+    "requirement_id": "S-02",
+    "name": "Factories Act extended by notification below the normal threshold",
+    "condition": {
+      "all": [
+        {
+          "fact": "notified_industry_category",
+          "op": "intersects",
+          "value": [
+            "power_loom",
+            "saw_mill",
+            "hazardous_chemical_industry",
+            "flammable_solvent_process"
+          ]
+        }
+      ]
+    },
+    "effect": {
+      "requires": [
+        "S-02",
+        "S-01"
+      ]
+    },
+    "source": {
+      "source_id": "SRC-DISH-001",
+      "statute": "Factories Act, 1948 s.85 as applied in Maharashtra",
+      "effective_from": "1963-01-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "note": "DISH states the Act has been extended by notification to power looms, saw mills, certain hazardous chemical industries and certain flammable solvent processes even where fewer than 10 workers are employed. SCOPE INCOMPLETE: the full notified list has not been retrieved, so absence from this list is not proof of non applicability."
+  }
+]

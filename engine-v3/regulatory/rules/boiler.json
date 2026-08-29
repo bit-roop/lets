@@ -1,0 +1,50 @@
+[
+  {
+    "rule_id": "BOILER-REG-001",
+    "version": 2,
+    "requirement_id": "S-03",
+    "name": "Boiler registration — capacity, pressure and temperature all required",
+    "condition": {
+      "all": [
+        {"fact": "boiler_operates", "op": "==", "value": true},
+        {"fact": "boiler_capacity_litres", "op": ">=", "value": 25},
+        {"fact": "boiler_pressure_kg_cm2", "op": ">=", "value": 1},
+        {"fact": "boiler_water_temp_c", "op": ">=", "value": 100}
+      ]
+    },
+    "effect": {"requires": ["S-03", "S-04"]},
+    "source": {
+      "source_id": "SRC-BOILER-002",
+      "statute": "Boilers Act, 1923 s.2(b)",
+      "instrument": "Indian Boiler Regulations, 1950; Directorate of Steam Boilers Maharashtra",
+      "effective_from": "1924-01-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "supersedes": "BOILER-REG-001@v1",
+    "note": "v1 checked capacity alone and would have wrongly required registration for a 500 litre hot water generator at 80C. s.2(b) excludes a vessel if capacity <25L OR pressure <1 kg/cm2 OR water heated below 100C, so inclusion requires all three."
+  },
+  {
+    "rule_id": "BOILER-HWG-001",
+    "version": 1,
+    "requirement_id": "S-03",
+    "name": "Hot water generator — no registration required",
+    "condition": {
+      "all": [
+        {"fact": "boiler_operates", "op": "==", "value": true},
+        {"fact": "boiler_water_temp_c", "op": "<", "value": 100}
+      ]
+    },
+    "effect": {"excludes": ["S-03", "S-04"]},
+    "source": {
+      "source_id": "SRC-BOILER-002",
+      "statute": "Boilers Act, 1923 s.2(b)(iii)",
+      "effective_from": "1924-01-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "note": "Where water is heated below 100C the equipment is a hot water generator, not a boiler. Active exclusion, so it outranks an indeterminate requires."
+  }
+]

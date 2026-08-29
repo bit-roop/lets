@@ -1,0 +1,102 @@
+{
+  "SRC-DISH-001": {
+    "source_type": "DEPARTMENT_WEBSITE",
+    "authority": "Directorate of Industrial Safety and Health, Maharashtra",
+    "document_title": "Factories Act 1948 applicability FAQ",
+    "source_url": "https://mahadish.in",
+    "section": "Definition of factory",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29",
+    "verified_by": "domain_lead",
+    "note": "Maharashtra applies 20 with power / 40 without, NOT central 10/20."
+  },
+  "SRC-DISH-002": {
+    "source_type": "GAZETTE_NOTIFICATION",
+    "authority": "Industries, Energy, Labour and Mining Dept, Maharashtra",
+    "document_title": "Maharashtra Factories (Second Amendment) Rules, 2025",
+    "document_number": "FAX-2025/CR-117(Part-I)/Lab-4",
+    "document_date": "2025-10-03",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29"
+  },
+  "SRC-FSSAI-001": {
+    "source_type": "REGULATOR_ORDER",
+    "authority": "FSSAI",
+    "document_title": "Order revising turnover thresholds for licensing categories",
+    "document_date": "2026-03-13",
+    "section": "FSS (Licensing and Registration) Amendment Regulations, 2026",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29",
+    "source_url": "https://fssai.gov.in"
+  },
+  "SRC-FSSAI-000": {
+    "source_type": "REGULATOR_ORDER",
+    "authority": "FSSAI",
+    "document_title": "FSS (Licensing and Registration) Regulations 2011, pre-2026 thresholds",
+    "verification_status": "SECONDARY",
+    "note": "Superseded 2026-04-01. Retained for correct temporal resolution."
+  },
+  "SRC-MSME-001": {
+    "source_type": "GAZETTE_NOTIFICATION",
+    "authority": "Ministry of MSME",
+    "document_title": "Revised MSME classification limits",
+    "document_number": "S.O. 1364(E)",
+    "document_date": "2025-03-21",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29",
+    "note": "Composite criterion: BOTH investment and turnover must hold. SCOPE RECORDED IN REPOSITORY: only the outer MSME ceiling (investment <= Rs 125 cr AND turnover <= Rs 500 cr) is present, in MSME-UDYAM-001. The MICRO and SMALL tier boundaries are NOT recorded here and tier classification is therefore BLOCKED. See docs/PENDING_VERIFICATION.md."
+  },
+  "SRC-MPCB-001": {
+    "source_type": "BOARD_CIRCULAR",
+    "authority": "MPCB / CPCB",
+    "document_title": "Harmonised industry categorisation R/O/G/W/B",
+    "document_date": "2025-06-16",
+    "verification_status": "UNVERIFIED",
+    "verified_at": null,
+    "note": "Five-category structure confirmed to exist. Specific line item for fruit and vegetable processing NOT retrieved."
+  },
+  "SRC-BOILER-001": {
+    "source_type": "STATUTE",
+    "authority": "Directorate of Steam Boilers, Maharashtra",
+    "document_title": "Boilers Act, 1923",
+    "verification_status": "UNVERIFIED",
+    "note": "25 litre threshold not confirmed against Maharashtra application."
+  },
+  "SRC-BOILER-002": {
+    "source_type": "DEPARTMENT_WEBSITE",
+    "authority": "Directorate of Steam Boilers, Maharashtra State",
+    "document_title": "Boiler registration FAQ",
+    "source_url": "https://mahaboiler.in/boiler/faq.html",
+    "section": "Which boilers require registration",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29",
+    "verified_by": "domain_lead",
+    "note": "Volumetric capacity 25 litres or more, steam pressure not less than 1 kg/cm2 or water temperature 100C or more. Water heated below 100C is a hot water generator and needs no registration."
+  },
+  "SRC-BOILER-003": {
+    "source_type": "STATUTE",
+    "authority": "Parliament of India",
+    "document_title": "Boilers Act, 1923, section 2(b)",
+    "source_url": "https://www.indiacode.nic.in/handle/123456789/2375",
+    "section": "2(b) definition of boiler",
+    "verification_status": "VERIFIED",
+    "verified_at": "2026-08-29",
+    "note": "Excludes a pressure vessel (i) with capacity less than 25 litres, (ii) with less than 1 kg/cm2 design and working gauge pressure, or (iii) in which water is heated below 100 degrees centigrade. Exclusion is disjunctive, so inclusion requires all three."
+  },
+  "SRC-EPF-001": {
+    "source_type": "STATUTE",
+    "authority": "EPFO",
+    "document_title": "Employees Provident Funds and Miscellaneous Provisions Act, 1952 s.1(3)",
+    "verification_status": "SECONDARY",
+    "verified_at": "2026-08-29",
+    "note": "20 employees, uniform nationwide per multiple secondary sources. Not confirmed from EPFO's own site."
+  },
+  "SRC-ESIC-001": {
+    "source_type": "STATUTE",
+    "authority": "ESIC / Government of Maharashtra",
+    "document_title": "Employees State Insurance Act, 1948 s.1(5) and Maharashtra extension notifications",
+    "verification_status": "UNVERIFIED",
+    "verified_at": null,
+    "note": "SOURCES CONTRADICT. Some place Maharashtra at 20 employees; another cites a state notification reducing it to 10 w.e.f. 01-10-2020 for implemented areas; another states manufacturing units with power were already at 10. Maharashtra is a partially implemented state so coverage is district dependent, and a separate wage condition applies. Domain lead must obtain the notification itself."
+  }
+}

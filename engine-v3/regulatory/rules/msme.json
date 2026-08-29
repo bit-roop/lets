@@ -1,0 +1,34 @@
+[
+  {
+    "rule_id": "MSME-ELIGIBLE-001",
+    "version": 1,
+    "requirement_id": "E-05",
+    "name": "MSME eligibility within the outer classification ceiling",
+    "condition": {
+      "all": [
+        {"fact": "investment_plant_machinery", "op": "<=", "value": 1250000000},
+        {"fact": "annual_turnover", "op": "<=", "value": 5000000000}
+      ]
+    },
+    "effect": {
+      "derives": [
+        {
+          "fact": "msme_eligible",
+          "operation": "constant",
+          "value": true,
+          "value_type": "boolean"
+        }
+      ]
+    },
+    "source": {
+      "source_id": "SRC-MSME-001",
+      "statute": "MSMED Act, 2006",
+      "instrument": "Notification S.O. 1364(E) dt. 21.03.2025",
+      "effective_from": "2025-04-01",
+      "effective_to": null
+    },
+    "verification_status": "VERIFIED",
+    "last_verified": "2026-08-29",
+    "note": "Derives eligibility only, NOT the MICRO/SMALL/MEDIUM tier. The repository records only the outer ceiling; deriving a tier from it would classify every eligible enterprise as MEDIUM, which is wrong. Tier classification is blocked pending the micro and small boundaries being recorded in sources.json. See docs/PENDING_VERIFICATION.md."
+  }
+]

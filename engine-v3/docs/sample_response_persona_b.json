@@ -1,0 +1,1133 @@
+{
+  "as_of": "2026-08-29",
+  "summary": {
+    "applicable": 10,
+    "not_applicable": 2,
+    "unknown": 3,
+    "conflict": 0,
+    "derived_facts": 1,
+    "indeterminate_derivations": 0,
+    "derived_fact_conflicts": 0,
+    "derivation_passes": 2,
+    "rules_evaluated": 15,
+    "warnings": 6
+  },
+  "applicable": [
+    {
+      "requirement_id": "E-05",
+      "name": "Udyam Registration",
+      "requirement_type": "REGISTRATION",
+      "authority": "Ministry of MSME",
+      "department": "MSME",
+      "statute": "MSMED Act, 2006",
+      "sla_days": 1,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "MSME-UDYAM-001",
+          "version": 2,
+          "rule_name": "Udyam registration eligibility (composite criterion)",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "investment_plant_machinery",
+              "value": 60000000,
+              "op": "<=",
+              "target": 1250000000,
+              "result": "TRUE",
+              "reason": "investment_plant_machinery (60000000) <= 1250000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": "<=",
+              "target": 5000000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) <= 5000000000",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-MSME-001",
+            "statute": "MSMED Act, 2006",
+            "instrument": "Notification S.O. 1364(E) dt. 21.03.2025",
+            "effective_from": "2025-04-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": "Composite: BOTH investment and turnover must be within limits.",
+          "source_detail": {
+            "source_type": "GAZETTE_NOTIFICATION",
+            "authority": "Ministry of MSME",
+            "document_title": "Revised MSME classification limits",
+            "document_number": "S.O. 1364(E)",
+            "document_date": "2025-03-21",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "note": "Composite criterion: BOTH investment and turnover must hold. SCOPE RECORDED IN REPOSITORY: only the outer MSME ceiling (investment <= Rs 125 cr AND turnover <= Rs 500 cr) is present, in MSME-UDYAM-001. The MICRO and SMALL tier boundaries are NOT recorded here and tier classification is therefore BLOCKED. See docs/PENDING_VERIFICATION.md."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "requirement_id": "E-08",
+      "name": "EPFO Registration",
+      "requirement_type": "REGISTRATION",
+      "authority": "Employees Provident Fund Organisation",
+      "department": "EPFO",
+      "statute": "EPF and MP Act, 1952 s.1(3)",
+      "sla_days": 3,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "EPF-REG-001",
+          "version": 1,
+          "rule_name": "EPFO registration by employee count",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "employees_total",
+              "value": 45,
+              "op": ">=",
+              "target": 20,
+              "result": "TRUE",
+              "reason": "employees_total (45) >= 20",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-EPF-001",
+            "statute": "EPF and MP Act, 1952 s.1(3)",
+            "effective_from": "1952-11-15",
+            "effective_to": null
+          },
+          "verification_status": "SECONDARY",
+          "last_verified": "2026-08-29",
+          "note": "20 employees, uniform nationwide per multiple secondary sources. Not confirmed from EPFO directly. Contract workers under direct supervision reportedly count toward the threshold \u2014 unconfirmed.",
+          "source_detail": {
+            "source_type": "STATUTE",
+            "authority": "EPFO",
+            "document_title": "Employees Provident Funds and Miscellaneous Provisions Act, 1952 s.1(3)",
+            "verification_status": "SECONDARY",
+            "verified_at": "2026-08-29",
+            "note": "20 employees, uniform nationwide per multiple secondary sources. Not confirmed from EPFO's own site."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "requirement_id": "F-02",
+      "name": "FSSAI State Licence",
+      "requirement_type": "LICENCE",
+      "authority": "Maharashtra FDA",
+      "department": "FSSAI",
+      "statute": "FSS Act, 2006 s.31(1)",
+      "sla_days": 60,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "FSSAI-CAT-STATE",
+          "version": 2,
+          "rule_name": "FSSAI State Licence by turnover (post 2026-04-01)",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": ">",
+              "target": 15000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) > 15000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": "<=",
+              "target": 500000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) <= 500000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "is_food_business",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "is_food_business (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "export",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "export (False) == False",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "multi_state_operation",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "multi_state_operation (False) == False",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-FSSAI-001",
+            "statute": "FSS Act, 2006 s.31(1)",
+            "instrument": "FSSAI Order dt. 13.03.2026",
+            "effective_from": "2026-04-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": null,
+          "source_detail": {
+            "source_type": "REGULATOR_ORDER",
+            "authority": "FSSAI",
+            "document_title": "Order revising turnover thresholds for licensing categories",
+            "document_date": "2026-03-13",
+            "section": "FSS (Licensing and Registration) Amendment Regulations, 2026",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "source_url": "https://fssai.gov.in"
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high",
+      "candidate_dependencies": [
+        {
+          "requirement_id": "V-02",
+          "dependency_type": "UNVERIFIED",
+          "basis": "PREVIOUSLY ASSERTED AS A DEPENDENCY - NOW RETRACTED. FSS Act s.31 and the licensing regulations require premises proof and a local body NOC. They do not condition the licence on a Water Act consent. Some FDA offices ask for it in practice; that is a process convention, not a legal precondition.",
+          "verification_status": "UNVERIFIED",
+          "action": "Domain lead to confirm against the FoSCoS document checklist before this edge enters the DAG."
+        },
+        {
+          "requirement_id": "S-02",
+          "dependency_type": "UNVERIFIED",
+          "basis": "No provision found conditioning an FSSAI licence on a factory licence.",
+          "verification_status": "UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "requirement_id": "F-09",
+      "name": "FoSTaC Trained Food Safety Supervisor",
+      "requirement_type": "TRAINING",
+      "authority": "FSSAI-approved training partner",
+      "department": "FSSAI",
+      "statute": "FSS (Licensing and Registration) Regulations, Schedule 4",
+      "sla_days": 5,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "FSSAI-FOSTAC-001",
+          "version": 1,
+          "rule_name": "FoSTaC supervisor ratio",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "is_food_business",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "is_food_business (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "food_handlers",
+              "value": 30,
+              "op": ">",
+              "target": 0,
+              "result": "TRUE",
+              "reason": "food_handlers (30) > 0",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "statute": "FSS (Licensing and Registration) Regulations, Schedule 4",
+            "effective_from": "2011-08-05",
+            "effective_to": null
+          },
+          "verification_status": "SECONDARY",
+          "last_verified": "2026-08-29",
+          "note": "One trained supervisor per 25 food handlers.",
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "medium",
+      "quantity": {
+        "value": 2,
+        "missing_facts": [],
+        "formula": "ceil(food_handlers / 25)"
+      }
+    },
+    {
+      "requirement_id": "S-01",
+      "name": "Factory Building Plan Approval (Form 1)",
+      "requirement_type": "APPROVAL",
+      "authority": "DISH Maharashtra",
+      "department": "DISH",
+      "statute": "Factories Act, 1948 s.6; Mah. Factories Rules 1963 r.3",
+      "sla_days": 30,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "DISH-FACTORY-001",
+          "version": 1,
+          "rule_name": "Factory licence applicability, Maharashtra thresholds",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "uses_power",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "uses_power (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "workers_for_threshold",
+              "value": 67,
+              "op": ">=",
+              "target": 20,
+              "result": "TRUE",
+              "reason": "workers_for_threshold (67) >= 20",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "uses_power",
+              "value": true,
+              "op": "==",
+              "target": false,
+              "result": "FALSE",
+              "reason": "uses_power (True) == False",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "workers_for_threshold",
+              "value": 67,
+              "op": ">=",
+              "target": 40,
+              "result": "TRUE",
+              "reason": "workers_for_threshold (67) >= 40",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-DISH-001",
+            "statute": "Factories Act, 1948 s.2(m) as applied in Maharashtra",
+            "instrument": "Maharashtra Factories Rules 1963; Second Amendment Rules 2025",
+            "effective_from": "2025-10-03",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": "Maharashtra uses 20/40, NOT central 10/20. Contract labourers count toward the threshold.",
+          "source_detail": {
+            "source_type": "DEPARTMENT_WEBSITE",
+            "authority": "Directorate of Industrial Safety and Health, Maharashtra",
+            "document_title": "Factories Act 1948 applicability FAQ",
+            "source_url": "https://mahadish.in",
+            "section": "Definition of factory",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "verified_by": "domain_lead",
+            "note": "Maharashtra applies 20 with power / 40 without, NOT central 10/20."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "requirement_id": "S-02",
+      "name": "Factory Licence",
+      "requirement_type": "LICENCE",
+      "authority": "Directorate of Industrial Safety and Health, Maharashtra",
+      "department": "DISH",
+      "statute": "Factories Act, 1948 s.6",
+      "sla_days": 30,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "DISH-FACTORY-001",
+          "version": 1,
+          "rule_name": "Factory licence applicability, Maharashtra thresholds",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "uses_power",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "uses_power (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "workers_for_threshold",
+              "value": 67,
+              "op": ">=",
+              "target": 20,
+              "result": "TRUE",
+              "reason": "workers_for_threshold (67) >= 20",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "uses_power",
+              "value": true,
+              "op": "==",
+              "target": false,
+              "result": "FALSE",
+              "reason": "uses_power (True) == False",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "workers_for_threshold",
+              "value": 67,
+              "op": ">=",
+              "target": 40,
+              "result": "TRUE",
+              "reason": "workers_for_threshold (67) >= 40",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-DISH-001",
+            "statute": "Factories Act, 1948 s.2(m) as applied in Maharashtra",
+            "instrument": "Maharashtra Factories Rules 1963; Second Amendment Rules 2025",
+            "effective_from": "2025-10-03",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": "Maharashtra uses 20/40, NOT central 10/20. Contract labourers count toward the threshold.",
+          "source_detail": {
+            "source_type": "DEPARTMENT_WEBSITE",
+            "authority": "Directorate of Industrial Safety and Health, Maharashtra",
+            "document_title": "Factories Act 1948 applicability FAQ",
+            "source_url": "https://mahadish.in",
+            "section": "Definition of factory",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "verified_by": "domain_lead",
+            "note": "Maharashtra applies 20 with power / 40 without, NOT central 10/20."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high",
+      "depends_on": [
+        {
+          "requirement_id": "S-01",
+          "dependency_type": "LEGAL",
+          "basis": "Factories Act 1948 s.6 - previous permission for the site and plans is a precondition to the licence.",
+          "verification_status": "SECONDARY"
+        }
+      ],
+      "scheduling_depends_on": [
+        "S-01"
+      ]
+    },
+    {
+      "requirement_id": "S-03",
+      "name": "Boiler Registration",
+      "requirement_type": "REGISTRATION",
+      "authority": "Directorate of Steam Boilers, Maharashtra",
+      "department": "BOILERS",
+      "statute": "Boilers Act, 1923",
+      "sla_days": 30,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "BOILER-REG-001",
+          "version": 2,
+          "rule_name": "Boiler registration \u2014 capacity, pressure and temperature all required",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "boiler_operates",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "boiler_operates (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_capacity_litres",
+              "value": 500,
+              "op": ">=",
+              "target": 25,
+              "result": "TRUE",
+              "reason": "boiler_capacity_litres (500) >= 25",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_pressure_kg_cm2",
+              "value": 7,
+              "op": ">=",
+              "target": 1,
+              "result": "TRUE",
+              "reason": "boiler_pressure_kg_cm2 (7) >= 1",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_water_temp_c",
+              "value": 170,
+              "op": ">=",
+              "target": 100,
+              "result": "TRUE",
+              "reason": "boiler_water_temp_c (170) >= 100",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-BOILER-002",
+            "statute": "Boilers Act, 1923 s.2(b)",
+            "instrument": "Indian Boiler Regulations, 1950; Directorate of Steam Boilers Maharashtra",
+            "effective_from": "1924-01-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": "v1 checked capacity alone and would have wrongly required registration for a 500 litre hot water generator at 80C. s.2(b) excludes a vessel if capacity <25L OR pressure <1 kg/cm2 OR water heated below 100C, so inclusion requires all three.",
+          "source_detail": {
+            "source_type": "DEPARTMENT_WEBSITE",
+            "authority": "Directorate of Steam Boilers, Maharashtra State",
+            "document_title": "Boiler registration FAQ",
+            "source_url": "https://mahaboiler.in/boiler/faq.html",
+            "section": "Which boilers require registration",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "verified_by": "domain_lead",
+            "note": "Volumetric capacity 25 litres or more, steam pressure not less than 1 kg/cm2 or water temperature 100C or more. Water heated below 100C is a hot water generator and needs no registration."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "requirement_id": "S-04",
+      "name": "Boiler Attendant Competency Certificate",
+      "requirement_type": "CERTIFICATE",
+      "authority": "Directorate of Steam Boilers, Maharashtra",
+      "department": "BOILERS",
+      "statute": "Boiler Operation Engineers Rules",
+      "sla_days": 15,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "BOILER-REG-001",
+          "version": 2,
+          "rule_name": "Boiler registration \u2014 capacity, pressure and temperature all required",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "boiler_operates",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "boiler_operates (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_capacity_litres",
+              "value": 500,
+              "op": ">=",
+              "target": 25,
+              "result": "TRUE",
+              "reason": "boiler_capacity_litres (500) >= 25",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_pressure_kg_cm2",
+              "value": 7,
+              "op": ">=",
+              "target": 1,
+              "result": "TRUE",
+              "reason": "boiler_pressure_kg_cm2 (7) >= 1",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "boiler_water_temp_c",
+              "value": 170,
+              "op": ">=",
+              "target": 100,
+              "result": "TRUE",
+              "reason": "boiler_water_temp_c (170) >= 100",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-BOILER-002",
+            "statute": "Boilers Act, 1923 s.2(b)",
+            "instrument": "Indian Boiler Regulations, 1950; Directorate of Steam Boilers Maharashtra",
+            "effective_from": "1924-01-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": "v1 checked capacity alone and would have wrongly required registration for a 500 litre hot water generator at 80C. s.2(b) excludes a vessel if capacity <25L OR pressure <1 kg/cm2 OR water heated below 100C, so inclusion requires all three.",
+          "source_detail": {
+            "source_type": "DEPARTMENT_WEBSITE",
+            "authority": "Directorate of Steam Boilers, Maharashtra State",
+            "document_title": "Boiler registration FAQ",
+            "source_url": "https://mahaboiler.in/boiler/faq.html",
+            "section": "Which boilers require registration",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "verified_by": "domain_lead",
+            "note": "Volumetric capacity 25 litres or more, steam pressure not less than 1 kg/cm2 or water temperature 100C or more. Water heated below 100C is a hot water generator and needs no registration."
+          },
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "requirement_id": "S-10",
+      "name": "CLRA Registration (Principal Employer)",
+      "requirement_type": "REGISTRATION",
+      "authority": "Labour Department, Maharashtra",
+      "department": "LABOUR",
+      "statute": "Contract Labour (R&A) Act, 1970 s.7",
+      "sla_days": 15,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "LABOUR-CLRA-001",
+          "version": 1,
+          "rule_name": "CLRA principal employer registration",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "contract_labourers",
+              "value": 22,
+              "op": ">=",
+              "target": 20,
+              "result": "TRUE",
+              "reason": "contract_labourers (22) >= 20",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "statute": "Contract Labour (Regulation and Abolition) Act, 1970 s.7",
+            "effective_from": "1971-02-10",
+            "effective_to": null
+          },
+          "verification_status": "SECONDARY",
+          "last_verified": "2026-08-29",
+          "note": null,
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "requirement_id": "S-14",
+      "name": "POSH Internal Committee",
+      "requirement_type": "COMPLIANCE",
+      "authority": "Employer (internal constitution)",
+      "department": "INTERNAL",
+      "statute": "POSH Act, 2013 s.4",
+      "sla_days": 0,
+      "state": "APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "POSH-IC-001",
+          "version": 1,
+          "rule_name": "POSH Internal Committee constitution",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "employees_total",
+              "value": 45,
+              "op": ">=",
+              "target": 10,
+              "result": "TRUE",
+              "reason": "employees_total (45) >= 10",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "statute": "POSH Act, 2013 s.4",
+            "effective_from": "2013-12-09",
+            "effective_to": null
+          },
+          "verification_status": "SECONDARY",
+          "last_verified": "2026-08-29",
+          "note": null,
+          "evidence_kind": "POSITIVE_DEFINITE"
+        }
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "not_applicable": [
+    {
+      "requirement_id": "F-01",
+      "name": "FSSAI Registration",
+      "requirement_type": "REGISTRATION",
+      "authority": "Designated Officer, local body",
+      "department": "FSSAI",
+      "statute": "FSS Act, 2006 s.31(2)",
+      "sla_days": 30,
+      "state": "NOT_APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "FSSAI-CAT-STATE",
+          "version": 2,
+          "rule_name": "FSSAI State Licence by turnover (post 2026-04-01)",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": ">",
+              "target": 15000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) > 15000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": "<=",
+              "target": 500000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) <= 500000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "is_food_business",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "is_food_business (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "export",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "export (False) == False",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "multi_state_operation",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "multi_state_operation (False) == False",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-FSSAI-001",
+            "statute": "FSS Act, 2006 s.31(1)",
+            "instrument": "FSSAI Order dt. 13.03.2026",
+            "effective_from": "2026-04-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": null,
+          "source_detail": {
+            "source_type": "REGULATOR_ORDER",
+            "authority": "FSSAI",
+            "document_title": "Order revising turnover thresholds for licensing categories",
+            "document_date": "2026-03-13",
+            "section": "FSS (Licensing and Registration) Amendment Regulations, 2026",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "source_url": "https://fssai.gov.in"
+          },
+          "evidence_kind": "ACTIVE_EXCLUSION"
+        }
+      ],
+      "confidence": "high"
+    },
+    {
+      "requirement_id": "F-03",
+      "name": "FSSAI Central Licence",
+      "requirement_type": "LICENCE",
+      "authority": "FSSAI Regional Office",
+      "department": "FSSAI",
+      "statute": "FSS Act, 2006 s.31(1)",
+      "sla_days": 60,
+      "state": "NOT_APPLICABLE",
+      "evidence": [
+        {
+          "rule_id": "FSSAI-CAT-STATE",
+          "version": 2,
+          "rule_name": "FSSAI State Licence by turnover (post 2026-04-01)",
+          "result": "TRUE",
+          "facts_used": [
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": ">",
+              "target": 15000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) > 15000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "annual_turnover",
+              "value": 80000000,
+              "op": "<=",
+              "target": 500000000,
+              "result": "TRUE",
+              "reason": "annual_turnover (80000000) <= 500000000",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "is_food_business",
+              "value": true,
+              "op": "==",
+              "target": true,
+              "result": "TRUE",
+              "reason": "is_food_business (True) == True",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "export",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "export (False) == False",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "multi_state_operation",
+              "value": false,
+              "op": "==",
+              "target": false,
+              "result": "TRUE",
+              "reason": "multi_state_operation (False) == False",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-FSSAI-001",
+            "statute": "FSS Act, 2006 s.31(1)",
+            "instrument": "FSSAI Order dt. 13.03.2026",
+            "effective_from": "2026-04-01",
+            "effective_to": null
+          },
+          "verification_status": "VERIFIED",
+          "last_verified": "2026-08-29",
+          "note": null,
+          "source_detail": {
+            "source_type": "REGULATOR_ORDER",
+            "authority": "FSSAI",
+            "document_title": "Order revising turnover thresholds for licensing categories",
+            "document_date": "2026-03-13",
+            "section": "FSS (Licensing and Registration) Amendment Regulations, 2026",
+            "verification_status": "VERIFIED",
+            "verified_at": "2026-08-29",
+            "source_url": "https://fssai.gov.in"
+          },
+          "evidence_kind": "ACTIVE_EXCLUSION"
+        }
+      ],
+      "confidence": "high"
+    }
+  ],
+  "unknown": [
+    {
+      "requirement_id": "E-09",
+      "name": "ESIC Registration",
+      "requirement_type": "REGISTRATION",
+      "authority": "Employees State Insurance Corporation",
+      "department": "ESIC",
+      "statute": "ESI Act, 1948 s.1(5)",
+      "sla_days": 3,
+      "state": "UNKNOWN",
+      "evidence": [
+        {
+          "rule_id": "ESIC-REG-001",
+          "version": 1,
+          "rule_name": "ESIC registration by employee count (Maharashtra) \u2014 DISPUTED",
+          "result": "UNKNOWN",
+          "facts_used": [
+            {
+              "fact": "employees_total",
+              "value": 45,
+              "op": ">=",
+              "target": 10,
+              "result": "TRUE",
+              "reason": "employees_total (45) >= 10",
+              "fact_origin": "SUPPLIED"
+            },
+            {
+              "fact": "in_esic_implemented_area",
+              "value": null,
+              "op": "==",
+              "target": true,
+              "result": "UNKNOWN",
+              "reason": "fact not provided",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-ESIC-001",
+            "statute": "ESI Act, 1948 s.1(5)",
+            "effective_from": "2020-10-01",
+            "effective_to": null
+          },
+          "verification_status": "UNVERIFIED",
+          "last_verified": null,
+          "note": "THRESHOLD DISPUTED. Sources give both 10 and 20 for Maharashtra. Coverage is district dependent (partially implemented state) and a wage condition applies. The in_esic_implemented_area fact will normally be missing, which correctly yields UNKNOWN rather than a wrong answer. Do not use in any demo claim.",
+          "source_detail": {
+            "source_type": "STATUTE",
+            "authority": "ESIC / Government of Maharashtra",
+            "document_title": "Employees State Insurance Act, 1948 s.1(5) and Maharashtra extension notifications",
+            "verification_status": "UNVERIFIED",
+            "verified_at": null,
+            "note": "SOURCES CONTRADICT. Some place Maharashtra at 20 employees; another cites a state notification reducing it to 10 w.e.f. 01-10-2020 for implemented areas; another states manufacturing units with power were already at 10. Maharashtra is a partially implemented state so coverage is district dependent, and a separate wage condition applies. Domain lead must obtain the notification itself."
+          },
+          "evidence_kind": "POSITIVE_INDETERMINATE"
+        }
+      ],
+      "confidence": "low",
+      "missing_facts": [
+        "in_esic_implemented_area"
+      ],
+      "missing_fact_origin": {
+        "in_esic_implemented_area": "NOT_SUPPLIED"
+      }
+    },
+    {
+      "requirement_id": "V-01",
+      "name": "Consent to Establish",
+      "requirement_type": "CONSENT",
+      "authority": "Maharashtra Pollution Control Board",
+      "department": "MPCB",
+      "statute": "Water Act 1974 s.25; Air Act 1981 s.21",
+      "sla_days": 60,
+      "state": "UNKNOWN",
+      "evidence": [
+        {
+          "rule_id": "MPCB-CTE-001",
+          "version": 1,
+          "rule_name": "Consent to Establish applicability",
+          "result": "UNKNOWN",
+          "facts_used": [
+            {
+              "fact": "mpcb_category",
+              "value": null,
+              "op": "in",
+              "target": [
+                "Red",
+                "Orange",
+                "Green",
+                "Blue"
+              ],
+              "result": "UNKNOWN",
+              "reason": "fact not provided",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-MPCB-001",
+            "statute": "Water Act 1974 s.25; Air Act 1981 s.21",
+            "effective_from": "2025-06-16",
+            "effective_to": null
+          },
+          "verification_status": "UNVERIFIED",
+          "last_verified": null,
+          "note": "White category is exempt (intimation only). Category derivation itself is UNVERIFIED.",
+          "source_detail": {
+            "source_type": "BOARD_CIRCULAR",
+            "authority": "MPCB / CPCB",
+            "document_title": "Harmonised industry categorisation R/O/G/W/B",
+            "document_date": "2025-06-16",
+            "verification_status": "UNVERIFIED",
+            "verified_at": null,
+            "note": "Five-category structure confirmed to exist. Specific line item for fruit and vegetable processing NOT retrieved."
+          },
+          "evidence_kind": "POSITIVE_INDETERMINATE"
+        }
+      ],
+      "confidence": "low",
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "missing_fact_origin": {
+        "mpcb_category": "NOT_SUPPLIED"
+      }
+    },
+    {
+      "requirement_id": "V-02",
+      "name": "Consent to Operate",
+      "requirement_type": "CONSENT",
+      "authority": "Maharashtra Pollution Control Board",
+      "department": "MPCB",
+      "statute": "Water Act 1974 s.25; Air Act 1981 s.21",
+      "sla_days": 60,
+      "state": "UNKNOWN",
+      "evidence": [
+        {
+          "rule_id": "MPCB-CTO-001",
+          "version": 1,
+          "rule_name": "Consent to Operate applicability",
+          "result": "UNKNOWN",
+          "facts_used": [
+            {
+              "fact": "mpcb_category",
+              "value": null,
+              "op": "in",
+              "target": [
+                "Red",
+                "Orange",
+                "Green",
+                "Blue"
+              ],
+              "result": "UNKNOWN",
+              "reason": "fact not provided",
+              "fact_origin": "SUPPLIED"
+            }
+          ],
+          "source": {
+            "source_id": "SRC-MPCB-001",
+            "effective_from": "2025-06-16",
+            "effective_to": null
+          },
+          "verification_status": "UNVERIFIED",
+          "last_verified": null,
+          "note": null,
+          "source_detail": {
+            "source_type": "BOARD_CIRCULAR",
+            "authority": "MPCB / CPCB",
+            "document_title": "Harmonised industry categorisation R/O/G/W/B",
+            "document_date": "2025-06-16",
+            "verification_status": "UNVERIFIED",
+            "verified_at": null,
+            "note": "Five-category structure confirmed to exist. Specific line item for fruit and vegetable processing NOT retrieved."
+          },
+          "evidence_kind": "POSITIVE_INDETERMINATE"
+        }
+      ],
+      "confidence": "low",
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "missing_fact_origin": {
+        "mpcb_category": "NOT_SUPPLIED"
+      },
+      "depends_on": [
+        {
+          "requirement_id": "V-01",
+          "dependency_type": "LEGAL",
+          "basis": "Consent to Operate presupposes a valid Consent to Establish for the same unit.",
+          "verification_status": "SECONDARY"
+        }
+      ],
+      "scheduling_depends_on": [
+        "V-01"
+      ]
+    }
+  ],
+  "conflict": [],
+  "derived_facts": {
+    "msme_eligible": {
+      "fact": "msme_eligible",
+      "value": true,
+      "value_type": "boolean",
+      "rule_id": "MSME-ELIGIBLE-001",
+      "rule_version": 1,
+      "source": {
+        "source_id": "SRC-MSME-001",
+        "statute": "MSMED Act, 2006",
+        "instrument": "Notification S.O. 1364(E) dt. 21.03.2025",
+        "effective_from": "2025-04-01",
+        "effective_to": null
+      },
+      "verification_status": "VERIFIED",
+      "input_facts": [],
+      "derived_in_pass": 1,
+      "derived_at": "2026-08-29T12:31:29Z",
+      "operation": "constant"
+    }
+  },
+  "indeterminate_derivations": [],
+  "derived_fact_conflicts": [],
+  "derivation_diagnostics": {
+    "passes_run": 2,
+    "max_passes": 10,
+    "repeated_derivations_suppressed": 1,
+    "reached_fixed_point": true
+  },
+  "warnings": [
+    {
+      "type": "UNVERIFIED_RULE",
+      "severity": "warning",
+      "rule_id": "ESIC-REG-001",
+      "message": "ESIC-REG-001 is UNVERIFIED and affected the outcome. Not usable as a demo claim."
+    },
+    {
+      "type": "UNVERIFIED_RULE",
+      "severity": "warning",
+      "rule_id": "MPCB-CTE-001",
+      "message": "MPCB-CTE-001 is UNVERIFIED and affected the outcome. Not usable as a demo claim."
+    },
+    {
+      "type": "UNVERIFIED_RULE",
+      "severity": "warning",
+      "rule_id": "MPCB-CTO-001",
+      "message": "MPCB-CTO-001 is UNVERIFIED and affected the outcome. Not usable as a demo claim."
+    },
+    {
+      "type": "INSUFFICIENT_FACTS",
+      "severity": "warning",
+      "missing_facts": [
+        "in_esic_implemented_area"
+      ],
+      "message": "Cannot determine applicability. Missing: in_esic_implemented_area",
+      "requirement_id": "E-09"
+    },
+    {
+      "type": "INSUFFICIENT_FACTS",
+      "severity": "warning",
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "message": "Cannot determine applicability. Missing: mpcb_category",
+      "requirement_id": "V-01"
+    },
+    {
+      "type": "INSUFFICIENT_FACTS",
+      "severity": "warning",
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "message": "Cannot determine applicability. Missing: mpcb_category",
+      "requirement_id": "V-02"
+    }
+  ]
+}
