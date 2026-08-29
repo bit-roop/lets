@@ -8,3 +8,6 @@ venv/
 !.env.example
 .vscode/
 .idea/
+*.pyc
+node_modules/
+dist/
