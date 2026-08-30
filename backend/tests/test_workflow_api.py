@@ -2,7 +2,7 @@ import unittest
 
 import requests
 
-from test_api import TestBackendAPI
+from backend.tests.test_api import TestBackendAPI
 
 
 class TestWorkflowAPI(TestBackendAPI):
