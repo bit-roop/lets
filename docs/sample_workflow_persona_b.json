@@ -1,0 +1,1025 @@
+{
+  "cycles": [],
+  "edges": [
+    {
+      "admission_reason": "Recorded in candidate_dependencies. Never admitted to scheduling regardless of declared dependency_type.",
+      "admitted": false,
+      "basis": "No provision found conditioning an FSSAI licence on a factory licence.",
+      "dependency_type": "UNVERIFIED",
+      "dropped": false,
+      "dropped_reason": null,
+      "from_id": "S-02",
+      "origin": "candidate_dependencies",
+      "to_id": "F-02",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "admission_reason": "Recorded in candidate_dependencies. Never admitted to scheduling regardless of declared dependency_type.",
+      "admitted": false,
+      "basis": "PREVIOUSLY ASSERTED AS A DEPENDENCY - NOW RETRACTED. FSS Act s.31 and the licensing regulations require premises proof and a local body NOC. They do not condition the licence on a Water Act consent. Some FDA offices ask for it in practice; that is a process convention, not a legal precondition.",
+      "dependency_type": "UNVERIFIED",
+      "dropped": false,
+      "dropped_reason": null,
+      "from_id": "V-02",
+      "origin": "candidate_dependencies",
+      "to_id": "F-02",
+      "verification_status": "UNVERIFIED"
+    },
+    {
+      "admission_reason": "Admitted to scheduling. Statute or rule conditions the dependent requirement on this one.",
+      "admitted": true,
+      "basis": "Factories Act 1948 s.6 - previous permission for the site and plans is a precondition to the licence.",
+      "dependency_type": "LEGAL",
+      "dropped": false,
+      "dropped_reason": null,
+      "from_id": "S-01",
+      "origin": "depends_on",
+      "to_id": "S-02",
+      "verification_status": "SECONDARY"
+    },
+    {
+      "admission_reason": "Admitted to scheduling. Statute or rule conditions the dependent requirement on this one.",
+      "admitted": true,
+      "basis": "Consent to Operate presupposes a valid Consent to Establish for the same unit.",
+      "dependency_type": "LEGAL",
+      "dropped": false,
+      "dropped_reason": null,
+      "from_id": "V-01",
+      "origin": "depends_on",
+      "to_id": "V-02",
+      "verification_status": "SECONDARY"
+    }
+  ],
+  "generated_for": {
+    "as_of": "2026-08-29",
+    "duration_unit": "sla_days",
+    "duration_unit_note": "Durations are expressed in the catalogue's own sla_days units. The regulatory data does not state whether these are working or calendar days, so no calendar conversion is performed and no dates are produced.",
+    "engine_summary": {
+      "applicable": 10,
+      "conflict": 0,
+      "derivation_passes": 2,
+      "derived_fact_conflicts": 0,
+      "derived_facts": 1,
+      "indeterminate_derivations": 0,
+      "not_applicable": 2,
+      "rules_evaluated": 15,
+      "unknown": 3,
+      "warnings": 6
+    }
+  },
+  "graph_diagnostics": {
+    "critical_path_count": 2,
+    "dependency_data_coverage": 0.2308,
+    "edge_count_admitted": 2,
+    "edge_count_candidate": 2,
+    "edge_count_dropped": 0,
+    "edge_count_total": 4,
+    "excluded_node_count": 0,
+    "node_count": 13,
+    "nodes_with_dependency_record": 3,
+    "nodes_without_dependency_record": 10,
+    "provisional_node_count": 3,
+    "scheduled_node_count": 10,
+    "top_blockers": [
+      {
+        "blocks": [
+          "S-02"
+        ],
+        "blocks_transitively": [
+          "S-02"
+        ],
+        "downstream_count": 1,
+        "duration_days": 30,
+        "name": "Factory Building Plan Approval (Form 1)",
+        "on_critical_path": true,
+        "requirement_id": "S-01"
+      }
+    ]
+  },
+  "nodes": {
+    "E-05": {
+      "authority": "Ministry of MSME",
+      "confidence": "high",
+      "department": "MSME",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "Udyam Registration",
+      "quantity": null,
+      "requirement_id": "E-05",
+      "requirement_type": "REGISTRATION",
+      "sla": {
+        "days": 1,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 1,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "MSMED Act, 2006"
+    },
+    "E-08": {
+      "authority": "Employees Provident Fund Organisation",
+      "confidence": "medium",
+      "department": "EPFO",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "EPFO Registration",
+      "quantity": null,
+      "requirement_id": "E-08",
+      "requirement_type": "REGISTRATION",
+      "sla": {
+        "days": 3,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 3,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "EPF and MP Act, 1952 s.1(3)"
+    },
+    "E-09": {
+      "authority": "Employees State Insurance Corporation",
+      "confidence": "low",
+      "department": "ESIC",
+      "document_slots": [],
+      "inclusion": "PROVISIONAL",
+      "inclusion_reason": "Applicability is UNKNOWN pending in_esic_implemented_area. Included in the provisional schedule only; never in the committed schedule.",
+      "missing_fact_origin": {
+        "in_esic_implemented_area": "NOT_SUPPLIED"
+      },
+      "missing_facts": [
+        "in_esic_implemented_area"
+      ],
+      "name": "ESIC Registration",
+      "quantity": null,
+      "requirement_id": "E-09",
+      "requirement_type": "REGISTRATION",
+      "sla": {
+        "days": 3,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 3,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "UNKNOWN",
+      "statute": "ESI Act, 1948 s.1(5)"
+    },
+    "F-02": {
+      "authority": "Maharashtra FDA",
+      "confidence": "high",
+      "department": "FSSAI",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "FSSAI State Licence",
+      "quantity": null,
+      "requirement_id": "F-02",
+      "requirement_type": "LICENCE",
+      "sla": {
+        "days": 60,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 60,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "FSS Act, 2006 s.31(1)"
+    },
+    "F-09": {
+      "authority": "FSSAI-approved training partner",
+      "confidence": "medium",
+      "department": "FSSAI",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "FoSTaC Trained Food Safety Supervisor",
+      "quantity": {
+        "formula": "ceil(food_handlers / 25)",
+        "missing_facts": [],
+        "value": 2
+      },
+      "requirement_id": "F-09",
+      "requirement_type": "TRAINING",
+      "sla": {
+        "days": 5,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 5,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "FSS (Licensing and Registration) Regulations, Schedule 4"
+    },
+    "S-01": {
+      "authority": "DISH Maharashtra",
+      "confidence": "high",
+      "department": "DISH",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "Factory Building Plan Approval (Form 1)",
+      "quantity": null,
+      "requirement_id": "S-01",
+      "requirement_type": "APPROVAL",
+      "sla": {
+        "days": 30,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 30,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "Factories Act, 1948 s.6; Mah. Factories Rules 1963 r.3"
+    },
+    "S-02": {
+      "authority": "Directorate of Industrial Safety and Health, Maharashtra",
+      "confidence": "high",
+      "department": "DISH",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "Factory Licence",
+      "quantity": null,
+      "requirement_id": "S-02",
+      "requirement_type": "LICENCE",
+      "sla": {
+        "days": 30,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 30,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "Factories Act, 1948 s.6"
+    },
+    "S-03": {
+      "authority": "Directorate of Steam Boilers, Maharashtra",
+      "confidence": "high",
+      "department": "BOILERS",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "Boiler Registration",
+      "quantity": null,
+      "requirement_id": "S-03",
+      "requirement_type": "REGISTRATION",
+      "sla": {
+        "days": 30,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 30,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "Boilers Act, 1923"
+    },
+    "S-04": {
+      "authority": "Directorate of Steam Boilers, Maharashtra",
+      "confidence": "high",
+      "department": "BOILERS",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "Boiler Attendant Competency Certificate",
+      "quantity": null,
+      "requirement_id": "S-04",
+      "requirement_type": "CERTIFICATE",
+      "sla": {
+        "days": 15,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 15,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "Boiler Operation Engineers Rules"
+    },
+    "S-10": {
+      "authority": "Labour Department, Maharashtra",
+      "confidence": "medium",
+      "department": "LABOUR",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "CLRA Registration (Principal Employer)",
+      "quantity": null,
+      "requirement_id": "S-10",
+      "requirement_type": "REGISTRATION",
+      "sla": {
+        "days": 15,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 15,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "Contract Labour (R&A) Act, 1970 s.7"
+    },
+    "S-14": {
+      "authority": "Employer (internal constitution)",
+      "confidence": "medium",
+      "department": "INTERNAL",
+      "document_slots": [],
+      "inclusion": "SCHEDULED",
+      "inclusion_reason": "Applicable. Included in the committed schedule.",
+      "missing_fact_origin": {},
+      "missing_facts": [],
+      "name": "POSH Internal Committee",
+      "quantity": null,
+      "requirement_id": "S-14",
+      "requirement_type": "COMPLIANCE",
+      "sla": {
+        "days": 0,
+        "excluded_from_duration": false,
+        "kind": "ZERO_DURATION",
+        "note": "Zero-duration requirement. It occupies a real position in the workflow and may gate dependents, but consumes no elapsed time.",
+        "raw_value": 0,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "APPLICABLE",
+      "statute": "POSH Act, 2013 s.4"
+    },
+    "V-01": {
+      "authority": "Maharashtra Pollution Control Board",
+      "confidence": "low",
+      "department": "MPCB",
+      "document_slots": [],
+      "inclusion": "PROVISIONAL",
+      "inclusion_reason": "Applicability is UNKNOWN pending mpcb_category. Included in the provisional schedule only; never in the committed schedule.",
+      "missing_fact_origin": {
+        "mpcb_category": "NOT_SUPPLIED"
+      },
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "name": "Consent to Establish",
+      "quantity": null,
+      "requirement_id": "V-01",
+      "requirement_type": "CONSENT",
+      "sla": {
+        "days": 60,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 60,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "UNKNOWN",
+      "statute": "Water Act 1974 s.25; Air Act 1981 s.21"
+    },
+    "V-02": {
+      "authority": "Maharashtra Pollution Control Board",
+      "confidence": "low",
+      "department": "MPCB",
+      "document_slots": [],
+      "inclusion": "PROVISIONAL",
+      "inclusion_reason": "Applicability is UNKNOWN pending mpcb_category. Included in the provisional schedule only; never in the committed schedule.",
+      "missing_fact_origin": {
+        "mpcb_category": "NOT_SUPPLIED"
+      },
+      "missing_facts": [
+        "mpcb_category"
+      ],
+      "name": "Consent to Operate",
+      "quantity": null,
+      "requirement_id": "V-02",
+      "requirement_type": "CONSENT",
+      "sla": {
+        "days": 60,
+        "excluded_from_duration": false,
+        "kind": "STANDARD",
+        "note": null,
+        "raw_value": 60,
+        "source": "catalogue.json:sla_days"
+      },
+      "state": "UNKNOWN",
+      "statute": "Water Act 1974 s.25; Air Act 1981 s.21"
+    }
+  },
+  "provisional_delta": {
+    "additional_node_count": 3,
+    "additional_requirements": [
+      {
+        "blocked_by": [],
+        "blocks": [],
+        "department": "ESIC",
+        "duration_days": 3,
+        "earliest_finish_day": 3,
+        "earliest_start_day": 0,
+        "explanation": "ESIC Registration may add approximately 3 sla_days if in_esic_implemented_area confirms that it applies. It would run in parallel with other work and would not extend the overall timeline on its own.",
+        "missing_facts": [
+          "in_esic_implemented_area"
+        ],
+        "name": "ESIC Registration",
+        "on_provisional_critical_path": false,
+        "requirement_id": "E-09",
+        "requirement_type": "REGISTRATION",
+        "sla_days": 3,
+        "sla_kind": "STANDARD",
+        "state": "UNKNOWN"
+      },
+      {
+        "blocked_by": [],
+        "blocks": [
+          "V-02"
+        ],
+        "department": "MPCB",
+        "duration_days": 60,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 0,
+        "explanation": "Consent to Establish may add approximately 60 sla_days if mpcb_category confirms that it applies. It would fall on the critical path, so it would extend the overall timeline rather than run alongside other work.",
+        "missing_facts": [
+          "mpcb_category"
+        ],
+        "name": "Consent to Establish",
+        "on_provisional_critical_path": true,
+        "requirement_id": "V-01",
+        "requirement_type": "CONSENT",
+        "sla_days": 60,
+        "sla_kind": "STANDARD",
+        "state": "UNKNOWN"
+      },
+      {
+        "blocked_by": [
+          "V-01"
+        ],
+        "blocks": [],
+        "department": "MPCB",
+        "duration_days": 60,
+        "earliest_finish_day": 120,
+        "earliest_start_day": 60,
+        "explanation": "Consent to Operate may add approximately 60 sla_days if mpcb_category confirms that it applies. It would fall on the critical path, so it would extend the overall timeline rather than run alongside other work.",
+        "missing_facts": [
+          "mpcb_category"
+        ],
+        "name": "Consent to Operate",
+        "on_provisional_critical_path": true,
+        "requirement_id": "V-02",
+        "requirement_type": "CONSENT",
+        "sla_days": 60,
+        "sla_kind": "STANDARD",
+        "state": "UNKNOWN"
+      }
+    ],
+    "committed_critical_paths": [
+      [
+        "F-02"
+      ],
+      [
+        "S-01",
+        "S-02"
+      ]
+    ],
+    "committed_duration_days": 60,
+    "critical_path_change_days": 60,
+    "critical_path_changed": true,
+    "provisional_critical_paths": [
+      [
+        "V-01",
+        "V-02"
+      ]
+    ],
+    "provisional_duration_days": 120,
+    "summary_explanation": "Supplying in_esic_implemented_area and mpcb_category could extend the timeline by up to 60 sla_days, from 60 to 120. The critical path would change.",
+    "unlocked_by_facts": [
+      "in_esic_implemented_area",
+      "mpcb_category"
+    ]
+  },
+  "provisional_schedule": {
+    "confidence_basis": "Weakest admitted scheduling dependency has verification_status SECONDARY: S-02<-S-01, V-02<-V-01.",
+    "critical_path_duration_days": 120,
+    "critical_paths": [
+      [
+        "V-01",
+        "V-02"
+      ]
+    ],
+    "duration_completeness": "COMPLETE",
+    "duration_unit": "sla_days",
+    "excluded_from_duration": [],
+    "label": "PROVISIONAL",
+    "nodes": {
+      "E-05": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 1,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 1,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 119,
+        "on_critical_path": false,
+        "requirement_id": "E-05",
+        "slack_days": 119
+      },
+      "E-08": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 3,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 3,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 117,
+        "on_critical_path": false,
+        "requirement_id": "E-08",
+        "slack_days": 117
+      },
+      "E-09": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 3,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 3,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 117,
+        "on_critical_path": false,
+        "requirement_id": "E-09",
+        "slack_days": 117
+      },
+      "F-02": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 60,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 60,
+        "on_critical_path": false,
+        "requirement_id": "F-02",
+        "slack_days": 60
+      },
+      "F-09": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 5,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 5,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 115,
+        "on_critical_path": false,
+        "requirement_id": "F-09",
+        "slack_days": 115
+      },
+      "S-01": {
+        "blocked_by": [],
+        "blocks": [
+          "S-02"
+        ],
+        "blocks_transitively": [
+          "S-02"
+        ],
+        "depth": 0,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 30,
+        "earliest_start_day": 0,
+        "latest_finish_day": 90,
+        "latest_start_day": 60,
+        "on_critical_path": false,
+        "requirement_id": "S-01",
+        "slack_days": 60
+      },
+      "S-02": {
+        "blocked_by": [
+          "S-01"
+        ],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 1,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 30,
+        "latest_finish_day": 120,
+        "latest_start_day": 90,
+        "on_critical_path": false,
+        "requirement_id": "S-02",
+        "slack_days": 60
+      },
+      "S-03": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 30,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 90,
+        "on_critical_path": false,
+        "requirement_id": "S-03",
+        "slack_days": 90
+      },
+      "S-04": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 15,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 15,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 105,
+        "on_critical_path": false,
+        "requirement_id": "S-04",
+        "slack_days": 105
+      },
+      "S-10": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 15,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 15,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 105,
+        "on_critical_path": false,
+        "requirement_id": "S-10",
+        "slack_days": 105
+      },
+      "S-14": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 0,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 0,
+        "earliest_start_day": 0,
+        "latest_finish_day": 120,
+        "latest_start_day": 120,
+        "on_critical_path": false,
+        "requirement_id": "S-14",
+        "slack_days": 120
+      },
+      "V-01": {
+        "blocked_by": [],
+        "blocks": [
+          "V-02"
+        ],
+        "blocks_transitively": [
+          "V-02"
+        ],
+        "depth": 0,
+        "duration_days": 60,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 0,
+        "on_critical_path": true,
+        "requirement_id": "V-01",
+        "slack_days": 0
+      },
+      "V-02": {
+        "blocked_by": [
+          "V-01"
+        ],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 1,
+        "duration_days": 60,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 120,
+        "earliest_start_day": 60,
+        "latest_finish_day": 120,
+        "latest_start_day": 60,
+        "on_critical_path": true,
+        "requirement_id": "V-02",
+        "slack_days": 0
+      }
+    },
+    "parallel_bands": [
+      [
+        "E-05",
+        "E-08",
+        "E-09",
+        "F-02",
+        "F-09",
+        "S-01",
+        "S-03",
+        "S-04",
+        "S-10",
+        "S-14",
+        "V-01"
+      ],
+      [
+        "S-02",
+        "V-02"
+      ]
+    ],
+    "parallel_duration_days": 120,
+    "schedule_confidence": "medium",
+    "scope_note": "PROVISIONAL: contains APPLICABLE requirements plus requirements whose applicability is UNKNOWN pending missing facts. This is a contingency view, NOT a confirmed schedule. Items may prove unnecessary.",
+    "sequential_duration_days": 312,
+    "topological_order": [
+      "E-05",
+      "E-08",
+      "E-09",
+      "F-02",
+      "F-09",
+      "S-01",
+      "S-02",
+      "S-03",
+      "S-04",
+      "S-10",
+      "S-14",
+      "V-01",
+      "V-02"
+    ]
+  },
+  "schedule": {
+    "confidence_basis": "Weakest admitted scheduling dependency has verification_status SECONDARY: S-02<-S-01.",
+    "critical_path_duration_days": 60,
+    "critical_paths": [
+      [
+        "F-02"
+      ],
+      [
+        "S-01",
+        "S-02"
+      ]
+    ],
+    "duration_completeness": "COMPLETE",
+    "duration_unit": "sla_days",
+    "excluded_from_duration": [],
+    "label": "COMMITTED",
+    "nodes": {
+      "E-05": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 1,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 1,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 59,
+        "on_critical_path": false,
+        "requirement_id": "E-05",
+        "slack_days": 59
+      },
+      "E-08": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 3,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 3,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 57,
+        "on_critical_path": false,
+        "requirement_id": "E-08",
+        "slack_days": 57
+      },
+      "F-02": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 60,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 0,
+        "on_critical_path": true,
+        "requirement_id": "F-02",
+        "slack_days": 0
+      },
+      "F-09": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 5,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 5,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 55,
+        "on_critical_path": false,
+        "requirement_id": "F-09",
+        "slack_days": 55
+      },
+      "S-01": {
+        "blocked_by": [],
+        "blocks": [
+          "S-02"
+        ],
+        "blocks_transitively": [
+          "S-02"
+        ],
+        "depth": 0,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 30,
+        "earliest_start_day": 0,
+        "latest_finish_day": 30,
+        "latest_start_day": 0,
+        "on_critical_path": true,
+        "requirement_id": "S-01",
+        "slack_days": 0
+      },
+      "S-02": {
+        "blocked_by": [
+          "S-01"
+        ],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 1,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 60,
+        "earliest_start_day": 30,
+        "latest_finish_day": 60,
+        "latest_start_day": 30,
+        "on_critical_path": true,
+        "requirement_id": "S-02",
+        "slack_days": 0
+      },
+      "S-03": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 30,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 30,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 30,
+        "on_critical_path": false,
+        "requirement_id": "S-03",
+        "slack_days": 30
+      },
+      "S-04": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 15,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 15,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 45,
+        "on_critical_path": false,
+        "requirement_id": "S-04",
+        "slack_days": 45
+      },
+      "S-10": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 15,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 15,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 45,
+        "on_critical_path": false,
+        "requirement_id": "S-10",
+        "slack_days": 45
+      },
+      "S-14": {
+        "blocked_by": [],
+        "blocks": [],
+        "blocks_transitively": [],
+        "depth": 0,
+        "duration_days": 0,
+        "duration_is_lower_bound": false,
+        "earliest_finish_day": 0,
+        "earliest_start_day": 0,
+        "latest_finish_day": 60,
+        "latest_start_day": 60,
+        "on_critical_path": false,
+        "requirement_id": "S-14",
+        "slack_days": 60
+      }
+    },
+    "parallel_bands": [
+      [
+        "E-05",
+        "E-08",
+        "F-02",
+        "F-09",
+        "S-01",
+        "S-03",
+        "S-04",
+        "S-10",
+        "S-14"
+      ],
+      [
+        "S-02"
+      ]
+    ],
+    "parallel_duration_days": 60,
+    "schedule_confidence": "medium",
+    "scope_note": "COMMITTED: contains only requirements the engine resolved as APPLICABLE. Every item here is confirmed to apply on the facts supplied.",
+    "sequential_duration_days": 189,
+    "topological_order": [
+      "E-05",
+      "E-08",
+      "F-02",
+      "F-09",
+      "S-01",
+      "S-02",
+      "S-03",
+      "S-04",
+      "S-10",
+      "S-14"
+    ]
+  },
+  "warnings": [
+    {
+      "additional_requirements": [
+        "E-09",
+        "V-01",
+        "V-02"
+      ],
+      "critical_path_change_days": 60,
+      "message": "Supplying in_esic_implemented_area and mpcb_category could extend the timeline by up to 60 sla_days, from 60 to 120. The critical path would change.",
+      "severity": "warning",
+      "type": "PROVISIONAL_SCHEDULE_DIFFERS",
+      "unlocked_by_facts": [
+        "in_esic_implemented_area",
+        "mpcb_category"
+      ]
+    },
+    {
+      "dependency_data_coverage": 0.2308,
+      "message": "10 of 13 requirements have no dependency record at all. Parallelism and duration figures are shaped by the absence of dependency data and must not be presented as a measured reduction in approval time.",
+      "severity": "warning",
+      "type": "SPARSE_DEPENDENCY_DATA"
+    },
+    {
+      "message": "F-02 has a candidate dependency on V-02 (UNVERIFIED). Recorded for transparency; never admitted to scheduling.",
+      "prerequisite_id": "V-02",
+      "requirement_id": "F-02",
+      "severity": "info",
+      "type": "UNVERIFIED_EDGE_PRESENT"
+    },
+    {
+      "message": "F-02 has a candidate dependency on S-02 (UNVERIFIED). Recorded for transparency; never admitted to scheduling.",
+      "prerequisite_id": "S-02",
+      "requirement_id": "F-02",
+      "severity": "info",
+      "type": "UNVERIFIED_EDGE_PRESENT"
+    }
+  ],
+  "workflow_version": "1.0.0"
+}

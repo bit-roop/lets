@@ -8,13 +8,14 @@ from fastapi.responses import JSONResponse
 from backend.config import get_registry
 from backend.engine_adapter import (
     evaluate_facts,
+    build_workflow_for_facts,
     get_catalogue,
     get_persona,
     get_sources,
     get_verification_summary,
     list_personas,
 )
-from backend.schemas import EvaluateRequest, HealthResponse, PersonaInfo
+from backend.schemas import EvaluateRequest, EvaluateWithWorkflowResponse, HealthResponse, PersonaInfo, WorkflowRequest
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("regulatory-engine-api")
@@ -122,3 +123,36 @@ def evaluate_regulatory_facts(payload: EvaluateRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Regulatory derivation failed: {str(e)}",
         )
+
+
+@app.post("/api/workflow", tags=["Workflow"], summary="Build a deterministic approval workflow")
+def build_regulatory_workflow(payload: WorkflowRequest):
+    try:
+        return build_workflow_for_facts(
+            payload.facts,
+            payload.as_of,
+            payload.include_provisional,
+            payload.include_candidate_edges,
+        )["workflow"]
+    except Exception as e:
+        logger.exception("Error during workflow construction")
+        raise HTTPException(status_code=500, detail=f"Workflow construction failed: {str(e)}")
+
+
+@app.post(
+    "/api/evaluate-with-workflow",
+    response_model=EvaluateWithWorkflowResponse,
+    tags=["Workflow"],
+    summary="Evaluate facts and build a workflow",
+)
+def evaluate_with_workflow(payload: WorkflowRequest):
+    try:
+        return build_workflow_for_facts(
+            payload.facts,
+            payload.as_of,
+            payload.include_provisional,
+            payload.include_candidate_edges,
+        )
+    except Exception as e:
+        logger.exception("Error during evaluation and workflow construction")
+        raise HTTPException(status_code=500, detail=f"Workflow evaluation failed: {str(e)}")

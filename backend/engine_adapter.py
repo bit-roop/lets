@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from backend.config import PERSONAS_DIR, derive, get_registry
+from backend.workflow import build_workflow
 
 
 def evaluate_facts(facts: Dict[str, Any], as_of: Optional[date] = None) -> Dict[str, Any]:
@@ -15,6 +16,25 @@ def evaluate_facts(facts: Dict[str, Any], as_of: Optional[date] = None) -> Dict[
     registry = get_registry()
     result = derive(facts=facts, registry=registry, as_of=as_of)
     return result
+
+
+def build_workflow_for_facts(
+    facts: Dict[str, Any],
+    as_of: Optional[date] = None,
+    include_provisional: bool = True,
+    include_candidate_edges: bool = True,
+) -> Dict[str, Any]:
+    """Evaluate through engine-v3, then build a workflow view downstream."""
+    effective_as_of = as_of or date.today()
+    evaluation = evaluate_facts(facts=facts, as_of=effective_as_of)
+    workflow = build_workflow(
+        evaluation,
+        get_catalogue(),
+        as_of=effective_as_of,
+        include_provisional=include_provisional,
+        include_candidate_edges=include_candidate_edges,
+    )
+    return {"evaluation": evaluation, "workflow": workflow.as_dict()}
 
 
 def get_catalogue() -> Dict[str, Any]:

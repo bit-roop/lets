@@ -27,3 +27,14 @@ class HealthResponse(BaseModel):
 class PersonaInfo(BaseModel):
     id: str
     name: str
+
+
+class WorkflowRequest(EvaluateRequest):
+    """Request payload for deterministic workflow construction."""
+    include_provisional: bool = True
+    include_candidate_edges: bool = True
+
+
+class EvaluateWithWorkflowResponse(BaseModel):
+    evaluation: Dict[str, Any]
+    workflow: Dict[str, Any]

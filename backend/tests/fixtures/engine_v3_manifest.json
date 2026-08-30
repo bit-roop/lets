@@ -1,0 +1,37 @@
+{
+  "algorithm": "sha256",
+  "captured_before_milestone_3_integration": true,
+  "files": {
+    "engine-v3/engine/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "engine-v3/engine/derive.py": "2319667341ee4df5263bb9491e6b2c93f08d75949f8d3993277275109841e730",
+    "engine-v3/engine/derived.py": "4fcfeeacc38e69bbaab99682467bf6dc8ce0ff7c9100f2ac064d35bb4b54d199",
+    "engine-v3/engine/evaluator.py": "061fa5560b3e167ce0b1dfa792daec4f5275be3a5eca9f2982e1990e821f2c4d",
+    "engine-v3/engine/quantity.py": "0426a51f201481ab06ecc1a1d364aea5e71485ea1a76df55fa60724c350083f8",
+    "engine-v3/engine/resolve.py": "0f5941900f4b12eb60cc394555322fa65f6a2932dcdefc9a96b7bbea6dd3b496",
+    "engine-v3/engine/tri.py": "f84e2d74db236bdec4ed6de6e532db86688b6d95cb720eb14a2272930ce2b7ec",
+    "engine-v3/engine/validate_data.py": "83032689dc28c688235d27d501179516ebe39fb0d1e793c5a5c62f5b81776cec",
+    "engine-v3/personas/persona_a.json": "56f7cbac41e9abecc8a9fd2b1a29608b4181104d272098d51bf139d263317ad2",
+    "engine-v3/personas/persona_b.json": "365a728d586c24375f4c4731895e899cd35fcb47da8e5648dc07e7e63b3c0d5e",
+    "engine-v3/personas/persona_c.json": "d4408e4d320768f539300fc0e2ce38dc0e5aa0b37b14de87c24e0ed730de4cbc",
+    "engine-v3/regulatory/approvals/catalogue.json": "453e30ef0ccca1f6f32a4514a8b85d8d5058aa7dc17e549ea43c1d87d92e7e7e",
+    "engine-v3/regulatory/rules/boiler.json": "3a48468b0f0178b157e2f93eee14ce28600d97d09c2e37b4d99406aa2263983f",
+    "engine-v3/regulatory/rules/common.json": "2648c8e43da9e76452f63ff8ffe7cdd3fd0192f7d4b1f4fd8fb565ea173ab844",
+    "engine-v3/regulatory/rules/dish.json": "eeacb90439e0eb230b2ebb45a7fb88ddd64d25970ab08c5569f63b4711a53fda",
+    "engine-v3/regulatory/rules/fssai.json": "6a2374983e357264f9a2c2e111b87f8b37f81ce1d9fdaa851a2b734ed69bb500",
+    "engine-v3/regulatory/rules/labour.json": "9396dd547e286146ff594e864422fff7669d08d114de3bc003fb0aace3948890",
+    "engine-v3/regulatory/rules/mpcb.json": "b24f58d8d0bea291fdac437e298d263e912690d199e6dfba3ee6dec51de179d0",
+    "engine-v3/regulatory/rules/msme.json": "e1d819c8858b1670d9e1f81c117bf4e63b95b74a2f1c3e81e1afad7361f1d4a6",
+    "engine-v3/regulatory/sources/sources.json": "ffc30bf85ea655fbd983a15cf6723106bef7f608d08ca6ba439291e5f1a77e79",
+    "engine-v3/regulatory/workflows/dependencies.json": "462cd1d70a0bde84b3acdf37779e2631cee39312170e710ed6dbfc53c5574884",
+    "engine-v3/tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "engine-v3/tests/test_derived.py": "d1a843d50b7d09085dbae9ddeecc33adad755315c8e45b96332637fbe1ae427f",
+    "engine-v3/tests/test_engine.py": "3f4e3d636f0d8671a477537646eed68e61c965d599006684a35918236565fe18"
+  },
+  "protected_directories": [
+    "engine-v3/engine",
+    "engine-v3/personas",
+    "engine-v3/regulatory",
+    "engine-v3/tests"
+  ],
+  "purpose": "Pre-integration integrity baseline for the protected engine-v3 area. Captured before workflow integration; engine-v3 was not modified to create these fixtures."
+}

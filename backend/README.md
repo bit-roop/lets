@@ -39,6 +39,14 @@ The interactive OpenAPI / Swagger documentation is available at:
 | `GET` | `/api/personas` | Lists available demo personas (`persona_a`, `persona_b`, `persona_c`) |
 | `GET` | `/api/personas/{id}` | Returns the fact vector for a specific persona |
 | `POST` | `/api/evaluate` | Evaluates a fact vector against regulatory rules as of a given date |
+| `POST` | `/api/workflow` | Builds committed and optional provisional deterministic schedules downstream of evaluation |
+| `POST` | `/api/evaluate-with-workflow` | Returns the unchanged evaluation plus its workflow view |
+
+Workflow semantics are documented in docs/WORKFLOW_CONTRACT.md. The workflow layer admits only
+LEGAL and OPERATIONAL dependencies, never promotes candidate dependencies, excludes
+NOT_APPLICABLE and CONFLICT requirements from schedules, and keeps UNKNOWN requirements
+provisional only. Durations are opaque catalogue sla_days values; missing or invalid values
+are surfaced rather than invented.
 
 ---
 
