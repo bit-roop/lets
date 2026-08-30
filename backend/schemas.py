@@ -38,3 +38,10 @@ class WorkflowRequest(EvaluateRequest):
 class EvaluateWithWorkflowResponse(BaseModel):
     evaluation: Dict[str, Any]
     workflow: Dict[str, Any]
+
+
+class DocumentRequirementsRequest(EvaluateRequest):
+    """M4 request; evaluation remains owned by engine-v3."""
+    approval_ids: Optional[List[str]] = None
+    include_provisional: bool = True
+    workflow_aware: bool = False

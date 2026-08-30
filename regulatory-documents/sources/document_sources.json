@@ -1,0 +1,7 @@
+{
+  "SRC-M4-FSSAI-001": {"authority":"FSSAI","title":"FoSCoS documents required for new State Licence application","source_url":"https://foscos.fssai.gov.in/document-required/SL","verification_status":"VERIFIED","verified_at":"2026-08-30","currentness":"CURRENTNESS_REQUIRES_RECHECK"},
+  "SRC-M4-DISH-001": {"authority":"Directorate of Industrial Safety and Health, Maharashtra","title":"Registration and grant of licence","source_url":"https://mahadish.in/registration_and_grant_of_license/index/","verification_status":"VERIFIED","verified_at":"2026-08-30","currentness":"CURRENTNESS_REQUIRES_RECHECK"},
+  "SRC-M4-BOILER-001": {"authority":"Directorate of Steam Boilers, Maharashtra","title":"Boiler FAQ","source_url":"https://mahaboiler.in/boiler/faq.html","verification_status":"VERIFIED","verified_at":"2026-08-30","currentness":"CURRENTNESS_REQUIRES_RECHECK"},
+  "SRC-M4-BOILER-002": {"authority":"Directorate of Steam Boilers, Maharashtra","title":"Online services for boiler registration","source_url":"https://mahaboiler.in/boiler/online_services.html","verification_status":"VERIFIED","verified_at":"2026-08-30","currentness":"CURRENTNESS_REQUIRES_RECHECK"},
+  "SRC-M4-BOILER-003": {"authority":"Directorate of Steam Boilers, Maharashtra","title":"Registration of Boilers/Economisers Guidelines","source_url":"https://mahaboiler.in/boiler/writereaddata/Portal/Images/pdf/Registration_of_Boilers_Economisers_Guidelines_27102017.pdf","verification_status":"SECONDARY","verified_at":"2026-08-30","currentness":"OLDER_PROCEDURE_REVALIDATE"}
+}

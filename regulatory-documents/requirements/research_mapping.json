@@ -1,0 +1,17 @@
+{
+  "purpose": "Reconcile the supplied research counts with atomic implementation records without treating decomposition as new regulatory evidence.",
+  "reported_research_counts": {"F-02": 21, "S-02": 20, "S-03": 6, "total": 47},
+  "atomic_implementation_counts": {"F-02": 21, "S-02": 23, "S-03": 7, "total": 51},
+  "mappings": [
+    {"approval_id":"F-02","research_item":"one-to-one FoSCoS checklist item","implementation_requirement_ids":["F02-REQ-001","F02-REQ-002","F02-REQ-003","F02-REQ-004","F02-REQ-005","F02-REQ-006","F02-REQ-007","F02-REQ-008","F02-REQ-009","F02-REQ-010","F02-REQ-011","F02-REQ-012","F02-REQ-013","F02-REQ-014","F02-REQ-015","F02-REQ-016","F02-REQ-017","F02-REQ-018","F02-REQ-019","F02-REQ-020","F02-REQ-021"],"mapping_status":"ONE_TO_ONE"},
+    {"approval_id":"S-02","research_item":"Form No. 1","implementation_requirement_ids":["S02-REQ-001"],"mapping_status":"ONE_TO_ONE"},
+    {"approval_id":"S-02","research_item":"occupier photo/signature and identity","implementation_requirement_ids":["S02-REQ-002","S02-REQ-003"],"mapping_status":"SPLIT_ATOMIC_FIELDS"},
+    {"approval_id":"S-02","research_item":"entity-specific documents","implementation_requirement_ids":["S02-REQ-004","S02-REQ-005","S02-REQ-006"],"mapping_status":"SPLIT_CONDITIONAL_BRANCHES","note":"The supplied research names these branches; the reported count groups them."},
+    {"approval_id":"S-02","research_item":"women-worker committee information","implementation_requirement_ids":["S02-REQ-007"],"mapping_status":"ONE_TO_ONE"},
+    {"approval_id":"S-02","research_item":"materials/products, premises, local authority, utility, declaration, occupier acceptance, process flow, process description, emergency sketch","implementation_requirement_ids":["S02-REQ-008","S02-REQ-009","S02-REQ-010","S02-REQ-011","S02-REQ-012","S02-REQ-013","S02-REQ-014","S02-REQ-015","S02-REQ-016"],"mapping_status":"ONE_TO_ONE_GROUPED_IN_RESEARCH"},
+    {"approval_id":"S-02","research_item":"hazardous-material/product/control/MSDS/PID/reaction/safety information","implementation_requirement_ids":["S02-REQ-017","S02-REQ-018","S02-REQ-019","S02-REQ-020","S02-REQ-021","S02-REQ-022","S02-REQ-023"],"mapping_status":"ATOMIC_DECOMPOSITION","note":"All seven categories are named in the supplied research, but the repository does not preserve the research grouping that produced the count of 20."},
+    {"approval_id":"S-03","research_item":"boiler/economiser details; owner details; prescribed fee; tentative inspection date","implementation_requirement_ids":["S03-REQ-001","S03-REQ-002","S03-REQ-003","S03-REQ-004"],"mapping_status":"ONE_TO_ONE"},
+    {"approval_id":"S-03","research_item":"optional applicant photo and signature","implementation_requirement_ids":["S03-REQ-005","S03-REQ-006"],"mapping_status":"SPLIT_ATOMIC_FIELDS"},
+    {"approval_id":"S-03","research_item":"other dashboard uploads / unresolved technical documents","implementation_requirement_ids":["S03-REQ-007"],"mapping_status":"UNSUPPORTED_PLACEHOLDER","note":"Not counted as verified researched evidence; no technical checklist is asserted."}
+  ]
+}

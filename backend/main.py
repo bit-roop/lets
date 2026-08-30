@@ -1,7 +1,8 @@
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, status
+import json
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -15,7 +16,12 @@ from backend.engine_adapter import (
     get_verification_summary,
     list_personas,
 )
-from backend.schemas import EvaluateRequest, EvaluateWithWorkflowResponse, HealthResponse, PersonaInfo, WorkflowRequest
+from backend.schemas import (EvaluateRequest, EvaluateWithWorkflowResponse, HealthResponse,
+                              PersonaInfo, WorkflowRequest, DocumentRequirementsRequest)
+from backend.documents.registry import get_document_registry
+from backend.documents.service import requirements_for_application, readiness_for_application
+from backend.documents.submissions import get_submission_store
+from backend.documents.validators import validate_structured_fields
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("regulatory-engine-api")
@@ -156,3 +162,66 @@ def evaluate_with_workflow(payload: WorkflowRequest):
     except Exception as e:
         logger.exception("Error during evaluation and workflow construction")
         raise HTTPException(status_code=500, detail=f"Workflow evaluation failed: {str(e)}")
+
+
+@app.get("/api/documents/requirements", tags=["Documents"], summary="List M4 document/evidence requirements")
+def get_document_requirements(approval_id: Optional[str] = None):
+    """Static registry view. Conditions are exposed; applicability is not changed."""
+    registry = get_document_registry()
+    selected = [approval_id] if approval_id else None
+    return {
+        "coverage": [c.as_dict() for c in registry.coverage(selected)],
+        "specs": [s.as_dict() for s in registry.specs()],
+        "requirements": [r.as_dict() | {"source": r.source.as_dict()} for r in registry.requirements(selected)],
+    }
+
+
+@app.post("/api/documents/requirements", tags=["Documents"], summary="Evaluate M4 requirements for facts")
+def evaluate_document_requirements(payload: DocumentRequirementsRequest):
+    return requirements_for_application(payload.facts, payload.as_of, payload.approval_ids, payload.include_provisional, payload.workflow_aware)
+
+
+@app.post("/api/documents/submit", tags=["Documents"], summary="Submit evidence metadata or an upload")
+async def submit_document(request: Request):
+    """Accept multipart upload or JSON structured/form input; never claims authenticity."""
+    content_type = request.headers.get("content-type", "")
+    store = get_submission_store()
+    try:
+        if content_type.startswith("multipart/form-data"):
+            form = await request.form()
+            application_id = str(form.get("application_id") or "")
+            document_id = str(form.get("document_id") or "")
+            item_kind = form.get("item_kind")
+            spec = get_document_registry().validate_submission(document_id, item_kind)
+            upload = form.get("file")
+            if upload is None or not hasattr(upload, "read"):
+                raise ValueError("multipart submission requires file")
+            content = await upload.read()
+            item, duplicate = store.submit_bytes(application_id, document_id, upload.filename, content, upload.content_type or "", spec)
+        else:
+            body = await request.json()
+            application_id = body.get("application_id")
+            document_id = body.get("document_id")
+            spec = get_document_registry().validate_submission(document_id, body.get("item_kind"))
+            if not isinstance(body.get("structured_data", {}), dict):
+                raise ValueError("structured_data must be an object")
+            validation = validate_structured_fields(body.get("structured_data", {}))
+            item, duplicate = store.submit_structured(application_id, document_id, validation["fields"], spec)
+            item.validation = validation
+        response = item.as_dict()
+        response["duplicate"] = duplicate
+        response["verification_note"] = "M4 records presence/metadata only; upload is not authenticity-verified."
+        return response
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
+
+@app.get("/api/documents/readiness", tags=["Documents"], summary="Get M4 document readiness")
+def get_document_readiness(application_id: str, facts: Optional[str] = None, approval_id: Optional[str] = None, workflow_aware: bool = False):
+    try:
+        parsed = json.loads(facts) if facts else {}
+        if not isinstance(parsed, dict):
+            raise ValueError("facts must be a JSON object")
+        return readiness_for_application(application_id, parsed, approval_ids=[approval_id] if approval_id else None, workflow_aware=workflow_aware)
+    except (ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
