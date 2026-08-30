@@ -21,6 +21,7 @@ import { RequirementCard } from '../components/results/RequirementCard';
 import { MissingFactsBox } from '../components/results/MissingFactsBox';
 import { DerivedFactsBox } from '../components/results/DerivedFactsBox';
 import { PersonaSelector } from '../components/intake/PersonaSelector';
+import { DocumentReadinessPanel } from '../components/results/DocumentReadinessPanel';
 
 export const ResultsPage: React.FC = () => {
   const { evaluationResult, facts, setFact, runEvaluation, goToStep, isLoading } = useAssessment();
@@ -179,6 +180,8 @@ export const ResultsPage: React.FC = () => {
 
         {/* Actionable Missing Facts Box for UNKNOWN items */}
         <MissingFactsBox unknownRequirements={unknown} />
+
+        <DocumentReadinessPanel facts={facts} evaluation={evaluationResult} />
 
         {/* Rule Warnings (if any) */}
         {warnings && warnings.length > 0 && (

@@ -18,12 +18,12 @@ export class ApiError extends Error {
 async function fetchJson<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   try {
+    const isFormData = typeof FormData !== 'undefined' && options?.body instanceof FormData;
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers: isFormData
+        ? options?.headers
+        : { 'Content-Type': 'application/json', ...options?.headers },
     });
 
     if (!response.ok) {
@@ -63,4 +63,135 @@ export const api = {
         as_of: asOf || new Date().toISOString().split('T')[0],
       }),
     }),
+  getDocumentRequirements: (approvalId?: string) =>
+    fetchJson<DocumentRequirementsResponse>(
+      `/api/documents/requirements${approvalId ? `?approval_id=${encodeURIComponent(approvalId)}` : ''}`
+    ),
+  evaluateDocumentRequirements: (payload: DocumentRequirementsRequest) =>
+    fetchJson<DocumentRequirementsEvaluation>('/api/documents/requirements', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  submitDocument: (formData: FormData) =>
+    fetchJson<DocumentSubmissionResponse>('/api/documents/submit', {
+      method: 'POST',
+      body: formData,
+    }),
+  submitStructuredDocument: (payload: StructuredDocumentSubmission) =>
+    fetchJson<DocumentSubmissionResponse>('/api/documents/submit', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  getDocumentReadiness: (applicationId: string, facts: ApplicantFacts, approvalIds?: string[]) => {
+    const params = new URLSearchParams({
+      application_id: applicationId,
+      facts: JSON.stringify(facts),
+      workflow_aware: 'true',
+    });
+    if (approvalIds?.length === 1) params.set('approval_id', approvalIds[0]);
+    return fetchJson<DocumentReadinessResponse>(`/api/documents/readiness?${params.toString()}`);
+  },
 };
+
+export interface DocumentRequirementRow {
+  requirement_id: string;
+  approval_id: string;
+  document_id: string;
+  obligation: 'MANDATORY' | 'CONDITIONAL' | 'SUPPORTING' | string;
+  condition: Record<string, any> | null;
+  condition_description: string | null;
+  blocking: boolean;
+  verification_status: 'VERIFIED' | 'VERIFIED_SCOPE_UNCLEAR' | 'SECONDARY' | 'UNSUPPORTED' | string;
+  source: {
+    source_id: string;
+    authority: string;
+    title: string;
+    url?: string | null;
+    checklist_item?: string | null;
+    section?: string | null;
+    verification_status: string;
+    last_verified?: string | null;
+  };
+  condition_state?: 'TRUE' | 'FALSE' | 'UNKNOWN' | string;
+  condition_trace?: any[];
+  notes?: string | null;
+}
+
+export interface DocumentApprovalResult {
+  approval_id: string;
+  engine_state: string | null;
+  coverage: {
+    approval_id: string;
+    status: 'SUPPORTED' | 'UNSUPPORTED' | string;
+    reason: string;
+    requirement_count: number;
+    source_ids: string[];
+  };
+  requirements: DocumentRequirementRow[];
+}
+
+export interface DocumentRequirementsResponse {
+  coverage: DocumentApprovalResult['coverage'][];
+  specs: Array<{
+    document_id: string;
+    name: string;
+    item_kind: 'UPLOAD_DOCUMENT' | 'FORM_INPUT' | 'FEE' | 'INSPECTION_EVENT' | 'DECLARATION' | string;
+    description: string;
+    accepted_formats?: string[];
+  }>;
+  requirements: DocumentRequirementRow[];
+}
+
+export interface DocumentRequirementsRequest {
+  facts: ApplicantFacts;
+  as_of?: string;
+  approval_ids?: string[];
+  include_provisional?: boolean;
+  workflow_aware?: boolean;
+}
+
+export interface DocumentRequirementsEvaluation {
+  approvals: DocumentApprovalResult[];
+  engine_evaluation: EvaluationResponse;
+  workflow?: any;
+}
+
+export interface DocumentSubmissionResponse {
+  submission_id: string;
+  document_id: string;
+  application_id: string;
+  filename?: string | null;
+  state: string;
+  validation?: { status?: string; semantics?: string; fields?: Record<string, any> } | null;
+  sha256?: string | null;
+  size_bytes?: number | null;
+  mime_type?: string | null;
+  duplicate?: boolean;
+  verification_note?: string;
+}
+
+export interface StructuredDocumentSubmission {
+  application_id: string;
+  document_id: string;
+  item_kind: string;
+  structured_data: Record<string, any>;
+}
+
+export interface DocumentReadinessRow {
+  approval_id: string;
+  status: 'READY' | 'INCOMPLETE' | 'INDETERMINATE' | 'UNSUPPORTED' | string;
+  mandatory_total: number;
+  mandatory_satisfied: number;
+  missing_requirement_ids: string[];
+  indeterminate_requirement_ids: string[];
+  unsupported_requirement_ids: string[];
+  supporting_missing_requirement_ids: string[];
+  reasons: string[];
+}
+
+export interface DocumentReadinessResponse {
+  application_id: string;
+  readiness: DocumentReadinessRow[];
+  submissions: DocumentSubmissionResponse[];
+  workflow?: any;
+}
