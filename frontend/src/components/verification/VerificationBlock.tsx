@@ -195,6 +195,22 @@ export default function VerificationBlock({ record, documentName }: Props) {
         </div>
       ) : null}
 
+      {record.findings.some((finding) => finding.outcome === 'UNKNOWN' && finding.remedy) ? (
+        <div className="border-t border-sky-100 bg-sky-50/60 px-3 py-2">
+          <p className="text-xs font-medium text-sky-900">Information that needs attention</p>
+          <ul className="mt-1 space-y-1 text-xs text-sky-900">
+            {record.findings
+              .filter((finding) => finding.outcome === 'UNKNOWN' && finding.remedy)
+              .map((finding) => (
+                <li key={finding.check_id}>
+                  {finding.message}
+                  <span className="block text-sky-800">{finding.remedy}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ) : null}
+
       {readable && record.fields.length > 0 ? (
         <div className="border-t border-slate-100">
           <button

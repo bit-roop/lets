@@ -231,6 +231,11 @@ def analyze(submission_id: str, m4_result: Dict[str, Any],
 
     # --- Deterministic checks ----------------------------------------------
     record.findings.extend(run_checks(profile, by_id, identity_matched, as_of))
+    # Make profile-grounded extraction explicit.  These findings describe
+    # evidence observed in the file; they do not create regulatory rules or
+    # turn an absent value into a mismatch.  Research-required fields remain
+    # informational extraction only.
+    record.findings.extend(_grounded_field_findings(profile, fields))
     record.internal_consistency = _internal_consistency(record.findings)
     record.confidence = _confidence(profile, fields, outcome)
 
@@ -295,6 +300,40 @@ def _internal_consistency(findings: List[Finding]) -> str:
     if any(f.outcome == states.OUTCOME_MISMATCH for f in relevant):
         return states.INCONSISTENT
     return states.CONSISTENT
+
+
+def _grounded_field_findings(profile, fields: List[ExtractedField]) -> List[Finding]:
+    """Report presence of fields the profile is allowed to ground.
+
+    A missing grounded value is UNKNOWN, not MISMATCH: extraction may have
+    missed it.  The only blocking negative in the shipped profiles remains
+    the separately grounded document-identity check.
+    """
+    findings: List[Finding] = []
+    grounded = {field["field_id"] for field in profile.fields
+                if field["field_source"] == states.PROFILE_GROUNDED}
+    for extracted in fields:
+        if extracted.field_id not in grounded:
+            continue
+        if extracted.value_present:
+            findings.append(Finding(
+                check_id=f"M5-GROUNDED-{extracted.field_id}",
+                outcome=states.OUTCOME_MATCH,
+                severity=states.INFORMATIONAL,
+                message=f"Expected information was found: {extracted.label}.",
+                provenance=extracted.provenance,
+                inputs=[extracted.field_id],
+                observed=extracted.display_value))
+        else:
+            findings.append(Finding(
+                check_id=f"M5-GROUNDED-{extracted.field_id}",
+                outcome=states.OUTCOME_UNKNOWN,
+                severity=states.INFORMATIONAL,
+                message=f"We could not read the expected information: {extracted.label}.",
+                remedy="Upload a clearer copy or ask an officer to review this item.",
+                provenance=extracted.provenance,
+                inputs=[extracted.field_id]))
+    return findings
 
 
 def _confidence(profile, fields, outcome) -> ConfidenceBreakdown:
