@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FileUp, Info, RefreshCw, UploadCloud } from 'lucide-react';
-import { api, DocumentApprovalResult, DocumentReadinessResponse, DocumentRequirementRow, DocumentRequirementsResponse, DocumentSubmissionResponse } from '../../api/client';
+import { api, DocumentApprovalResult, DocumentReadinessResponse, DocumentRequirementRow, DocumentRequirementsEvaluation, DocumentRequirementsResponse, DocumentSubmissionResponse } from '../../api/client';
 import { ApplicantFacts } from '../../types/facts';
 import { EvaluationResponse } from '../../types/engine';
+import { VerificationRecord, M5EvidenceCounters } from '../../types/verification';
+import VerificationBlock from '../verification/VerificationBlock';
 
 interface Props {
   facts: ApplicantFacts;
@@ -106,6 +108,13 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  // Milestone 5 evidence layer. Held separately from M4 readiness on purpose:
+  // these are annotations about submitted files, not checklist status.
+  const [verificationRecords, setVerificationRecords] = useState<VerificationRecord[]>([]);
+  const [evidenceCounters, setEvidenceCounters] = useState<M5EvidenceCounters | null>(null);
+  // The last M4 requirements result, kept so M5 can observe it rather than
+  // triggering a fresh evaluation of its own.
+  const [m4Result, setM4Result] = useState<DocumentRequirementsEvaluation | null>(null);
 
   const refresh = async () => {
     setLoading(true);
@@ -128,6 +137,23 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
       setReadiness(readinessResult);
       setSpecs(registryResult.specs);
       setWorkflow(requirementsResult.workflow || readinessResult.workflow || null);
+
+      // M5 is additive. If it is unavailable the M4 checklist must still work,
+      // so its failure is swallowed rather than surfaced as a checklist error.
+      //
+      // The M4 results just fetched are handed to M5 directly. M5 observes that
+      // established state instead of causing another engine evaluation, so the
+      // two layers can never drift apart.
+      setM4Result(requirementsResult);
+      try {
+        const overlay = await api.getVerificationOverlay(
+          applicationId, requirementsResult, readinessResult);
+        setVerificationRecords((await api.getVerificationRecords(applicationId)).records || []);
+        setEvidenceCounters(overlay.m5_evidence?.counters || null);
+      } catch {
+        setVerificationRecords([]);
+        setEvidenceCounters(null);
+      }
     } catch (err: any) {
       setError(err?.message || 'Could not load document requirements.');
     } finally {
@@ -157,6 +183,17 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
       const result = await api.submitDocument(form);
       const documentName = specs.find((item) => item.document_id === requirement.document_id)?.name || 'Evidence item';
       setMessage(`${documentName} uploaded — authenticity not verified.`);
+      // Examine the file. A failure here leaves the upload intact and simply
+      // means no document check is shown.
+      try {
+        const context = m4Result
+          || (await api.evaluateDocumentRequirements({
+            facts, approval_ids: approvalIds, workflow_aware: true, include_provisional: true,
+          }));
+        await api.analyzeSubmission(result.submission_id, context);
+      } catch {
+        /* the checklist stands on its own without the document check */
+      }
       await refresh();
     } catch (err: any) {
       const documentName = specs.find((item) => item.document_id === requirement.document_id)?.name || 'this evidence item';
@@ -222,13 +259,15 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
                   Readiness: {ready?.status || 'LOADING'}
                 </span>
               </div>
+              {evidenceCounters ? <EvidenceSummary counters={evidenceCounters} /> : null}
               {approval.coverage.status === 'UNSUPPORTED' ? (
                 <div className="p-3 text-xs text-slate-600 flex items-start gap-2"><Info className="w-3.5 h-3.5 mt-0.5" /> No authoritative M4 checklist is encoded for this approval.</div>
               ) : (
                 <div className="divide-y divide-slate-100">
                   {approval.requirements.map((requirement) => {
                     const spec = specs.find((item) => item.document_id === requirement.document_id);
-                    return <RequirementRow key={requirement.requirement_id} requirement={requirement} spec={spec} submissions={readiness?.submissions || []} onFile={submitFile} onForm={submitFormInput} />;
+                    const record = [...verificationRecords].reverse().find((item) => item.document_id === requirement.document_id);
+                    return <RequirementRow key={requirement.requirement_id} requirement={requirement} spec={spec} submissions={readiness?.submissions || []} onFile={submitFile} onForm={submitFormInput} verification={record} />;
                   })}
                 </div>
               )}
@@ -247,7 +286,8 @@ const RequirementRow: React.FC<{
   submissions: DocumentSubmissionResponse[];
   onFile: (requirement: DocumentRequirementRow, file: File) => void;
   onForm: (requirement: DocumentRequirementRow, value: string, itemKind?: 'FORM_INPUT' | 'DECLARATION') => void;
-}> = ({ requirement, spec, submissions, onFile, onForm }) => {
+  verification?: VerificationRecord;
+}> = ({ requirement, spec, submissions, onFile, onForm, verification }) => {
   const [formValue, setFormValue] = useState('');
   const [fileError, setFileError] = useState<string | null>(null);
   const [inputKey, setInputKey] = useState(0);
@@ -323,6 +363,7 @@ const RequirementRow: React.FC<{
       ) : (
         <div className="text-[11px] text-slate-600 bg-slate-50 rounded p-2">This item type is not available for upload in the current M4 UI.</div>
       )}
+      {verification ? <VerificationBlock record={verification} documentName={uploadName} /> : null}
     </div>
   );
 };
@@ -333,3 +374,50 @@ const FormInput: React.FC<{ value: string; setValue: (value: string) => void; on
     <button onClick={onSubmit} className="self-start px-2.5 py-1.5 rounded bg-gov-navy text-white text-[11px] font-bold">Submit input</button>
   </div>
 );
+
+
+/**
+ * The Milestone 5 evidence layer, shown alongside — never merged into — the M4
+ * readiness badge above. Accepting a document for review says nothing about
+ * whether the requirement is satisfied or whether the document is genuine, and
+ * the copy here has to keep saying so.
+ */
+const EvidenceSummary: React.FC<{ counters: M5EvidenceCounters }> = ({ counters }) => {
+  const {
+    m5_supported_applicable_count: total,
+    m5_accepted_for_review_count: accepted,
+    m5_needs_action_count: needsAction,
+    m5_human_review_count: humanReview,
+    m5_no_profile_count: noProfile,
+    m5_applicability_unresolved_count: unresolved,
+  } = counters;
+
+  return (
+    <div className="border-t border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-600">
+      <div className="font-bold text-slate-800">Document checks (separate from the readiness status above)</div>
+      <div className="mt-1">
+        {total > 0
+          ? `${accepted} of ${total} uploaded items we can read have been accepted for an officer to review.`
+          : 'No uploaded items on this checklist can be read by this system yet.'}
+        {needsAction > 0 ? ` ${needsAction} need${needsAction === 1 ? 's' : ''} your attention.` : ''}
+        {humanReview > 0 ? ` ${humanReview} need${humanReview === 1 ? 's' : ''} to be checked by a person.` : ''}
+      </div>
+      {noProfile > 0 ? (
+        <div className="mt-1">
+          {noProfile} further required item{noProfile === 1 ? '' : 's'} cannot be read by this system and{' '}
+          {noProfile === 1 ? 'has' : 'have'} not been examined.
+        </div>
+      ) : null}
+      {unresolved > 0 ? (
+        <div className="mt-1">
+          For {unresolved} item{unresolved === 1 ? '' : 's'} we cannot yet tell whether they are required. They are
+          not being treated as unnecessary.
+        </div>
+      ) : null}
+      <div className="mt-1 text-slate-500">
+        Authenticity has not been established for any document. Accepted for review does not mean the requirement is
+        satisfied or that the document is genuine.
+      </div>
+    </div>
+  );
+};

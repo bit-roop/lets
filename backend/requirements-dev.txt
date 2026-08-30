@@ -1,0 +1,11 @@
+# Test-only dependencies. Not needed to run the application.
+#
+# httpx is required by fastapi.testclient.TestClient, which the M5 API tests
+# use. It was previously relied on without being declared anywhere, so a clean
+# checkout could not run the suite.
+#
+#   python -m pip install -r backend/requirements.txt
+#   python -m pip install -r backend/requirements-dev.txt
+
+pytest
+httpx

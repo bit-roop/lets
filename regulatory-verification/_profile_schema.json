@@ -1,0 +1,309 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "M5 VerificationProfile",
+  "description": "Describes HOW M5 inspects an evidence item that M4 has already established is required. A profile cannot create, alter, or scope a regulatory requirement. Enforcement is in backend/verification/profiles/loader.py; this file is the human-readable contract and is not evaluated at runtime in slice 1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "version",
+    "document_id",
+    "expected_identity",
+    "authenticity",
+    "provenance"
+  ],
+  "forbidden_keys_rationale": {
+    "obligation": "M4 owns whether evidence is mandatory, conditional or supporting.",
+    "approval_id": "M4 owns which approval an evidence item belongs to.",
+    "requirement_id": "M4 owns requirement identity.",
+    "blocking": "M4 owns blocking policy.",
+    "condition": "engine-v3 and M4 own applicability conditions.",
+    "condition_description": "M4 owns condition descriptions.",
+    "applicability": "M5 observes applicability; it never declares it.",
+    "verification_status": "M4 owns requirement verification status.",
+    "coverage": "M4 owns approval coverage.",
+    "readiness": "M4 owns readiness semantics.",
+    "sla_days": "The catalogue and M3 own durations.",
+    "depends_on": "M3 owns dependencies and ordering.",
+    "item_kind": "M4's DocumentSpec owns item_kind; redeclaring risks divergence.",
+    "accepted_formats": "M4's DocumentSpec owns accepted formats; redeclaring risks divergence."
+  },
+  "properties": {
+    "profile_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "supersedes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "document_id": {
+      "type": "string",
+      "description": "MUST already exist in the M4 registry with item_kind UPLOAD_DOCUMENT. Unknown IDs fail profile loading."
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "applicant_summary": {
+      "type": "string",
+      "description": "Applicant-facing one-line description of what this document is."
+    },
+    "expected_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "anchors_required"
+      ],
+      "properties": {
+        "anchors_required": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text",
+              "weight",
+              "basis"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number"
+              },
+              "basis": {
+                "type": "string",
+                "description": "Where in the repository this anchor string is evidenced."
+              }
+            }
+          }
+        },
+        "anchors_forbidden": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text",
+              "weight",
+              "basis"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number"
+              },
+              "basis": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field_id",
+          "field_source",
+          "sensitivity",
+          "basis"
+        ],
+        "properties": {
+          "field_id": {
+            "type": "string"
+          },
+          "field_source": {
+            "enum": [
+              "PROFILE_GROUNDED",
+              "RESEARCH_REQUIRED"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "anchors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pattern": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "normalizer": {
+            "enum": [
+              "none",
+              "date",
+              "integer",
+              "text"
+            ]
+          },
+          "basis": {
+            "type": "string"
+          },
+          "sensitivity": {
+            "enum": [
+              "NON_SENSITIVE",
+              "PERSONAL_NAME",
+              "IDENTIFIER",
+              "QUANTITY",
+              "DATE"
+            ],
+            "description": "Governs what is stored. PERSONAL_NAME and IDENTIFIER values are masked before they reach the record store or any API response; raw extracted text is never persisted for any field."
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "check_id",
+          "kind",
+          "inputs",
+          "severity"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "identity_anchor_present",
+              "date_well_formed",
+              "date_not_future",
+              "integer_non_negative"
+            ]
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "severity": {
+            "enum": [
+              "BLOCKING",
+              "ADVISORY",
+              "INFORMATIONAL"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "remedy": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "classification_min_score": {
+          "type": "number"
+        },
+        "classification_min_margin": {
+          "type": "number"
+        },
+        "max_pages": {
+          "type": "integer"
+        },
+        "min_text_chars": {
+          "type": "integer"
+        }
+      }
+    },
+    "authenticity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "explanation"
+      ],
+      "properties": {
+        "capability": {
+          "enum": [
+            "NOT_APPLICABLE_APPLICANT_AUTHORED",
+            "NO_MECHANISM_AVAILABLE"
+          ],
+          "description": "VERIFIED and SUPPORTED are NOT declarable. Only an authoritative gateway can produce VERIFIED, and no gateway exists in this build."
+        },
+        "explanation": {
+          "type": "string"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "human_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "always": {
+          "type": "boolean"
+        },
+        "always_reason": {
+          "type": "string"
+        },
+        "checklist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "MUST be empty unless every entry is source-grounded in regulatory-documents/. An invented checklist is a fabricated regulatory requirement."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "author",
+        "created",
+        "basis"
+      ],
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

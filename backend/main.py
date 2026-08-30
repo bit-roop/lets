@@ -22,6 +22,8 @@ from backend.documents.registry import get_document_registry
 from backend.documents.service import requirements_for_application, readiness_for_application
 from backend.documents.submissions import get_submission_store
 from backend.documents.validators import validate_structured_fields
+from backend.verification.api import router as verification_router
+from backend.verification.cors import VerificationCorsMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("regulatory-engine-api")
@@ -40,6 +42,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Milestone 5 (additive). The router is mounted here because routers and
+# middleware can only be registered on the application object.
+#
+# VerificationCorsMiddleware is added AFTER CORSMiddleware on purpose:
+# Starlette's add_middleware inserts at position 0, so the last-added middleware
+# is the outermost layer and can correct the headers CORSMiddleware wrote. It
+# restricts origins for /api/verification only, because those responses carry
+# information extracted from applicant documents. Every other path, including
+# all M4 and M3 endpoints, is passed through untouched, and the global CORS
+# configuration above is deliberately left unchanged.
+app.include_router(verification_router)
+app.add_middleware(VerificationCorsMiddleware)
 
 
 @app.get(

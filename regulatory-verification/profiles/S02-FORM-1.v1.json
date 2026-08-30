@@ -1,0 +1,189 @@
+{
+  "profile_id": "PROF-S02-FORM-1",
+  "version": "1.0.0",
+  "supersedes": null,
+  "document_id": "S02-FORM-1",
+  "display_name": "Factory Form No. 1",
+  "applicant_summary": "The completed and signed factory licence application form you submit to the Directorate of Industrial Safety and Health.",
+  "expected_identity": {
+    "anchors_required": [
+      {
+        "text": "Form No. 1",
+        "weight": 3.0,
+        "basis": "regulatory-documents/requirements/dish.json S02-REQ-001 checklist_item, verbatim"
+      },
+      {
+        "text": "Form 1",
+        "weight": 1.0,
+        "basis": "orthographic variant of the S02-REQ-001 checklist_item"
+      },
+      {
+        "text": "Factory Form No. 1",
+        "weight": 3.0,
+        "basis": "regulatory-documents/specs/documents.json S02-FORM-1 name, verbatim"
+      },
+      {
+        "text": "Factories Act",
+        "weight": 2.0,
+        "basis": "engine-v3/regulatory/approvals/catalogue.json S-02 statute 'Factories Act, 1948 s.6'"
+      },
+      {
+        "text": "Directorate of Industrial Safety and Health",
+        "weight": 2.0,
+        "basis": "regulatory-documents/sources/document_sources.json SRC-M4-DISH-001 authority, verbatim"
+      },
+      {
+        "text": "factory licence",
+        "weight": 1.0,
+        "basis": "regulatory-documents/specs/documents.json S02-FORM-1 description 'Completed and signed factory licence form'"
+      },
+      {
+        "text": "occupier",
+        "weight": 1.0,
+        "basis": "regulatory-documents/requirements/dish.json S02-REQ-002/003/013 checklist items reference the occupier for this approval"
+      }
+    ],
+    "anchors_forbidden": [
+      {
+        "text": "Form B",
+        "weight": 2.0,
+        "basis": "regulatory-documents/requirements/fssai.json F02-REQ-001 checklist_item identifies a different evidence item"
+      },
+      {
+        "text": "Food Safety and Standards Authority",
+        "weight": 2.0,
+        "basis": "regulatory-documents/sources/document_sources.json SRC-M4-FSSAI-001 authority 'FSSAI' denotes a different authority"
+      }
+    ]
+  },
+  "fields": [
+    {
+      "field_id": "document_identity_text",
+      "field_source": "PROFILE_GROUNDED",
+      "label": "Document title text found",
+      "normalizer": "text",
+      "basis": "Derived from the matched expected_identity anchors, each of which is repository-grounded above.",
+      "sensitivity": "NON_SENSITIVE"
+    },
+    {
+      "field_id": "issuing_context_text",
+      "field_source": "PROFILE_GROUNDED",
+      "label": "Authority named in the document",
+      "anchors": [
+        "Directorate of Industrial Safety and Health"
+      ],
+      "normalizer": "text",
+      "basis": "SRC-M4-DISH-001 authority string in regulatory-documents/sources/document_sources.json.",
+      "sensitivity": "NON_SENSITIVE"
+    },
+    {
+      "field_id": "document_date",
+      "field_source": "RESEARCH_REQUIRED",
+      "label": "Date printed on the form",
+      "anchors": [
+        "Date",
+        "Dated",
+        "Date of application"
+      ],
+      "pattern": "(\\d{1,2}[/\\-.]\\d{1,2}[/\\-.]\\d{2,4}|\\d{4}-\\d{2}-\\d{2})",
+      "normalizer": "date",
+      "basis": "RESEARCH_REQUIRED. The repository records no field schema for Form No. 1. The anchors are conservative guesses and are not authoritative.",
+      "sensitivity": "DATE"
+    },
+    {
+      "field_id": "occupier_name",
+      "field_source": "RESEARCH_REQUIRED",
+      "label": "Occupier named on the form",
+      "anchors": [
+        "Name of the Occupier",
+        "Name of Occupier",
+        "Occupier"
+      ],
+      "pattern": "[:\\s]*([A-Za-z][A-Za-z .'\\-]{3,60})",
+      "normalizer": "text",
+      "basis": "RESEARCH_REQUIRED. M4 records that an occupier exists for S-02 (S02-REQ-002/003/013) but records no field label on Form No. 1.",
+      "sensitivity": "PERSONAL_NAME"
+    },
+    {
+      "field_id": "max_workers",
+      "field_source": "RESEARCH_REQUIRED",
+      "label": "Maximum number of workers stated",
+      "anchors": [
+        "Maximum number of workers",
+        "Max. workers",
+        "Number of workers"
+      ],
+      "pattern": "[:\\s]*(\\d{1,6})",
+      "normalizer": "integer",
+      "basis": "RESEARCH_REQUIRED. No field label is recorded in the repository. Not used for any blocking finding.",
+      "sensitivity": "QUANTITY"
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "S02F1-IDENTITY",
+      "kind": "identity_anchor_present",
+      "inputs": [
+        "__identity__"
+      ],
+      "severity": "BLOCKING",
+      "message": "The uploaded file does not contain the identifying text expected on Factory Form No. 1.",
+      "remedy": "Please upload the completed Factory Form No. 1 for this application."
+    },
+    {
+      "check_id": "S02F1-DATE-FORMAT",
+      "kind": "date_well_formed",
+      "inputs": [
+        "document_date"
+      ],
+      "severity": "ADVISORY",
+      "message": "A date was found but could not be read as a calendar date.",
+      "remedy": "Check that the date on the form is legible."
+    },
+    {
+      "check_id": "S02F1-DATE-FUTURE",
+      "kind": "date_not_future",
+      "inputs": [
+        "document_date"
+      ],
+      "severity": "ADVISORY",
+      "message": "The date read from this form is in the future.",
+      "remedy": "Check the date entered on the form."
+    },
+    {
+      "check_id": "S02F1-WORKERS-NONNEG",
+      "kind": "integer_non_negative",
+      "inputs": [
+        "max_workers"
+      ],
+      "severity": "ADVISORY",
+      "message": "The worker count read from this form is not a plausible non-negative whole number.",
+      "remedy": "Check the worker count entered on the form."
+    }
+  ],
+  "thresholds": {
+    "classification_min_score": 4.0,
+    "classification_min_margin": 1.5,
+    "max_pages": 50,
+    "min_text_chars": 40
+  },
+  "authenticity": {
+    "capability": "NOT_APPLICABLE_APPLICANT_AUTHORED",
+    "explanation": "This is an application form completed by the applicant, not a certificate issued by an authority. There is no issuer to verify it against, so issuer authenticity does not apply to this document."
+  },
+  "human_review": {
+    "always": false,
+    "checklist": []
+  },
+  "provenance": {
+    "author": "M5 slice 1",
+    "created": "2026-08-30",
+    "basis": "regulatory-documents/requirements/dish.json (S02-REQ-001), regulatory-documents/specs/documents.json (S02-FORM-1), regulatory-documents/sources/document_sources.json (SRC-M4-DISH-001), engine-v3/regulatory/approvals/catalogue.json (S-02).",
+    "notes": "Every anchor string is traceable to a repository file named in its own basis field.",
+    "limitations": [
+      "No specimen of the current MahaDISH Form No. 1 was available. No authoritative field schema exists in this repository.",
+      "occupier_name, max_workers and document_date are RESEARCH_REQUIRED: their anchors are conservative guesses and may not match the real form.",
+      "Only the identity check is BLOCKING. No RESEARCH_REQUIRED field can block an applicant."
+    ]
+  }
+}

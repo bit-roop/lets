@@ -1,5 +1,18 @@
 import { EvaluationResponse, HealthResponse } from '../types/engine';
 import { ApplicantFacts } from '../types/facts';
+import {
+  VerificationCapabilities,
+  VerificationOverlayResponse,
+  VerificationRecord,
+  VerificationRecordsResponse,
+} from '../types/verification';
+
+export type {
+  VerificationCapabilities,
+  VerificationOverlayResponse,
+  VerificationRecord,
+  VerificationRecordsResponse,
+};
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
@@ -91,6 +104,38 @@ export const api = {
     if (approvalIds?.length === 1) params.set('approval_id', approvalIds[0]);
     return fetchJson<DocumentReadinessResponse>(`/api/documents/readiness?${params.toString()}`);
   },
+
+  // --- Milestone 5: evidence verification (additive) ---
+  // These endpoints report what M5 observed about submitted documents. They do
+  // not change M4 readiness, requirements, or which approvals apply.
+  //
+  // Both calls pass the M4 result the caller already holds. M5 observes the
+  // applicability M4 established rather than triggering a fresh evaluation, so
+  // it always reports on exactly the M4 state the applicant is being shown.
+  analyzeSubmission: (submissionId: string, m4Result: DocumentRequirementsEvaluation) =>
+    fetchJson<VerificationRecord>('/api/verification/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ submission_id: submissionId, m4_result: m4Result }),
+    }),
+  getVerificationRecords: (applicationId: string) =>
+    fetchJson<VerificationRecordsResponse>(
+      `/api/verification/records?application_id=${encodeURIComponent(applicationId)}`
+    ),
+  getVerificationOverlay: (
+    applicationId: string,
+    m4Result: DocumentRequirementsEvaluation,
+    m4Readiness: DocumentReadinessResponse | null
+  ) =>
+    fetchJson<VerificationOverlayResponse>('/api/verification/evidence', {
+      method: 'POST',
+      body: JSON.stringify({
+        application_id: applicationId,
+        m4_result: m4Result,
+        m4_readiness: m4Readiness,
+      }),
+    }),
+  getVerificationCapabilities: () =>
+    fetchJson<VerificationCapabilities>('/api/verification/capabilities'),
 };
 
 export interface DocumentRequirementRow {

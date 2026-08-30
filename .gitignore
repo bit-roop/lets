@@ -11,3 +11,6 @@ venv/
 *.pyc
 node_modules/
 dist/
+
+# Milestone 5 verification record store (local, regenerable)
+.m5-data/

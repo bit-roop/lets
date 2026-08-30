@@ -11,6 +11,11 @@ This guide describes the tested setup for a fresh Windows clone of the repositor
 
 No database, Docker service, external API key, or separate engine installation is required.
 
+Milestone 5 slice 1 adds two pure-Python packages (`pypdf`, `pdfplumber`) to
+`backend/requirements.txt`. Neither needs a system-level installation, so this
+remains true. M5 uses SQLite through the Python standard library. No OCR
+engine, Poppler, ZBar, libmagic, or language model is installed or required.
+
 ## Repository structure
 
 ```text
@@ -20,16 +25,18 @@ backend/workflow/       Milestone 3 workflow/DAG layer
 backend/documents/      Milestone 4 evidence/readiness layer
 frontend/               Milestone 2 applicant UI
 regulatory-documents/   M4 source-backed document catalogue
-docs/                   workflow and document contracts
+backend/verification/   Milestone 5 evidence verification layer
+regulatory-verification/ M5 verification profiles (separate from M4 data)
+docs/                   workflow, document and verification contracts
 ```
 
 The runtime direction is:
 
 ```text
-engine-v3 → M3 workflow → M4 document/evidence layer → future M5 verification
+engine-v3 → M3 workflow → M4 document/evidence layer → M5 evidence verification
 ```
 
-`engine-v3/` is protected. M3 and M4 are downstream and must not alter engine applicability or regulatory rules. M5 is not implemented.
+`engine-v3/` is protected. M3, M4 and M5 are downstream and must not alter engine applicability or regulatory rules. M5 slice 1 is implemented for two evidence items; see the verification contract for exactly what it does and does not do.
 
 ## Backend setup
 
@@ -126,7 +133,33 @@ The repository instruction is not to run `npm run build`; it is not part of this
 - M2 frontend behavior is complete and unchanged by M4.
 - M3 workflow scheduling is complete under `backend/workflow/`.
 - M4 is implemented and hardened for researched evidence requirements, submissions, deterministic format checks, reuse, and readiness.
-- M5 is not implemented.
+- M5 slice 1 is implemented: media guard, native PDF text extraction, deterministic classification, anchored extraction, deterministic checks, SQLite records, and a two-layer M4/M5 readiness overlay, for `S02-FORM-1` and `F02-FORM-B` only. All other evidence items report `NOT_ANALYZED`.
+
+### What M5 slice 1 does not do
+
+OCR, image documents, LLM or semantic extraction, QR decoding, PDF signature
+validation, cross-document consistency, and any authoritative government
+verification are all absent. `GET /api/verification/capabilities` reports each
+by name at runtime.
+
+**No authenticity mechanism exists in this build.** The `VERIFIED` state is
+unreachable by construction and is guarded in code. M5 never establishes that a
+document is genuine, and never claims to.
+
+M5 is handed an already-computed M4 result and observes it. It does not
+re-evaluate applicability, conditions, or workflow, does not change M4
+readiness, M4 requirements, M3 scheduling, or engine applicability, and does not
+set `DocumentSubmission.state = VALID`. These properties are enforced
+dynamically by `backend/tests/test_m5_engine_isolation.py`, which sabotages
+every engine entry point and requires M5 to keep working, and statically by
+`backend/tests/test_m5_isolation.py`.
+
+Running the tests needs the dev dependencies as well:
+
+```text
+python -m pip install -r backend\requirements.txt
+python -m pip install -r backend\requirements-dev.txt
+```
 
 ## M4 scope and limitations
 
@@ -148,4 +181,6 @@ Current MVP limitations include no authentication/authorization, temporary/in-me
 
 - [Workflow contract](docs/WORKFLOW_CONTRACT.md)
 - [Document contract](docs/DOCUMENT_CONTRACT.md)
+- [Verification contract](docs/VERIFICATION_CONTRACT.md)
+- [Evidence items M5 does not examine](regulatory-verification/NOT_ANALYZED.md)
 - [Backend documentation](backend/README.md)

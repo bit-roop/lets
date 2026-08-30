@@ -1,0 +1,149 @@
+"""M5 verification state vocabulary.
+
+The axes are orthogonal on purpose.  A single flat enum cannot represent a
+document that is correctly classified AND internally consistent AND has no
+available authenticity mechanism, which is the normal case here.  Collapsing
+them would reintroduce exactly the conflation this layer exists to prevent.
+"""
+
+# --- What M4 said about applicability.  M5 copies; M5 never computes. --------
+APPLICABLE_CONDITION_TRUE = "APPLICABLE_CONDITION_TRUE"
+NOT_APPLICABLE_CONDITION_FALSE = "NOT_APPLICABLE_CONDITION_FALSE"
+UNRESOLVED_CONDITION_UNKNOWN = "UNRESOLVED_CONDITION_UNKNOWN"
+UNRESOLVED_ENGINE_STATE = "UNRESOLVED_ENGINE_STATE"
+UNSUPPORTED_APPROVAL = "UNSUPPORTED_APPROVAL"
+
+M4_APPLICABILITY_OBSERVED = frozenset({
+    APPLICABLE_CONDITION_TRUE,
+    NOT_APPLICABLE_CONDITION_FALSE,
+    UNRESOLVED_CONDITION_UNKNOWN,
+    UNRESOLVED_ENGINE_STATE,
+    UNSUPPORTED_APPROVAL,
+})
+
+#: Applicability values under which M5 may analyse a submission as applicable.
+#: UNRESOLVED_CONDITION_UNKNOWN is deliberately absent: unresolved is not false.
+ANALYSABLE_APPLICABILITY = frozenset({APPLICABLE_CONDITION_TRUE})
+
+# --- Ingestion ---------------------------------------------------------------
+NOT_ANALYZED = "NOT_ANALYZED"
+INGESTED = "INGESTED"
+MEDIA_REJECTED = "MEDIA_REJECTED"
+INGEST_FAILED = "INGEST_FAILED"
+
+INGESTION = frozenset({NOT_ANALYZED, INGESTED, MEDIA_REJECTED, INGEST_FAILED})
+
+# --- Extraction --------------------------------------------------------------
+NOT_ATTEMPTED = "NOT_ATTEMPTED"
+NATIVE_TEXT = "NATIVE_TEXT"
+OCR_TEXT = "OCR_TEXT"           # reserved for Phase F; never produced in slice 1
+PARTIAL = "PARTIAL"
+UNREADABLE = "UNREADABLE"       # document property: nothing usable came out
+FAILED = "FAILED"               # system property: the extractor raised
+
+EXTRACTION = frozenset({NOT_ATTEMPTED, NATIVE_TEXT, OCR_TEXT, PARTIAL, UNREADABLE, FAILED})
+
+# --- Classification ----------------------------------------------------------
+MATCHES_EXPECTED = "MATCHES_EXPECTED"
+DIFFERENT_KNOWN_TYPE = "DIFFERENT_KNOWN_TYPE"
+UNKNOWN_TYPE = "UNKNOWN_TYPE"
+MULTI_DOCUMENT = "MULTI_DOCUMENT"          # reserved; not produced in slice 1
+INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+
+CLASSIFICATION = frozenset({
+    MATCHES_EXPECTED, DIFFERENT_KNOWN_TYPE, UNKNOWN_TYPE,
+    MULTI_DOCUMENT, INSUFFICIENT_EVIDENCE,
+})
+
+# --- Requirement match (file <-> requirement correspondence only) ------------
+MATCH = "MATCH"
+LIKELY_MATCH = "LIKELY_MATCH"
+MISMATCH = "MISMATCH"
+INDETERMINATE = "INDETERMINATE"
+NOT_APPLICABLE = "NOT_APPLICABLE"
+
+REQUIREMENT_MATCH = frozenset({MATCH, LIKELY_MATCH, MISMATCH, INDETERMINATE, NOT_APPLICABLE})
+
+# --- Consistency -------------------------------------------------------------
+CONSISTENT = "CONSISTENT"
+INCONSISTENT = "INCONSISTENT"
+NO_COMPARANDA = "NO_COMPARANDA"
+
+INTERNAL_CONSISTENCY = frozenset({CONSISTENT, INCONSISTENT, INDETERMINATE})
+CROSS_CONSISTENCY = frozenset({CONSISTENT, INCONSISTENT, INDETERMINATE, NO_COMPARANDA})
+
+# --- Authenticity ------------------------------------------------------------
+AUTH_NOT_ASSESSED = "NOT_ASSESSED"
+AUTH_NOT_APPLICABLE_APPLICANT_AUTHORED = "NOT_APPLICABLE_APPLICANT_AUTHORED"
+AUTH_NO_MECHANISM_AVAILABLE = "NO_MECHANISM_AVAILABLE"
+AUTH_UNVERIFIED = "UNVERIFIED"
+AUTH_SUPPORTED = "SUPPORTED"
+AUTH_VERIFIED = "VERIFIED"
+AUTH_FAILED = "FAILED"
+
+AUTHENTICITY = frozenset({
+    AUTH_NOT_ASSESSED, AUTH_NOT_APPLICABLE_APPLICANT_AUTHORED,
+    AUTH_NO_MECHANISM_AVAILABLE, AUTH_UNVERIFIED,
+    AUTH_SUPPORTED, AUTH_VERIFIED, AUTH_FAILED,
+})
+
+#: Authenticity capabilities a profile is allowed to declare.  VERIFIED is not
+#: among them: only an authoritative gateway may produce it, and slice 1 has none.
+DECLARABLE_AUTHENTICITY = frozenset({
+    AUTH_NOT_APPLICABLE_APPLICANT_AUTHORED,
+    AUTH_NO_MECHANISM_AVAILABLE,
+})
+
+# --- Disposition (derived; never set directly) -------------------------------
+REJECTED_STRUCTURAL = "REJECTED_STRUCTURAL"
+NEEDS_APPLICANT_ACTION = "NEEDS_APPLICANT_ACTION"
+HUMAN_REVIEW_REQUIRED = "HUMAN_REVIEW_REQUIRED"
+ACCEPTED_FOR_REVIEW = "ACCEPTED_FOR_REVIEW"
+
+DISPOSITION = frozenset({
+    NOT_ANALYZED, REJECTED_STRUCTURAL, NEEDS_APPLICANT_ACTION,
+    HUMAN_REVIEW_REQUIRED, ACCEPTED_FOR_REVIEW,
+})
+
+# --- Finding vocabulary ------------------------------------------------------
+OUTCOME_MATCH = "MATCH"
+OUTCOME_MISMATCH = "MISMATCH"
+OUTCOME_UNKNOWN = "UNKNOWN"
+OUTCOME_NOT_APPLICABLE = "NOT_APPLICABLE"
+OUTCOME_UNREADABLE = "UNREADABLE"
+
+OUTCOMES = frozenset({
+    OUTCOME_MATCH, OUTCOME_MISMATCH, OUTCOME_UNKNOWN,
+    OUTCOME_NOT_APPLICABLE, OUTCOME_UNREADABLE,
+})
+
+BLOCKING = "BLOCKING"
+ADVISORY = "ADVISORY"
+INFORMATIONAL = "INFORMATIONAL"
+
+SEVERITIES = frozenset({BLOCKING, ADVISORY, INFORMATIONAL})
+
+# --- Field grounding ---------------------------------------------------------
+PROFILE_GROUNDED = "PROFILE_GROUNDED"
+RESEARCH_REQUIRED = "RESEARCH_REQUIRED"
+
+FIELD_SOURCES = frozenset({PROFILE_GROUNDED, RESEARCH_REQUIRED})
+
+# --- Provenance methods ------------------------------------------------------
+METHOD_PDF_TEXT_LAYER = "PDF_TEXT_LAYER"
+METHOD_ANCHORED_REGEX = "ANCHORED_REGEX"
+METHOD_DETERMINISTIC = "DETERMINISTIC"
+METHOD_M4_OBSERVATION = "M4_OBSERVATION"
+
+# --- Human-review triggers used in slice 1 -----------------------------------
+TRIGGER_SYSTEM_EXTRACTION_FAILURE = "SYSTEM_EXTRACTION_FAILURE"
+TRIGGER_DOCUMENT_UNREADABLE = "DOCUMENT_UNREADABLE"
+TRIGGER_BLOCKING_MISMATCH = "BLOCKING_MISMATCH"
+TRIGGER_EXTRACTION_UNCERTAIN_ON_BLOCKING_FIELD = "EXTRACTION_UNCERTAIN_ON_BLOCKING_FIELD"
+TRIGGER_INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+
+# --- Disposition reasons -----------------------------------------------------
+REASON_NO_PROFILE = "NO_PROFILE_FOR_DOCUMENT"
+REASON_M4_NOT_APPLICABLE = "M4_APPLICABILITY_FALSE"
+REASON_M4_UNRESOLVED = "M4_APPLICABILITY_UNRESOLVED"
+REASON_M4_UNSUPPORTED = "M4_APPROVAL_UNSUPPORTED"
