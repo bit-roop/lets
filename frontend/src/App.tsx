@@ -7,9 +7,10 @@ import { HomePage } from './pages/HomePage';
 import { IntakeWizardPage } from './pages/IntakeWizardPage';
 import { ReviewFactsPage } from './pages/ReviewFactsPage';
 import { ResultsPage } from './pages/ResultsPage';
+import { ApplicantDashboardPage } from './pages/ApplicantDashboardPage';
 
 const AppContent: React.FC = () => {
-  const { currentStep } = useAssessment();
+  const { currentStep, activeApplicationId } = useAssessment();
 
   return (
     <div className="flex flex-col min-h-screen bg-gov-canvas text-gov-slate">
@@ -20,6 +21,7 @@ const AppContent: React.FC = () => {
         {currentStep >= 1 && currentStep <= 4 && <IntakeWizardPage />}
         {currentStep === 5 && <ReviewFactsPage />}
         {currentStep === 6 && <ResultsPage />}
+        {currentStep === 7 && <ApplicantDashboardPage initialApplicationId={activeApplicationId} />}
       </main>
       <Footer />
     </div>

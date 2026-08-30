@@ -136,7 +136,129 @@ export const api = {
     }),
   getVerificationCapabilities: () =>
     fetchJson<VerificationCapabilities>('/api/verification/capabilities'),
+
+  // --- Milestone 5, Slice 3: Persistent Application Case & Tracking ---
+  createApplication: (payload: ApplicationCreateRequest) =>
+    fetchJson<ApplicationRecord>('/api/applications', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listApplications: () =>
+    fetchJson<ApplicationListResponse>('/api/applications'),
+  getApplication: (applicationId: string) =>
+    fetchJson<ApplicationRecord>(`/api/applications/${encodeURIComponent(applicationId)}`),
 };
+
+export interface ApplicationCreateRequest {
+  application_id?: string;
+  entity_name: string;
+  facts: ApplicantFacts;
+  as_of?: string;
+  approvals?: Array<{
+    approval_id: string;
+    name?: string;
+    department?: string;
+    statute?: string;
+    sla_days?: number | null;
+    readiness_status?: string;
+    engine_state?: string;
+  }>;
+  submissions?: Array<{
+    document_id: string;
+    submission_id: string;
+    filename?: string | null;
+    item_kind?: string;
+    state?: string;
+  }>;
+  verification_records?: Array<{
+    document_id: string;
+    record_id?: string;
+    disposition?: string;
+    internal_consistency?: string;
+    confidence_overall?: number;
+  }>;
+  workflow_snapshot?: any;
+}
+
+export interface ApplicationSummary {
+  application_id: string;
+  tracking_reference: string;
+  entity_name: string;
+  status: string;
+  as_of: string;
+  approvals_count: number;
+  ready_count: number;
+  submissions_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApplicationListResponse {
+  applications: ApplicationSummary[];
+  total_count: number;
+}
+
+export interface TimelinePhaseItem {
+  approval_id: string;
+  name: string;
+  department: string;
+  sla_days?: number | null;
+  readiness_status: string;
+  blocked_by: string[];
+  precondition_note?: string;
+}
+
+export interface ApplicationRecord {
+  application_id: string;
+  tracking_reference: string;
+  entity_name: string;
+  status: string;
+  as_of: string;
+  facts: ApplicantFacts;
+  approvals: Array<{
+    approval_id: string;
+    name?: string;
+    department?: string;
+    statute?: string;
+    sla_days?: number | null;
+    readiness_status?: string;
+    engine_state?: string;
+  }>;
+  submissions: Array<{
+    document_id: string;
+    submission_id: string;
+    filename?: string | null;
+    item_kind?: string;
+    state?: string;
+  }>;
+  verification_records: Array<{
+    document_id: string;
+    record_id?: string;
+    disposition?: string;
+    internal_consistency?: string;
+    confidence_overall?: number;
+  }>;
+  timeline: {
+    summary: string;
+    total_approvals: number;
+    phase_1_immediate: {
+      phase_number: number;
+      title: string;
+      description: string;
+      count: number;
+      items: TimelinePhaseItem[];
+    };
+    phase_2_sequential: {
+      phase_number: number;
+      title: string;
+      description: string;
+      count: number;
+      items: TimelinePhaseItem[];
+    };
+  };
+  created_at: string;
+  updated_at: string;
+}
 
 export interface DocumentRequirementRow {
   requirement_id: string;

@@ -24,6 +24,7 @@ from backend.documents.submissions import get_submission_store
 from backend.documents.validators import validate_structured_fields
 from backend.verification.api import router as verification_router
 from backend.verification.cors import VerificationCorsMiddleware
+from backend.applications.api import router as applications_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("regulatory-engine-api")
@@ -54,6 +55,7 @@ app.add_middleware(
 # all M4 and M3 endpoints, is passed through untouched, and the global CORS
 # configuration above is deliberately left unchanged.
 app.include_router(verification_router)
+app.include_router(applications_router)
 app.add_middleware(VerificationCorsMiddleware)
 
 

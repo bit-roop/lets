@@ -84,11 +84,22 @@ export const Header: React.FC = () => {
           {currentStep === 6 && (
             <button
               onClick={() => goToStep(6)}
-              className="px-3 py-1.5 rounded font-medium text-xs transition border bg-gov-gold text-gov-navy border-gov-gold font-semibold"
+              className="px-3 py-1.5 rounded font-medium text-xs transition border bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight"
             >
               Results Matrix
             </button>
           )}
+
+          <button
+            onClick={() => goToStep(7)}
+            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+              currentStep === 7
+                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+            }`}
+          >
+            Case Dashboard
+          </button>
 
           <button
             onClick={resetAssessment}

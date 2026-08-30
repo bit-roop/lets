@@ -6,6 +6,7 @@ M4's internals, so the tests exercise the same path the application uses.
 
 import json
 import tempfile
+import uuid
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -54,12 +55,21 @@ def isolated_store(test_case):
     the code. `client()` calls this, so isolation is the default and cannot be
     forgotten.
     """
-    tmp = tempfile.TemporaryDirectory()
-    test_case.addCleanup(tmp.cleanup)
-    path = Path(tmp.name) / "records.db"
+    import gc
+    root = Path(tempfile.gettempdir()) / "sih26_m5_test_dbs"
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / f"records_{uuid.uuid4().hex}.db"
+    def _cleanup():
+        reset_record_store(None)
+        gc.collect()
+        try:
+            if path.exists():
+                path.unlink()
+        except Exception:
+            pass
     store = RecordStore(path)
     reset_record_store(path)
-    test_case.addCleanup(reset_record_store)
+    test_case.addCleanup(_cleanup)
     return store
 
 

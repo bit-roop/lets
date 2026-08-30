@@ -33,6 +33,7 @@ interface AssessmentContextType {
   facts: ApplicantFacts;
   asOfDate: string;
   activePersonaId: string | null;
+  activeApplicationId: string | null;
   currentStep: number;
   evaluationResult: EvaluationResponse | null;
   isLoading: boolean;
@@ -43,6 +44,7 @@ interface AssessmentContextType {
   setFact: (key: string, value: any) => void;
   setFacts: (facts: Partial<ApplicantFacts>) => void;
   setAsOfDate: (date: string) => void;
+  setActiveApplicationId: (id: string | null) => void;
   loadPersona: (personaId: string) => Promise<void>;
   runEvaluation: (customFacts?: ApplicantFacts) => Promise<EvaluationResponse | null>;
   resetAssessment: () => void;
@@ -56,7 +58,8 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
   const [facts, setFactsState] = useState<ApplicantFacts>(INITIAL_FACTS);
   const [asOfDate, setAsOfDate] = useState<string>('2026-08-29');
   const [activePersonaId, setActivePersonaId] = useState<string | null>(null);
-  const [currentStep, setCurrentStep] = useState<number>(0); // 0: Home, 1: Step 1, 2: Step 2, 3: Step 3, 4: Step 4, 5: Review, 6: Results
+  const [activeApplicationId, setActiveApplicationId] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState<number>(0); // 0: Home, 1: Step 1, 2: Step 2, 3: Step 3, 4: Step 4, 5: Review, 6: Results, 7: Dashboard
   const [evaluationResult, setEvaluationResult] = useState<EvaluationResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +134,7 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
   const resetAssessment = () => {
     setFactsState(INITIAL_FACTS);
     setActivePersonaId(null);
+    setActiveApplicationId(null);
     setEvaluationResult(null);
     setError(null);
     setCurrentStep(0);
@@ -150,6 +154,7 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
         facts,
         asOfDate,
         activePersonaId,
+        activeApplicationId,
         currentStep,
         evaluationResult,
         isLoading,
@@ -160,6 +165,7 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
         setFact,
         setFacts,
         setAsOfDate,
+        setActiveApplicationId,
         loadPersona,
         runEvaluation,
         resetAssessment,

@@ -5,6 +5,7 @@ import { ApplicantFacts } from '../../types/facts';
 import { EvaluationResponse } from '../../types/engine';
 import { VerificationRecord, M5EvidenceCounters } from '../../types/verification';
 import VerificationBlock from '../verification/VerificationBlock';
+import { useAssessment } from '../../context/AssessmentContext';
 
 interface Props {
   facts: ApplicantFacts;
@@ -96,6 +97,7 @@ function friendlySubmissionError(message?: string) {
 }
 
 export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) => {
+  const { goToStep, setActiveApplicationId } = useAssessment();
   const approvalIds = useMemo(() => evaluation.applicable.map((item) => item.requirement_id), [evaluation.applicable]);
   const applicationId = useMemo(
     () => `local-${facts._name || facts.entity_name || 'assessment'}`.replace(/[^a-zA-Z0-9_-]/g, '-'),
@@ -275,6 +277,86 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
             </div>
           );
         })}
+      </div>
+
+      {/* Slice 3: Submit Application Case Box */}
+      <div className="bg-gov-navy text-white rounded-lg p-4 sm:p-5 mt-6 shadow-md border-l-4 border-l-gov-gold">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gov-gold bg-gov-navyLight px-2 py-0.5 rounded border border-gov-gold/30">
+                Prototype Application Filing
+              </span>
+              <span className="text-[11px] text-slate-300">
+                Persistent Application Case (Slice 3)
+              </span>
+            </div>
+            <h3 className="text-sm font-bold text-white">
+              Submit Application for Prototype Case Tracking
+            </h3>
+            <p className="text-xs text-slate-300 mt-1 max-w-xl">
+              Saves the current assessment into a persistent tracking case with attached evidence and M5 verification references, assigning a tracking reference number.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            disabled={loading}
+            onClick={async () => {
+              setLoading(true);
+              setError(null);
+              try {
+                const approvalsList = evaluation.applicable.map((appr) => {
+                  const r = readinessFor(appr.requirement_id, readiness);
+                  return {
+                    approval_id: appr.requirement_id,
+                    name: appr.name,
+                    department: appr.department || appr.authority,
+                    statute: appr.statute,
+                    sla_days: appr.sla_days,
+                    readiness_status: r?.status || 'READY',
+                    engine_state: appr.state,
+                  };
+                });
+                const submissionsList = (readiness?.submissions || []).map((s) => ({
+                  document_id: s.document_id,
+                  submission_id: s.submission_id,
+                  filename: s.filename,
+                  item_kind: 'UPLOAD_DOCUMENT',
+                  state: s.state,
+                }));
+                const verList = verificationRecords.map((vr) => ({
+                  document_id: vr.document_id,
+                  record_id: vr.record_id,
+                  disposition: vr.disposition,
+                  internal_consistency: vr.internal_consistency,
+                  confidence_overall: vr.confidence?.extraction_mean ?? undefined,
+                }));
+                const payload = {
+                  application_id: applicationId,
+                  entity_name: facts._name || facts.entity_name || 'Declared Entity',
+                  facts,
+                  as_of: evaluation.as_of,
+                  approvals: approvalsList,
+                  submissions: submissionsList,
+                  verification_records: verList,
+                  workflow_snapshot: workflow,
+                };
+                const created = await api.createApplication(payload);
+                setActiveApplicationId(created.application_id);
+                goToStep(7);
+              } catch (err: any) {
+                setError(err?.message || 'Could not submit application case. Please try again.');
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="px-5 py-2.5 rounded bg-gov-gold text-gov-navy font-bold text-xs uppercase tracking-wider hover:bg-gov-goldLight transition shadow flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+          >
+            <UploadCloud className="w-4 h-4" />
+            Submit Application for Tracking
+          </button>
+        </div>
       </div>
     </section>
   );
