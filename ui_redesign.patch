@@ -1,0 +1,3554 @@
+diff --git a/frontend/index.html b/frontend/index.html
+index 50fbd58..7711c76 100644
+--- a/frontend/index.html
++++ b/frontend/index.html
+@@ -2,11 +2,11 @@
+ <html lang="en">
+   <head>
+     <meta charset="UTF-8" />
+-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230B2545'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
++    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230B5FA5'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>Regulatory Approval & Compliance Assessment Portal — Maharashtra (SIH 2026)</title>
++    <title>Compliance Checker — Maharashtra Industrial Approvals</title>
+   </head>
+-  <body class="bg-gov-canvas text-gov-slate min-h-screen font-sans antialiased">
++  <body class="bg-slate-50 text-ink-900 min-h-screen font-sans antialiased">
+     <div id="root"></div>
+     <script type="module" src="/src/main.tsx"></script>
+   </body>
+diff --git a/frontend/src/App.tsx b/frontend/src/App.tsx
+index 534fd84..7e2dad3 100644
+--- a/frontend/src/App.tsx
++++ b/frontend/src/App.tsx
+@@ -12,7 +12,7 @@ const AppContent: React.FC = () => {
+   const { currentStep } = useAssessment();
+ 
+   return (
+-    <div className="flex flex-col min-h-screen bg-gov-canvas text-gov-slate">
++    <div className="flex flex-col min-h-screen bg-slate-50 text-ink-900">
+       <Header />
+       <main className="flex-grow">
+         <ErrorBanner />
+diff --git a/frontend/src/components/common/Breadcrumb.tsx b/frontend/src/components/common/Breadcrumb.tsx
+index 378de8c..77cc2f8 100644
+--- a/frontend/src/components/common/Breadcrumb.tsx
++++ b/frontend/src/components/common/Breadcrumb.tsx
+@@ -11,30 +11,21 @@ export const Breadcrumb: React.FC<{ items: BreadcrumbItem[] }> = ({ items }) =>
+   const { goToStep } = useAssessment();
+ 
+   return (
+-    <nav className="flex items-center text-xs text-slate-500 py-2.5 px-4 bg-slate-100 border-b border-slate-200" aria-label="Breadcrumb">
+-      <div className="max-w-7xl mx-auto w-full flex items-center space-x-1.5 overflow-x-auto">
+-        <button
+-          onClick={() => goToStep(0)}
+-          className="flex items-center hover:text-gov-navy transition text-slate-600 font-medium"
+-        >
+-          <Home className="w-3.5 h-3.5 mr-1" />
+-          Gateway
++    <nav className="border-b border-slate-200 bg-white" aria-label="Breadcrumb">
++      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-1.5 text-sm text-slate-500 overflow-x-auto">
++        <button onClick={() => goToStep(0)} className="flex items-center gap-1 hover:text-brand transition shrink-0">
++          <Home className="w-3.5 h-3.5" />
++          Home
+         </button>
+-
+         {items.map((item, idx) => (
+           <React.Fragment key={idx}>
+-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
++            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+             {item.step !== undefined ? (
+-              <button
+-                onClick={() => goToStep(item.step!)}
+-                className="hover:text-gov-navy font-medium text-slate-700 hover:underline truncate"
+-              >
++              <button onClick={() => goToStep(item.step!)} className="hover:text-brand transition truncate">
+                 {item.label}
+               </button>
+             ) : (
+-              <span className="font-semibold text-gov-navy truncate">
+-                {item.label}
+-              </span>
++              <span className="font-medium text-ink-900 truncate">{item.label}</span>
+             )}
+           </React.Fragment>
+         ))}
+diff --git a/frontend/src/components/common/ConfidenceTag.tsx b/frontend/src/components/common/ConfidenceTag.tsx
+index d48458d..9d9c15d 100644
+--- a/frontend/src/components/common/ConfidenceTag.tsx
++++ b/frontend/src/components/common/ConfidenceTag.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { ShieldCheck, ShieldAlert, Shield } from 'lucide-react';
++import { ShieldCheck, Shield, ShieldAlert } from 'lucide-react';
+ import { VerificationStatus } from '../../types/engine';
+ 
+ export const ConfidenceTag: React.FC<{
+@@ -10,11 +10,11 @@ export const ConfidenceTag: React.FC<{
+   if (status === 'VERIFIED' || confidence === 'high') {
+     return (
+       <span
+-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200"
+-        title="Direct statutory backing verified against department gazette / notification."
++        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200"
++        title="Confirmed directly against the government notification."
+       >
+-        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+-        {showLabel && 'VERIFIED SOURCE'}
++        <ShieldCheck className="w-3 h-3" />
++        {showLabel && 'Confirmed'}
+       </span>
+     );
+   }
+@@ -22,22 +22,22 @@ export const ConfidenceTag: React.FC<{
+   if (status === 'SECONDARY' || confidence === 'medium') {
+     return (
+       <span
+-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200"
+-        title="Derived from consistent secondary sources; awaiting direct gazette verification."
++        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200"
++        title="Based on consistent secondary sources, not yet checked against the original notification."
+       >
+-        <Shield className="w-3 h-3 text-amber-600" />
+-        {showLabel && 'SECONDARY PROVENANCE'}
++        <Shield className="w-3 h-3" />
++        {showLabel && 'Likely accurate'}
+       </span>
+     );
+   }
+ 
+   return (
+     <span
+-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-50 text-rose-800 border border-rose-200"
+-      title="Unverified / disputed threshold. Not used as a definitive statutory claim."
++      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200"
++      title="Not yet verified — treat as a starting point, not a final answer."
+     >
+-      <ShieldAlert className="w-3 h-3 text-rose-600" />
+-      {showLabel && 'UNVERIFIED DATA'}
++      <ShieldAlert className="w-3 h-3" />
++      {showLabel && 'Unverified'}
+     </span>
+   );
+ };
+diff --git a/frontend/src/components/common/ErrorBanner.tsx b/frontend/src/components/common/ErrorBanner.tsx
+index a58ff44..32f8f0c 100644
+--- a/frontend/src/components/common/ErrorBanner.tsx
++++ b/frontend/src/components/common/ErrorBanner.tsx
+@@ -8,19 +8,14 @@ export const ErrorBanner: React.FC = () => {
+   if (!error) return null;
+ 
+   return (
+-    <div className="bg-rose-50 border-l-4 border-rose-600 p-4 mb-6 rounded-r shadow-sm">
+-      <div className="flex items-start justify-between">
+-        <div className="flex items-start">
+-          <AlertCircle className="w-5 h-5 text-rose-600 mr-3 shrink-0 mt-0.5" />
+-          <div>
+-            <h4 className="text-sm font-bold text-rose-900">System Notification</h4>
+-            <p className="text-xs text-rose-800 mt-0.5">{error}</p>
+-          </div>
+-        </div>
++    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
++      <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
++        <AlertCircle className="w-4.5 h-4.5 text-red-500 shrink-0 mt-0.5" />
++        <p className="text-sm text-red-800 flex-1">{error}</p>
+         <button
+           onClick={clearError}
+-          className="text-rose-400 hover:text-rose-700 transition ml-4"
+-          aria-label="Dismiss error"
++          className="text-red-400 hover:text-red-700 transition"
++          aria-label="Dismiss"
+         >
+           <X className="w-4 h-4" />
+         </button>
+diff --git a/frontend/src/components/common/Footer.tsx b/frontend/src/components/common/Footer.tsx
+index 9cc85b6..c5f415a 100644
+--- a/frontend/src/components/common/Footer.tsx
++++ b/frontend/src/components/common/Footer.tsx
+@@ -1,53 +1,16 @@
+ import React from 'react';
+-import { Shield, BookOpen, ExternalLink, Cpu } from 'lucide-react';
++import { ShieldCheck } from 'lucide-react';
+ 
+ export const Footer: React.FC = () => {
+   return (
+-    <footer className="bg-gov-slate text-slate-400 text-xs border-t border-slate-700 mt-16">
+-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-6 border-b border-slate-700">
+-          <div>
+-            <div className="text-slate-200 font-semibold text-sm mb-2 flex items-center gap-1.5">
+-              <Shield className="w-4 h-4 text-gov-gold" />
+-              Statutory Research Prototype
+-            </div>
+-            <p className="text-slate-400 leading-relaxed">
+-              Developed for <strong>Smart India Hackathon 2026 (Problem Statement 26130)</strong>. 
+-              Designed to extend the Maharashtra Industry, Trade and Investment Facilitation (MAITRI) Act 
+-              with deterministic regulatory derivation.
+-            </p>
+-          </div>
+-
+-          <div>
+-            <div className="text-slate-200 font-semibold text-sm mb-2 flex items-center gap-1.5">
+-              <Cpu className="w-4 h-4 text-gov-gold" />
+-              Engine Discipline & Standards
+-            </div>
+-            <p className="text-slate-400 leading-relaxed">
+-              Powered by <code>engine-v3</code>: three-valued Kleene logic, bounded fixed-point inference, 
+-              and active exclusion resolution. Zero non-deterministic LLMs in the regulatory derivation path.
+-            </p>
+-          </div>
+-
+-          <div>
+-            <div className="text-slate-200 font-semibold text-sm mb-2 flex items-center gap-1.5">
+-              <BookOpen className="w-4 h-4 text-gov-gold" />
+-              Statutory Transparency
+-            </div>
+-            <p className="text-slate-400 leading-relaxed">
+-              Every regulatory claim is tied to a versioned rule citing Maharashtra Factories Rules, 
+-              FSS Act 2006, Boilers Act 1923, MSMED Act 2006, or MPCB notifications.
+-            </p>
+-          </div>
+-        </div>
+-
+-        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between text-slate-400 gap-2">
+-          <div>
+-            &copy; 2026 Regulatory Reasoning & Compliance Platform Prototype (PS 26130)
+-          </div>
+-          <div className="text-[11px] text-slate-400">
+-            Official Sources: mahadish.in · fssai.gov.in · mpcb.gov.in · mahaboiler.in
++    <footer className="border-t border-slate-200 mt-16">
++      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
++        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-500">
++          <div className="flex items-center gap-2">
++            <ShieldCheck className="w-4 h-4 text-slate-400" />
++            Every result links back to the exact rule and government source behind it.
+           </div>
++          <div>Built for Smart India Hackathon 2026 · PS 26130</div>
+         </div>
+       </div>
+     </footer>
+diff --git a/frontend/src/components/common/Header.tsx b/frontend/src/components/common/Header.tsx
+index dbb2228..a74cfdd 100644
+--- a/frontend/src/components/common/Header.tsx
++++ b/frontend/src/components/common/Header.tsx
+@@ -1,102 +1,53 @@
+ import React from 'react';
+-import { ShieldCheck, Layers, RefreshCw, Landmark, AlertCircle } from 'lucide-react';
++import { Landmark, Circle } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ export const Header: React.FC = () => {
+   const { health, currentStep, goToStep, resetAssessment } = useAssessment();
+ 
+-  return (
+-    <header className="bg-gov-navy text-white shadow-md border-b-4 border-gov-gold">
+-      {/* Top Gov Bar */}
+-      <div className="bg-gov-slate px-4 py-1 text-xs text-slate-300 border-b border-slate-700 flex justify-between items-center">
+-        <div className="flex items-center space-x-2">
+-          <span className="font-semibold text-gov-goldLight tracking-wider uppercase">
+-            Government of Maharashtra · SIH 2026 PS 26130
+-          </span>
+-          <span className="text-slate-500">|</span>
+-          <span>Regulatory Reasoning & Compliance Pre-Scrutiny Subsystem</span>
+-        </div>
+-        <div className="flex items-center space-x-3 text-xs">
+-          {health ? (
+-            <span className="flex items-center text-emerald-400 font-medium">
+-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-1.5"></span>
+-              Engine v{health.engine_version} Online ({health.verification_summary?.VERIFIED || 0} Verified Rules)
+-            </span>
+-          ) : (
+-            <span className="flex items-center text-amber-400">
+-              <AlertCircle className="w-3.5 h-3.5 mr-1" />
+-              Checking Engine Connection...
+-            </span>
+-          )}
+-        </div>
+-      </div>
++  const navItem = (label: string, active: boolean, onClick: () => void) => (
++    <button
++      onClick={onClick}
++      className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition ${
++        active
++          ? 'bg-brand text-white'
++          : 'text-ink-700 hover:bg-slate-100'
++      }`}
++    >
++      {label}
++    </button>
++  );
+ 
+-      {/* Main Brand Bar */}
+-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+-        <div 
+-          className="flex items-center space-x-3 cursor-pointer group"
++  return (
++    <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
++      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
++        <button
+           onClick={() => goToStep(0)}
+-          title="Return to Portal Gateway"
++          className="flex items-center gap-2.5 shrink-0"
+         >
+-          <div className="w-10 h-10 rounded bg-gov-navyLight border border-gov-gold/40 flex items-center justify-center text-gov-gold font-bold text-lg shadow-inner">
+-            <Landmark className="w-6 h-6 text-gov-gold" />
++          <div className="w-9 h-9 rounded-lg bg-brand flex items-center justify-center">
++            <Landmark className="w-5 h-5 text-white" />
+           </div>
+-          <div>
+-            <div className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+-              MAITRI-COMPLY
+-              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gov-gold/20 text-gov-gold border border-gov-gold/40 uppercase">
+-                Prototype v3
+-              </span>
+-            </div>
+-            <div className="text-xs text-slate-300">
+-              Regulatory Approval Discovery & Statutory Assessment Matrix
+-            </div>
++          <div className="text-left leading-tight">
++            <div className="text-[15px] font-semibold text-ink-900">Compliance Checker</div>
++            <div className="text-[11px] text-slate-500">Maharashtra industrial approvals</div>
+           </div>
+-        </div>
+-
+-        {/* Action Controls */}
+-        <div className="flex items-center space-x-2 text-sm">
+-          <button
+-            onClick={() => goToStep(0)}
+-            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+-              currentStep === 0
+-                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+-                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+-            }`}
+-          >
+-            Portal Home
+-          </button>
+-
+-          <button
+-            onClick={() => {
+-              resetAssessment();
+-              goToStep(1);
+-            }}
+-            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+-              currentStep >= 1 && currentStep <= 5
+-                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+-                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+-            }`}
+-          >
+-            Start Assessment
+-          </button>
++        </button>
+ 
+-          {currentStep === 6 && (
+-            <button
+-              onClick={() => goToStep(6)}
+-              className="px-3 py-1.5 rounded font-medium text-xs transition border bg-gov-gold text-gov-navy border-gov-gold font-semibold"
+-            >
+-              Results Matrix
+-            </button>
+-          )}
++        <nav className="hidden sm:flex items-center gap-1.5">
++          {navItem('Home', currentStep === 0, () => goToStep(0))}
++          {navItem('New check', currentStep >= 1 && currentStep <= 5, () => {
++            resetAssessment();
++            goToStep(1);
++          })}
++          {currentStep === 6 && navItem('Results', true, () => goToStep(6))}
++        </nav>
+ 
+-          <button
+-            onClick={resetAssessment}
+-            className="p-1.5 rounded bg-gov-navyLight/40 hover:bg-gov-navyLight text-slate-300 hover:text-white border border-slate-700 transition"
+-            title="Reset Form"
+-          >
+-            <RefreshCw className="w-4 h-4" />
+-          </button>
++        <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 shrink-0">
++          <Circle
++            className={`w-2 h-2 ${health ? 'fill-emerald-500 text-emerald-500' : 'fill-slate-300 text-slate-300'}`}
++          />
++          {health ? 'Engine connected' : 'Connecting…'}
+         </div>
+       </div>
+     </header>
+diff --git a/frontend/src/components/common/StatusBadge.tsx b/frontend/src/components/common/StatusBadge.tsx
+index 84719f4..404be95 100644
+--- a/frontend/src/components/common/StatusBadge.tsx
++++ b/frontend/src/components/common/StatusBadge.tsx
+@@ -2,60 +2,50 @@ import React from 'react';
+ import { CheckCircle2, XCircle, HelpCircle, AlertTriangle } from 'lucide-react';
+ import { RequirementState } from '../../types/engine';
+ 
+-export const StatusBadge: React.FC<{ state: RequirementState; size?: 'sm' | 'md' }> = ({
+-  state,
+-  size = 'md',
+-}) => {
+-  const isSm = size === 'sm';
+-  const padding = isSm ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
+-  const iconSize = isSm ? 'w-3 h-3' : 'w-3.5 h-3.5';
++const CONFIG: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; classes: string; hint: string }> = {
++  APPLICABLE: {
++    label: 'Required',
++    icon: CheckCircle2,
++    classes: 'bg-emerald-50 text-emerald-700 border-emerald-200',
++    hint: 'This applies to your business based on what you told us.',
++  },
++  NOT_APPLICABLE: {
++    label: 'Not needed',
++    icon: XCircle,
++    classes: 'bg-slate-100 text-slate-600 border-slate-200',
++    hint: 'This does not apply to your business.',
++  },
++  UNKNOWN: {
++    label: 'Need more info',
++    icon: HelpCircle,
++    classes: 'bg-amber-50 text-amber-700 border-amber-200',
++    hint: 'We need a few more details to be sure.',
++  },
++  CONFLICT: {
++    label: 'Conflicting rules',
++    icon: AlertTriangle,
++    classes: 'bg-red-50 text-red-700 border-red-200',
++    hint: 'Two rules disagree — this needs a human to check.',
++  },
++};
++
++export const StatusBadge: React.FC<{ state: RequirementState; size?: 'sm' | 'md' }> = ({ state, size = 'md' }) => {
++  const cfg = CONFIG[state] || {
++    label: state,
++    icon: HelpCircle,
++    classes: 'bg-slate-100 text-slate-600 border-slate-200',
++    hint: '',
++  };
++  const Icon = cfg.icon;
++  const padding = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-sm';
+ 
+-  switch (state) {
+-    case 'APPLICABLE':
+-      return (
+-        <span
+-          className={`inline-flex items-center gap-1 font-bold rounded border bg-emerald-50 text-emerald-800 border-emerald-300 ${padding}`}
+-          title="This requirement is legally required based on your declared facts."
+-        >
+-          <CheckCircle2 className={`${iconSize} text-emerald-600`} />
+-          APPLICABLE
+-        </span>
+-      );
+-    case 'NOT_APPLICABLE':
+-      return (
+-        <span
+-          className={`inline-flex items-center gap-1 font-bold rounded border bg-slate-100 text-slate-700 border-slate-300 ${padding}`}
+-          title="This requirement is excluded or does not apply."
+-        >
+-          <XCircle className={`${iconSize} text-slate-500`} />
+-          NOT APPLICABLE
+-        </span>
+-      );
+-    case 'UNKNOWN':
+-      return (
+-        <span
+-          className={`inline-flex items-center gap-1 font-bold rounded border bg-amber-50 text-amber-900 border-amber-300 ${padding}`}
+-          title="More information is required to evaluate this requirement."
+-        >
+-          <HelpCircle className={`${iconSize} text-amber-600`} />
+-          NEEDS INFORMATION
+-        </span>
+-      );
+-    case 'CONFLICT':
+-      return (
+-        <span
+-          className={`inline-flex items-center gap-1 font-bold rounded border bg-rose-50 text-rose-900 border-rose-300 ${padding}`}
+-          title="Regulatory conflict detected between competing rules."
+-        >
+-          <AlertTriangle className={`${iconSize} text-rose-600`} />
+-          CONFLICT DETECTED
+-        </span>
+-      );
+-    default:
+-      return (
+-        <span className={`inline-flex items-center font-bold rounded border bg-slate-100 text-slate-800 ${padding}`}>
+-          {state}
+-        </span>
+-      );
+-  }
++  return (
++    <span
++      className={`inline-flex items-center gap-1.5 font-medium rounded-full border ${cfg.classes} ${padding}`}
++      title={cfg.hint}
++    >
++      <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
++      {cfg.label}
++    </span>
++  );
+ };
+diff --git a/frontend/src/components/intake/ConstraintAlert.tsx b/frontend/src/components/intake/ConstraintAlert.tsx
+index 15ee2b4..2e10899 100644
+--- a/frontend/src/components/intake/ConstraintAlert.tsx
++++ b/frontend/src/components/intake/ConstraintAlert.tsx
+@@ -5,27 +5,24 @@ import { ApplicantFacts } from '../../types/facts';
+ export const ConstraintAlert: React.FC<{ facts: ApplicantFacts }> = ({ facts }) => {
+   const issues: { type: 'error' | 'warning' | 'info'; title: string; message: string; fix?: string }[] = [];
+ 
+-  // Contradiction 1: MIDC vs Municipal Corporation planning
+   if (facts.location_authority === 'MIDC' && facts.land_classification === 'agricultural') {
+     issues.push({
+       type: 'error',
+-      title: 'Planning Authority & Zoning Inconsistency',
+-      message: 'MIDC estates are notified industrial areas. An MIDC plot cannot be classified as agricultural.',
+-      fix: 'Select "MIDC Industrial Land" or change Planning Authority to Local Collector / Grampanchayat.',
++      title: "That combination doesn't match",
++      message: 'MIDC plots are already-notified industrial land — they can\'t also be agricultural.',
++      fix: 'Change the land type to "MIDC industrial plot", or change the location authority.',
+     });
+   }
+ 
+-  // Contradiction 2: Municipal Authority vs MIDC Industrial land
+   if (facts.location_authority === 'Municipal_Corporation' && facts.land_classification === 'midc_industrial') {
+     issues.push({
+       type: 'error',
+-      title: 'Planning Authority & Jurisdiction Conflict',
+-      message: 'MIDC industrial land falls under MIDC planning jurisdiction under the MID Act 1961, not the Municipal Corporation.',
+-      fix: 'Set Location Authority to "MIDC" or select Non-Agricultural municipal land.',
++      title: "That combination doesn't match",
++      message: 'MIDC industrial land is governed by MIDC, not the Municipal Corporation.',
++      fix: 'Set location authority to "MIDC", or pick a non-agricultural municipal plot.',
+     });
+   }
+ 
+-  // Contradiction 3: Headcount inconsistency
+   if (
+     facts.workers_for_threshold !== null &&
+     facts.employees_total !== null &&
+@@ -35,12 +32,11 @@ export const ConstraintAlert: React.FC<{ facts: ApplicantFacts }> = ({ facts })
+   ) {
+     issues.push({
+       type: 'warning',
+-      title: 'Headcount Definition Notice',
+-      message: 'Under the Maharashtra Factories Rules, total workers for factory licensing includes contract workers and plant operators.',
++      title: 'Double-check your worker count',
++      message: 'For factory licensing, "workers" usually includes contract staff and machine operators too — not just permanent employees.',
+     });
+   }
+ 
+-  // Informational: Boiler Hot Water Generator nuance
+   if (
+     facts.boiler_operates &&
+     facts.boiler_water_temp_c !== null &&
+@@ -49,39 +45,36 @@ export const ConstraintAlert: React.FC<{ facts: ApplicantFacts }> = ({ facts })
+   ) {
+     issues.push({
+       type: 'info',
+-      title: 'Hot Water Generator Statutory Exemption (s.2(b))',
+-      message: 'Vessels heating water below 100°C are classified as Hot Water Generators under the Boilers Act 1923 and are exempt from boiler registration.',
++      title: 'Good news — this looks exempt',
++      message: 'Vessels heating water below 100°C count as hot-water generators, not boilers, so boiler registration isn\'t required.',
+     });
+   }
+ 
+   if (issues.length === 0) return null;
+ 
+   return (
+-    <div className="space-y-3 mb-6">
++    <div className="space-y-2.5 mb-6">
+       {issues.map((issue, idx) => {
+         const isErr = issue.type === 'error';
+         const isWarn = issue.type === 'warning';
+-        const bg = isErr ? 'bg-rose-50 border-rose-500' : isWarn ? 'bg-amber-50 border-amber-500' : 'bg-blue-50 border-blue-500';
+-        const textColor = isErr ? 'text-rose-900' : isWarn ? 'text-amber-900' : 'text-blue-900';
+-        const icon = isErr || isWarn ? (
+-          <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${isErr ? 'text-rose-600' : 'text-amber-600'}`} />
+-        ) : (
+-          <Info className="w-5 h-5 shrink-0 mt-0.5 text-blue-600" />
+-        );
++        const styles = isErr
++          ? { bg: 'bg-red-50 border-red-200', text: 'text-red-800', icon: 'text-red-500' }
++          : isWarn
++          ? { bg: 'bg-amber-50 border-amber-200', text: 'text-amber-800', icon: 'text-amber-500' }
++          : { bg: 'bg-brand-tint border-brand-border', text: 'text-brand-darker', icon: 'text-brand' };
++        const Icon = isErr || isWarn ? AlertTriangle : Info;
+ 
+         return (
+-          <div key={idx} className={`border-l-4 p-3.5 rounded-r shadow-xs ${bg}`}>
+-            <div className="flex items-start gap-3">
+-              {icon}
+-              <div className="text-xs">
+-                <div className={`font-bold ${textColor}`}>{issue.title}</div>
+-                <div className={`${textColor} mt-0.5 opacity-90`}>{issue.message}</div>
+-                {issue.fix && (
+-                  <div className="mt-1 text-[11px] font-semibold text-slate-700 bg-white/70 px-2 py-0.5 rounded border border-slate-300 inline-block">
+-                    Recommended Correction: {issue.fix}
+-                  </div>
+-                )}
+-              </div>
++          <div key={idx} className={`flex items-start gap-3 rounded-xl border p-3.5 ${styles.bg}`}>
++            <Icon className={`w-4.5 h-4.5 shrink-0 mt-0.5 ${styles.icon}`} />
++            <div className="text-sm">
++              <div className={`font-medium ${styles.text}`}>{issue.title}</div>
++              <div className={`${styles.text} opacity-90 mt-0.5`}>{issue.message}</div>
++              {issue.fix && (
++                <div className="mt-1.5 text-xs font-medium text-ink-700 bg-white/70 px-2 py-1 rounded-lg inline-block">
++                  {issue.fix}
++                </div>
++              )}
+             </div>
+           </div>
+         );
+diff --git a/frontend/src/components/intake/PersonaSelector.tsx b/frontend/src/components/intake/PersonaSelector.tsx
+index 8231347..f84d94d 100644
+--- a/frontend/src/components/intake/PersonaSelector.tsx
++++ b/frontend/src/components/intake/PersonaSelector.tsx
+@@ -1,10 +1,9 @@
+ import React from 'react';
+-import { UserCheck, Sparkles, Building2, Store, Factory } from 'lucide-react';
++import { Store, Factory, Building2, ArrowRight } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ interface PersonaCard {
+   id: string;
+-  badge: string;
+   name: string;
+   tagline: string;
+   description: string;
+@@ -15,29 +14,26 @@ interface PersonaCard {
+ const PERSONAS: PersonaCard[] = [
+   {
+     id: 'persona_a',
+-    badge: 'Micro Enterprise · Municipal',
+-    name: 'Persona A: Shree Ganesh Bakery',
+-    tagline: 'Small Food Processing (Pune Municipal Limits)',
+-    description: 'Proprietorship with ₹40L turnover, 6 workers, no boiler. Demonstrates basic registration thresholds & non-factory exemption.',
+-    factsPills: ['₹40L Turnover', '6 Workers', 'No Boiler', 'Municipal Land'],
++    name: 'Shree Ganesh Bakery',
++    tagline: 'Small bakery, municipal area',
++    description: '₹40L turnover, 6 workers, no boiler.',
++    factsPills: ['₹40L turnover', '6 workers', 'No boiler'],
+     icon: Store,
+   },
+   {
+     id: 'persona_b',
+-    badge: 'Medium Food Plant · MIDC',
+-    name: 'Persona B: Sahyadri Foods Pvt Ltd',
+-    tagline: 'Fruit Pulp Processing (MIDC Ranjangaon, Pune)',
+-    description: 'Pvt Ltd with ₹8 Cr turnover, ₹6 Cr investment, 67 workers, 500L steam boiler at 170°C, 22 contract workers. Canonical demo baseline.',
+-    factsPills: ['₹8 Cr Turnover', '67 Workers', '500L Steam Boiler', '22 Contract Labour', 'MIDC Estate'],
++    name: 'Sahyadri Foods Pvt Ltd',
++    tagline: 'Mid-size food plant, MIDC Ranjangaon',
++    description: '₹8Cr turnover, 67 workers, 500L steam boiler.',
++    factsPills: ['₹8Cr turnover', '67 workers', '500L boiler'],
+     icon: Factory,
+   },
+   {
+     id: 'persona_c',
+-    badge: 'Boiler Edge Case · Statutory Exemption',
+-    name: 'Persona C: Dairy Chilling Unit',
+-    tagline: 'Hot Water Generator Unit (80°C Vessel)',
+-    description: 'Industrial facility with 500L vessel operating at 80°C (<100°C). Demonstrates s.2(b) Hot Water Generator active exclusion.',
+-    factsPills: ['500L Vessel', '80°C Water Temp', 'HWG Excluded', 'MIDC Estate'],
++    name: 'Dairy Chilling Unit',
++    tagline: 'Hot-water vessel, boiler-exempt',
++    description: '500L vessel at 80°C — below the boiler threshold.',
++    factsPills: ['500L vessel', '80°C', 'Boiler-exempt'],
+     icon: Building2,
+   },
+ ];
+@@ -46,84 +42,49 @@ export const PersonaSelector: React.FC = () => {
+   const { loadPersona, activePersonaId, isLoading } = useAssessment();
+ 
+   return (
+-    <div className="bg-slate-100 border border-slate-300 rounded-md p-4 mb-6">
++    <div>
+       <div className="flex items-center justify-between mb-3">
+-        <div className="flex items-center space-x-2">
+-          <Sparkles className="w-4 h-4 text-gov-gold" />
+-          <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-            Hackathon Live Evaluation · Preset Personas
+-          </h3>
+-        </div>
+-        <span className="text-[11px] text-slate-500 font-medium">
+-          Populates authentic fact vectors & triggers live derivation
+-        </span>
++        <h3 className="text-sm font-semibold text-ink-900">Try a sample business</h3>
++        <span className="text-xs text-slate-500">Loads example details instantly</span>
+       </div>
+ 
+-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
++      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+         {PERSONAS.map((p) => {
+           const Icon = p.icon;
+           const isActive = activePersonaId === p.id;
+ 
+           return (
+-            <div
++            <button
+               key={p.id}
+-              className={`p-3.5 rounded border transition flex flex-col justify-between ${
++              type="button"
++              disabled={isLoading}
++              onClick={() => loadPersona(p.id)}
++              className={`text-left p-4 rounded-xl border transition group disabled:opacity-50 ${
+                 isActive
+-                  ? 'bg-gov-navy text-white border-gov-navy shadow-sm'
+-                  : 'bg-white text-slate-800 border-slate-300 hover:border-gov-navy hover:shadow-xs'
++                  ? 'bg-brand-tint border-brand'
++                  : 'bg-white border-slate-200 hover:border-brand hover:shadow-card'
+               }`}
+             >
+-              <div>
+-                <div className="flex items-center justify-between mb-1.5">
+-                  <span
+-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
+-                      isActive
+-                        ? 'bg-gov-gold text-gov-navy'
+-                        : 'bg-slate-100 text-slate-700 border border-slate-200'
+-                    }`}
+-                  >
+-                    {p.badge}
+-                  </span>
+-                  <Icon className={`w-4 h-4 ${isActive ? 'text-gov-gold' : 'text-slate-400'}`} />
+-                </div>
+-
+-                <h4 className={`text-xs font-bold leading-snug ${isActive ? 'text-white' : 'text-gov-navy'}`}>
+-                  {p.name}
+-                </h4>
+-                <p className={`text-[11px] mt-1 leading-normal ${isActive ? 'text-slate-200' : 'text-slate-600'}`}>
+-                  {p.description}
+-                </p>
+-
+-                <div className="flex flex-wrap gap-1 mt-2.5">
+-                  {p.factsPills.map((pill, i) => (
+-                    <span
+-                      key={i}
+-                      className={`text-[9.5px] px-1.5 py-0.5 rounded font-mono font-medium ${
+-                        isActive
+-                          ? 'bg-gov-navyLight text-slate-200 border border-slate-600'
+-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+-                      }`}
+-                    >
+-                      {pill}
+-                    </span>
+-                  ))}
++              <div className="flex items-center justify-between mb-2">
++                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-brand text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-brand-tint group-hover:text-brand'}`}>
++                  <Icon className="w-4 h-4" />
+                 </div>
++                {isLoading && isActive ? (
++                  <span className="text-xs text-brand font-medium">Loading…</span>
++                ) : (
++                  <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-brand transition" />
++                )}
+               </div>
+-
+-              <button
+-                type="button"
+-                disabled={isLoading}
+-                onClick={() => loadPersona(p.id)}
+-                className={`mt-3 w-full py-1.5 px-3 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+-                  isActive
+-                    ? 'bg-gov-gold text-gov-navy hover:bg-gov-goldLight font-bold'
+-                    : 'bg-gov-navy text-white hover:bg-gov-navyLight'
+-                } disabled:opacity-50`}
+-              >
+-                <UserCheck className="w-3.5 h-3.5" />
+-                {isLoading && isActive ? 'Evaluating...' : `Load & Evaluate ${p.id.replace('persona_', 'Persona ').toUpperCase()}`}
+-              </button>
+-            </div>
++              <div className="text-sm font-semibold text-ink-900">{p.name}</div>
++              <div className="text-xs text-slate-500 mt-0.5">{p.tagline}</div>
++              <div className="flex flex-wrap gap-1.5 mt-2.5">
++                {p.factsPills.map((pill, i) => (
++                  <span key={i} className="text-[11px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
++                    {pill}
++                  </span>
++                ))}
++              </div>
++            </button>
+           );
+         })}
+       </div>
+diff --git a/frontend/src/components/intake/Step1Business.tsx b/frontend/src/components/intake/Step1Business.tsx
+index dc437af..a955305 100644
+--- a/frontend/src/components/intake/Step1Business.tsx
++++ b/frontend/src/components/intake/Step1Business.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { Building, IndianRupee, Layers, Briefcase } from 'lucide-react';
++import { Building2 } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ export const Step1Business: React.FC = () => {
+@@ -7,22 +7,19 @@ export const Step1Business: React.FC = () => {
+ 
+   return (
+     <div className="space-y-6">
+-      <div>
+-        <h3 className="text-sm font-bold text-gov-navy uppercase tracking-wider mb-1 flex items-center gap-2">
+-          <Building className="w-4 h-4 text-gov-navyLight" />
+-          Section 1: Enterprise Profile & Legal Constitution
+-        </h3>
+-        <p className="text-xs text-slate-600">
+-          Declare the legal form and initial project stage. This establishes the statutory jurisdiction (Companies Act / Partnership Act) and baseline MSME thresholds.
+-        </p>
++      <div className="flex items-center gap-2.5">
++        <div className="w-8 h-8 rounded-lg bg-brand-tint flex items-center justify-center">
++          <Building2 className="w-4 h-4 text-brand" />
++        </div>
++        <div>
++          <h3 className="text-base font-semibold text-ink-900">About your business</h3>
++          <p className="text-sm text-slate-500">Basic details about the company and its stage.</p>
++        </div>
+       </div>
+ 
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+-        {/* Entity Name */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Enterprise / Unit Legal Name <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Business name</label>
+           <input
+             type="text"
+             value={facts._name || facts.entity_name || ''}
+@@ -31,76 +28,51 @@ export const Step1Business: React.FC = () => {
+               setFact('entity_name', e.target.value);
+             }}
+             placeholder="e.g. Sahyadri Foods Private Limited"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Used as the applicant entity identifier across certificates and licenses.
+-          </span>
+         </div>
+ 
+-        {/* Project Stage */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Project Lifecycle Stage <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">What stage are you at?</label>
+           <select
+             value={facts.stage || 'new_setup'}
+             onChange={(e) => setFact('stage', e.target.value)}
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            className="field-input"
+           >
+-            <option value="new_setup">New Greenfield Industrial Setup</option>
+-            <option value="expansion">Brownfield Expansion / Capacity Addition</option>
+-            <option value="renewal">Periodic Licence & Consent Renewal</option>
++            <option value="new_setup">Setting up a new unit</option>
++            <option value="expansion">Expanding an existing unit</option>
++            <option value="renewal">Renewing existing licences</option>
+           </select>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Determines whether prior clearances (CTE, building permissions) are required.
+-          </span>
+         </div>
+ 
+-        {/* Legal Constitution */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Legal Form of Entity <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Business structure</label>
+           <select
+             value={facts.entity_type || 'private_limited'}
+             onChange={(e) => setFact('entity_type', e.target.value)}
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            className="field-input"
+           >
+-            <option value="private_limited">Private Limited Company (MCA Incorporated)</option>
++            <option value="private_limited">Private Limited Company</option>
+             <option value="proprietorship">Sole Proprietorship</option>
+-            <option value="partnership">Registered Partnership Firm</option>
++            <option value="partnership">Partnership Firm</option>
+             <option value="llp">Limited Liability Partnership (LLP)</option>
+             <option value="public_limited">Public Limited Company</option>
+           </select>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Drives entity-level registration paths and board resolution requirements.
+-          </span>
+         </div>
+ 
+-        {/* Plant & Machinery Investment */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Investment in Plant & Machinery (INR ₹) <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Investment in plant & machinery</label>
+           <div className="relative">
+-            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+-              ₹
+-            </div>
++            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">₹</span>
+             <input
+               type="number"
+               value={facts.investment_plant_machinery ?? ''}
+-              onChange={(e) => {
+-                const v = e.target.value === '' ? null : Number(e.target.value);
+-                setFact('investment_plant_machinery', v);
+-              }}
+-              placeholder="e.g. 60000000 (for ₹6.00 Crores)"
+-              className="w-full text-xs pl-7 pr-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++              onChange={(e) => setFact('investment_plant_machinery', e.target.value === '' ? null : Number(e.target.value))}
++              placeholder="e.g. 60000000"
++              className="field-input pl-7"
+             />
+           </div>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Evaluated for Udyam MSME classification (Notification S.O. 1364(E)). Ceiling: ₹125 Cr.
+-          </span>
++          <p className="field-help">Used to check MSME eligibility (limit: ₹125 crore).</p>
+         </div>
+       </div>
+     </div>
+diff --git a/frontend/src/components/intake/Step2Location.tsx b/frontend/src/components/intake/Step2Location.tsx
+index e581401..4709a2a 100644
+--- a/frontend/src/components/intake/Step2Location.tsx
++++ b/frontend/src/components/intake/Step2Location.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { MapPin, Building2, Ruler } from 'lucide-react';
++import { MapPin } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ export const Step2Location: React.FC = () => {
+@@ -7,92 +7,64 @@ export const Step2Location: React.FC = () => {
+ 
+   return (
+     <div className="space-y-6">
+-      <div>
+-        <h3 className="text-sm font-bold text-gov-navy uppercase tracking-wider mb-1 flex items-center gap-2">
+-          <MapPin className="w-4 h-4 text-gov-navyLight" />
+-          Section 2: Site Location, Planning Authority & Land Tenure
+-        </h3>
+-        <p className="text-xs text-slate-600">
+-          Declare the geographical jurisdiction and land classification. Maharashtra establishes distinct planning authorities for MIDC industrial estates versus municipal corporation zones.
+-        </p>
++      <div className="flex items-center gap-2.5">
++        <div className="w-8 h-8 rounded-lg bg-brand-tint flex items-center justify-center">
++          <MapPin className="w-4 h-4 text-brand" />
++        </div>
++        <div>
++          <h3 className="text-base font-semibold text-ink-900">Where is your unit located?</h3>
++          <p className="text-sm text-slate-500">MIDC plots and municipal land follow different approval routes.</p>
++        </div>
+       </div>
+ 
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+-        {/* Planning Authority */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Planning & Location Authority <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Location authority</label>
+           <select
+             value={facts.location_authority || 'MIDC'}
+             onChange={(e) => setFact('location_authority', e.target.value)}
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            className="field-input"
+           >
+-            <option value="MIDC">MIDC (Maharashtra Industrial Development Corporation)</option>
+-            <option value="Municipal_Corporation">Municipal Corporation (PMC / PCMC / MCGM / etc.)</option>
+-            <option value="Grampanchayat">Grampanchayat / PMRDA / Rural Collectorate</option>
++            <option value="MIDC">MIDC industrial estate</option>
++            <option value="Municipal_Corporation">Municipal Corporation area</option>
++            <option value="Grampanchayat">Gram Panchayat / rural area</option>
+           </select>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Controls factory building plan approvals and local trade licensing routes.
+-          </span>
+         </div>
+ 
+-        {/* Land Classification */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Land Classification & Zoning <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Land type</label>
+           <select
+             value={facts.land_classification || 'midc_industrial'}
+             onChange={(e) => setFact('land_classification', e.target.value)}
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            className="field-input"
+           >
+-            <option value="midc_industrial">MIDC Industrial Allotted Plot</option>
+-            <option value="non_agricultural">Non-Agricultural (NA Converted) Private Plot</option>
+-            <option value="agricultural">Agricultural Land (Requires NA Permission)</option>
++            <option value="midc_industrial">MIDC industrial plot</option>
++            <option value="non_agricultural">Non-agricultural (converted) plot</option>
++            <option value="agricultural">Agricultural land</option>
+           </select>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            MIDC allotted land carries deemed-NA conversion status under MLRC amendments.
+-          </span>
+         </div>
+ 
+-        {/* Built-up Area */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Total Factory Built-up Area (Sq. Meters)
+-          </label>
+-          <div className="relative">
+-            <input
+-              type="number"
+-              value={facts.builtup_area_sqm ?? ''}
+-              onChange={(e) => {
+-                const v = e.target.value === '' ? null : Number(e.target.value);
+-                setFact('builtup_area_sqm', v);
+-              }}
+-              placeholder="e.g. 4200"
+-              className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
+-            />
+-          </div>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Total covered floor area across all processing sheds and storage bays.
+-          </span>
++          <label className="field-label">Built-up area (sq. m)</label>
++          <input
++            type="number"
++            value={facts.builtup_area_sqm ?? ''}
++            onChange={(e) => setFact('builtup_area_sqm', e.target.value === '' ? null : Number(e.target.value))}
++            placeholder="e.g. 4200"
++            className="field-input"
++          />
+         </div>
+ 
+-        {/* District & Taluka Reference */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Industrial Cluster / Estate Reference
+-          </label>
++          <label className="field-label">Industrial estate / cluster</label>
+           <input
+             type="text"
+             value={facts.midc_estate || 'MIDC Ranjangaon, Pune'}
+             onChange={(e) => setFact('midc_estate', e.target.value)}
+-            placeholder="e.g. Ranjangaon, Pune / Chakan / Butibori"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++            placeholder="e.g. Chakan, Ranjangaon, Butibori"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Designates the competent regional office for DISH, MPCB, and local health officers.
+-          </span>
++          <p className="field-help">Determines which regional office handles your file.</p>
+         </div>
+       </div>
+     </div>
+diff --git a/frontend/src/components/intake/Step3Operations.tsx b/frontend/src/components/intake/Step3Operations.tsx
+index 81658cb..08b0fc2 100644
+--- a/frontend/src/components/intake/Step3Operations.tsx
++++ b/frontend/src/components/intake/Step3Operations.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { Utensils, Users, TrendingUp, Globe2, AlertCircle } from 'lucide-react';
++import { Utensils } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ export const Step3Operations: React.FC = () => {
+@@ -7,165 +7,111 @@ export const Step3Operations: React.FC = () => {
+ 
+   return (
+     <div className="space-y-6">
+-      <div>
+-        <h3 className="text-sm font-bold text-gov-navy uppercase tracking-wider mb-1 flex items-center gap-2">
+-          <Utensils className="w-4 h-4 text-gov-navyLight" />
+-          Section 3: Operations, Turnover & Workforce Structure
+-        </h3>
+-        <p className="text-xs text-slate-600">
+-          Declare operational scale, projected turnover, and employee staffing. These facts determine FSSAI licensing tier (Registration vs State vs Central), Factory Act coverage (20/40 rule), and labour welfare registrations.
+-        </p>
++      <div className="flex items-center gap-2.5">
++        <div className="w-8 h-8 rounded-lg bg-brand-tint flex items-center justify-center">
++          <Utensils className="w-4 h-4 text-brand" />
++        </div>
++        <div>
++          <h3 className="text-base font-semibold text-ink-900">Operations & workforce</h3>
++          <p className="text-sm text-slate-500">Turnover and headcount decide which FSSAI licence tier and labour registrations apply.</p>
++        </div>
+       </div>
+ 
+-      <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-md mb-2">
+-        <label className="flex items-start gap-3 cursor-pointer">
+-          <input
+-            type="checkbox"
+-            checked={facts.is_food_business ?? true}
+-            onChange={(e) => setFact('is_food_business', e.target.checked)}
+-            className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
+-          />
+-          <div>
+-            <span className="text-xs font-bold text-gov-navy block">
+-              Food Business Operator (FBO) Confirmation <span className="text-rose-500">*</span>
+-            </span>
+-            <span className="text-[11px] text-slate-600">
+-              Unit engages in manufacturing, processing, packaging, storage, or distribution of food or beverage articles.
+-            </span>
+-          </div>
+-        </label>
+-      </div>
++      <label className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
++        <input
++          type="checkbox"
++          checked={facts.is_food_business ?? true}
++          onChange={(e) => setFact('is_food_business', e.target.checked)}
++          className="mt-0.5 rounded border-slate-300 text-brand focus:ring-brand w-4 h-4"
++        />
++        <div>
++          <span className="text-sm font-medium text-ink-900 block">This is a food business</span>
++          <span className="text-xs text-slate-500">Manufactures, processes, packages, stores, or distributes food or drink.</span>
++        </div>
++      </label>
+ 
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+-        {/* Annual Turnover */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Annual Projected Turnover (INR ₹) <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Annual turnover</label>
+           <div className="relative">
+-            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+-              ₹
+-            </div>
++            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">₹</span>
+             <input
+               type="number"
+               value={facts.annual_turnover ?? ''}
+-              onChange={(e) => {
+-                const v = e.target.value === '' ? null : Number(e.target.value);
+-                setFact('annual_turnover', v);
+-              }}
+-              placeholder="e.g. 80000000 (for ₹8.00 Crores)"
+-              className="w-full text-xs pl-7 pr-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++              onChange={(e) => setFact('annual_turnover', e.target.value === '' ? null : Number(e.target.value))}
++              placeholder="e.g. 80000000"
++              className="field-input pl-7"
+             />
+           </div>
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            <strong>FSSAI 2026 Slabs:</strong> &le; ₹1.5 Cr: Registration | ₹1.5 Cr &ndash; ₹50 Cr: State Licence | &gt; ₹50 Cr: Central Licence.
+-          </span>
++          <p className="field-help">Up to ₹1.5Cr: Registration · ₹1.5Cr–₹50Cr: State Licence · above ₹50Cr: Central Licence.</p>
+         </div>
+ 
+-        {/* Total Employees */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Total Headcount on Premises <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Total employees</label>
+           <input
+             type="number"
+             value={facts.employees_total ?? ''}
+-            onChange={(e) => {
+-              const v = e.target.value === '' ? null : Number(e.target.value);
+-              setFact('employees_total', v);
+-            }}
++            onChange={(e) => setFact('employees_total', e.target.value === '' ? null : Number(e.target.value))}
+             placeholder="e.g. 45"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Triggers POSH Internal Committee (&ge; 10) and EPFO registration (&ge; 20 employees).
+-          </span>
++          <p className="field-help">10+ needs a POSH committee, 20+ needs EPFO registration.</p>
+         </div>
+ 
+-        {/* Factory Workers */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Total Manufacturing / Floor Workers <span className="text-rose-500">*</span>
+-          </label>
++          <label className="field-label">Factory floor workers</label>
+           <input
+             type="number"
+             value={facts.workers_for_threshold ?? ''}
+-            onChange={(e) => {
+-              const v = e.target.value === '' ? null : Number(e.target.value);
+-              setFact('workers_for_threshold', v);
+-            }}
++            onChange={(e) => setFact('workers_for_threshold', e.target.value === '' ? null : Number(e.target.value))}
+             placeholder="e.g. 67"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            <strong>Maharashtra Factories Act Threshold:</strong> &ge; 20 workers with power / &ge; 40 without power.
+-          </span>
++          <p className="field-help">Factory licence applies at 20+ workers with power, or 40+ without.</p>
+         </div>
+ 
+-        {/* Contract Labourers */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Contract Labourers Engaged
+-          </label>
++          <label className="field-label">Contract labourers</label>
+           <input
+             type="number"
+             value={facts.contract_labourers ?? 0}
+-            onChange={(e) => {
+-              const v = e.target.value === '' ? 0 : Number(e.target.value);
+-              setFact('contract_labourers', v);
+-            }}
++            onChange={(e) => setFact('contract_labourers', e.target.value === '' ? 0 : Number(e.target.value))}
+             placeholder="e.g. 22"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            Contract Labour (R&A) Act registration required if &ge; 20 contract workers.
+-          </span>
++          <p className="field-help">20+ requires Contract Labour Act registration.</p>
+         </div>
+ 
+-        {/* Food Handlers */}
+         <div>
+-          <label className="block text-xs font-bold text-slate-700 mb-1">
+-            Active Food Handlers
+-          </label>
++          <label className="field-label">Food handlers on site</label>
+           <input
+             type="number"
+             value={facts.food_handlers ?? 0}
+-            onChange={(e) => {
+-              const v = e.target.value === '' ? 0 : Number(e.target.value);
+-              setFact('food_handlers', v);
+-            }}
++            onChange={(e) => setFact('food_handlers', e.target.value === '' ? 0 : Number(e.target.value))}
+             placeholder="e.g. 30"
+-            className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++            className="field-input"
+           />
+-          <span className="text-[10.5px] text-slate-500 mt-1 block">
+-            FSSAI FoSTaC ratio formula: <code>ceil(food_handlers / 25)</code> trained supervisors.
+-          </span>
++          <p className="field-help">One trained (FoSTaC) supervisor is needed per 25 food handlers.</p>
+         </div>
+ 
+-        {/* Trade Attributes */}
+-        <div className="flex flex-col justify-center space-y-3 pt-2">
++        <div className="flex flex-col justify-center gap-3">
+           <label className="flex items-center gap-2.5 cursor-pointer">
+             <input
+               type="checkbox"
+               checked={facts.export ?? false}
+               onChange={(e) => setFact('export', e.target.checked)}
+-              className="rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
++              className="rounded border-slate-300 text-brand focus:ring-brand w-4 h-4"
+             />
+-            <span className="text-xs font-semibold text-slate-700">
+-              100% Export-Oriented / Direct Food Exporting (Triggers Central Licence)
+-            </span>
++            <span className="text-sm text-ink-700">We export our products</span>
+           </label>
+-
+           <label className="flex items-center gap-2.5 cursor-pointer">
+             <input
+               type="checkbox"
+               checked={facts.multi_state_operation ?? false}
+               onChange={(e) => setFact('multi_state_operation', e.target.checked)}
+-              className="rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
++              className="rounded border-slate-300 text-brand focus:ring-brand w-4 h-4"
+             />
+-            <span className="text-xs font-semibold text-slate-700">
+-              Multi-State Headquartered Unit (Triggers Central Licence)
+-            </span>
++            <span className="text-sm text-ink-700">We operate in more than one state</span>
+           </label>
+         </div>
+       </div>
+diff --git a/frontend/src/components/intake/Step4Equipment.tsx b/frontend/src/components/intake/Step4Equipment.tsx
+index a886105..d7796b8 100644
+--- a/frontend/src/components/intake/Step4Equipment.tsx
++++ b/frontend/src/components/intake/Step4Equipment.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { Flame, Zap, Gauge, AlertTriangle, ShieldCheck } from 'lucide-react';
++import { Flame, Zap, Gauge } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+ export const Step4Equipment: React.FC = () => {
+@@ -7,169 +7,118 @@ export const Step4Equipment: React.FC = () => {
+ 
+   return (
+     <div className="space-y-6">
+-      <div>
+-        <h3 className="text-sm font-bold text-gov-navy uppercase tracking-wider mb-1 flex items-center gap-2">
+-          <Flame className="w-4 h-4 text-gov-navyLight" />
+-          Section 4: Equipment, Boilers, Power & Hazardous Operations
+-        </h3>
+-        <p className="text-xs text-slate-600">
+-          Capture equipment specifications and energy sources. Indian Boiler Regulations (IBR 1950) under the Boilers Act 1923 require registration for steam generation vessels &ge; 25L, &ge; 1 kg/cm&sup2;, and &ge; 100&deg;C.
+-        </p>
+-      </div>
+-
+-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+-        {/* Electrical Power */}
+-        <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-md">
+-          <label className="flex items-start gap-3 cursor-pointer">
+-            <input
+-              type="checkbox"
+-              checked={facts.uses_power ?? true}
+-              onChange={(e) => setFact('uses_power', e.target.checked)}
+-              className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
+-            />
+-            <div>
+-              <span className="text-xs font-bold text-gov-navy block flex items-center gap-1.5">
+-                <Zap className="w-3.5 h-3.5 text-amber-600" />
+-                Unit Uses Electrical Power in Manufacturing
+-              </span>
+-              <span className="text-[11px] text-slate-600 block mt-0.5">
+-                Sets the Maharashtra Factories Act threshold to <strong>20 workers</strong> (vs 40 without power).
+-              </span>
+-            </div>
+-          </label>
++      <div className="flex items-center gap-2.5">
++        <div className="w-8 h-8 rounded-lg bg-brand-tint flex items-center justify-center">
++          <Flame className="w-4 h-4 text-brand" />
+         </div>
+-
+-        {/* Boiler Operation Toggle */}
+-        <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-md">
+-          <label className="flex items-start gap-3 cursor-pointer">
+-            <input
+-              type="checkbox"
+-              checked={facts.boiler_operates ?? false}
+-              onChange={(e) => {
+-                const checked = e.target.checked;
+-                setFact('boiler_operates', checked);
+-                if (!checked) {
+-                  setFact('boiler_capacity_litres', null);
+-                  setFact('boiler_pressure_kg_cm2', null);
+-                  setFact('boiler_water_temp_c', null);
+-                } else if (facts.boiler_capacity_litres === null) {
+-                  setFact('boiler_capacity_litres', 500);
+-                  setFact('boiler_pressure_kg_cm2', 7);
+-                  setFact('boiler_water_temp_c', 170);
+-                }
+-              }}
+-              className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
+-            />
+-            <div>
+-              <span className="text-xs font-bold text-gov-navy block flex items-center gap-1.5">
+-                <Gauge className="w-3.5 h-3.5 text-gov-navyLight" />
+-                Operates Steam Boiler / Pressure Vessel on Premises
+-              </span>
+-              <span className="text-[11px] text-slate-600 block mt-0.5">
+-                Steam generation for blanching, pasteurisation, sterilization, or process heating.
+-              </span>
+-            </div>
+-          </label>
++        <div>
++          <h3 className="text-base font-semibold text-ink-900">Equipment & utilities</h3>
++          <p className="text-sm text-slate-500">Boilers of 25L / 1 kg/cm² / 100°C or above need registration.</p>
+         </div>
+       </div>
+ 
+-      {/* Conditional Boiler Parameters */}
+-      {facts.boiler_operates && (
+-        <div className="bg-amber-50/60 border border-amber-200 p-4 rounded-md space-y-4">
+-          <div className="flex items-center justify-between">
+-            <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+-              <Gauge className="w-4 h-4 text-amber-700" />
+-              Boiler Technical Specifications (Boilers Act 1923 s.2(b) Composite Criteria)
+-            </h4>
+-            <span className="text-[10.5px] text-amber-800 font-semibold bg-white/80 px-2 py-0.5 rounded border border-amber-300">
+-              Thresholds: &ge; 25L &bull; &ge; 1.0 kg/cm&sup2; &bull; &ge; 100&deg;C
++      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
++        <label className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
++          <input
++            type="checkbox"
++            checked={facts.uses_power ?? true}
++            onChange={(e) => setFact('uses_power', e.target.checked)}
++            className="mt-0.5 rounded border-slate-300 text-brand focus:ring-brand w-4 h-4"
++          />
++          <div>
++            <span className="text-sm font-medium text-ink-900 block flex items-center gap-1.5">
++              <Zap className="w-3.5 h-3.5 text-amber-500" />
++              We use electrical power
+             </span>
++            <span className="text-xs text-slate-500">Sets the factory-licence worker threshold to 20 (vs. 40 without power).</span>
+           </div>
++        </label>
+ 
++        <label className="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
++          <input
++            type="checkbox"
++            checked={facts.boiler_operates ?? false}
++            onChange={(e) => {
++              const checked = e.target.checked;
++              setFact('boiler_operates', checked);
++              if (!checked) {
++                setFact('boiler_capacity_litres', null);
++                setFact('boiler_pressure_kg_cm2', null);
++                setFact('boiler_water_temp_c', null);
++              } else if (facts.boiler_capacity_litres === null) {
++                setFact('boiler_capacity_litres', 500);
++                setFact('boiler_pressure_kg_cm2', 7);
++                setFact('boiler_water_temp_c', 170);
++              }
++            }}
++            className="mt-0.5 rounded border-slate-300 text-brand focus:ring-brand w-4 h-4"
++          />
++          <div>
++            <span className="text-sm font-medium text-ink-900 block flex items-center gap-1.5">
++              <Gauge className="w-3.5 h-3.5 text-brand" />
++              We run a steam boiler
++            </span>
++            <span className="text-xs text-slate-500">For blanching, pasteurising, sterilising, or process heating.</span>
++          </div>
++        </label>
++      </div>
++
++      {facts.boiler_operates && (
++        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-4">
++          <h4 className="text-sm font-medium text-amber-900">Boiler details</h4>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div>
+-              <label className="block text-xs font-bold text-slate-700 mb-1">
+-                Volumetric Capacity (Litres) <span className="text-rose-500">*</span>
+-              </label>
++              <label className="field-label">Capacity (litres)</label>
+               <input
+                 type="number"
+                 value={facts.boiler_capacity_litres ?? ''}
+-                onChange={(e) => {
+-                  const v = e.target.value === '' ? null : Number(e.target.value);
+-                  setFact('boiler_capacity_litres', v);
+-                }}
++                onChange={(e) => setFact('boiler_capacity_litres', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 500"
+-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++                className="field-input"
+               />
+-              <span className="text-[10.5px] text-slate-500 mt-1 block">
+-                Statutory trigger threshold: &ge; 25 Litres.
+-              </span>
++              <p className="field-help">Threshold: 25L</p>
+             </div>
+-
+             <div>
+-              <label className="block text-xs font-bold text-slate-700 mb-1">
+-                Operating Steam Pressure (kg/cm&sup2;) <span className="text-rose-500">*</span>
+-              </label>
++              <label className="field-label">Pressure (kg/cm²)</label>
+               <input
+                 type="number"
+                 step="0.1"
+                 value={facts.boiler_pressure_kg_cm2 ?? ''}
+-                onChange={(e) => {
+-                  const v = e.target.value === '' ? null : Number(e.target.value);
+-                  setFact('boiler_pressure_kg_cm2', v);
+-                }}
++                onChange={(e) => setFact('boiler_pressure_kg_cm2', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 7"
+-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++                className="field-input"
+               />
+-              <span className="text-[10.5px] text-slate-500 mt-1 block">
+-                Statutory trigger threshold: &ge; 1.0 kg/cm&sup2;.
+-              </span>
++              <p className="field-help">Threshold: 1.0 kg/cm²</p>
+             </div>
+-
+             <div>
+-              <label className="block text-xs font-bold text-slate-700 mb-1">
+-                Working Water Temperature (&deg;C) <span className="text-rose-500">*</span>
+-              </label>
++              <label className="field-label">Water temperature (°C)</label>
+               <input
+                 type="number"
+                 value={facts.boiler_water_temp_c ?? ''}
+-                onChange={(e) => {
+-                  const v = e.target.value === '' ? null : Number(e.target.value);
+-                  setFact('boiler_water_temp_c', v);
+-                }}
++                onChange={(e) => setFact('boiler_water_temp_c', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 170"
+-                className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white font-mono"
++                className="field-input"
+               />
+-              <span className="text-[10.5px] text-slate-500 mt-1 block">
+-                &lt; 100&deg;C = Hot Water Generator (Actively Excluded).
+-              </span>
++              <p className="field-help">Below 100°C = hot-water generator (exempt)</p>
+             </div>
+           </div>
+         </div>
+       )}
+ 
+-      {/* Pollution Category Optional Field */}
+       <div>
+-        <label className="block text-xs font-bold text-slate-700 mb-1">
+-          MPCB Industrial Pollution Category (Optional)
+-        </label>
++        <label className="field-label">Pollution category (if known)</label>
+         <select
+           value={facts.mpcb_category ?? ''}
+-          onChange={(e) => {
+-            const v = e.target.value === '' ? null : e.target.value;
+-            setFact('mpcb_category', v);
+-          }}
+-          className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
++          onChange={(e) => setFact('mpcb_category', e.target.value === '' ? null : e.target.value)}
++          className="field-input"
+         >
+-          <option value="">-- Unspecified (Engine will evaluate Consent to Establish / Operate as UNKNOWN) --</option>
+-          <option value="Orange">Orange Category (Food processing typical)</option>
+-          <option value="Red">Red Category (Heavy discharge / large effluent)</option>
+-          <option value="Green">Green Category (Low pollution small unit / bakery)</option>
+-          <option value="White">White Category (Non-polluting / intimation only)</option>
++          <option value="">Not sure — leave blank</option>
++          <option value="Orange">Orange (typical for food processing)</option>
++          <option value="Red">Red (heavy discharge / large effluent)</option>
++          <option value="Green">Green (low pollution, small unit)</option>
++          <option value="White">White (non-polluting)</option>
+         </select>
+-        <span className="text-[10.5px] text-slate-500 mt-1 block">
+-          If left unspecified, the engine safely yields <strong>UNKNOWN</strong> with a missing fact prompt, preventing premature consent misclassification.
+-        </span>
++        <p className="field-help">Leaving this blank is fine — we'll flag it as something to confirm rather than guess.</p>
+       </div>
+     </div>
+   );
+diff --git a/frontend/src/components/results/DerivedFactsBox.tsx b/frontend/src/components/results/DerivedFactsBox.tsx
+index 1ca3286..fdbfbef 100644
+--- a/frontend/src/components/results/DerivedFactsBox.tsx
++++ b/frontend/src/components/results/DerivedFactsBox.tsx
+@@ -1,56 +1,32 @@
+ import React from 'react';
+-import { Cpu, CheckCircle2, Sparkles, ArrowRight } from 'lucide-react';
++import { Sparkles } from 'lucide-react';
+ import { DerivedFact, DerivationDiagnostics } from '../../types/engine';
+ import { ConfidenceTag } from '../common/ConfidenceTag';
+ 
+ export const DerivedFactsBox: React.FC<{
+   derivedFacts: Record<string, DerivedFact>;
+   diagnostics?: DerivationDiagnostics;
+-}> = ({ derivedFacts, diagnostics }) => {
++}> = ({ derivedFacts }) => {
+   const factKeys = Object.keys(derivedFacts);
+-
+   if (factKeys.length === 0) return null;
+ 
+   return (
+-    <div className="bg-slate-100 border border-slate-300 rounded p-4 mb-6">
+-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200 mb-3">
+-        <div className="flex items-center gap-2">
+-          <Cpu className="w-4 h-4 text-gov-navy" />
+-          <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-            Intermediate Derived Facts (Fixed-Point Inference)
+-          </h3>
+-        </div>
+-        {diagnostics && (
+-          <span className="text-[11px] font-mono text-slate-600">
+-            Passes Run: {diagnostics.passes_run} (Quiescence Reached: {diagnostics.reached_fixed_point ? 'Yes' : 'No'})
+-          </span>
+-        )}
++    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5">
++      <div className="flex items-center gap-2 mb-3">
++        <Sparkles className="w-4 h-4 text-brand" />
++        <h3 className="text-sm font-semibold text-ink-900">Things we worked out for you</h3>
+       </div>
+-
+       <div className="space-y-2">
+         {factKeys.map((key) => {
+           const df = derivedFacts[key];
+           return (
+-            <div
+-              key={key}
+-              className="bg-white p-3 rounded border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
+-            >
+-              <div className="flex items-center gap-2">
+-                <span className="font-mono font-bold text-gov-navy bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+-                  {df.fact}
+-                </span>
+-                <span className="text-slate-500">&rarr;</span>
+-                <span className="font-mono font-bold text-emerald-700">
+-                  {String(df.value)}
+-                </span>
+-                <span className="text-[11px] text-slate-500 font-sans">
+-                  (derived via rule <code className="text-gov-navy font-bold">{df.rule_id}@v{df.rule_version}</code> in pass {df.derived_in_pass})
+-                </span>
+-              </div>
+-
+-              <div className="flex items-center gap-2">
+-                <ConfidenceTag status={df.verification_status} />
++            <div key={key} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm bg-slate-50 rounded-lg p-2.5">
++              <div className="flex items-center gap-2 flex-wrap">
++                <span className="text-ink-700">{df.fact.replace(/_/g, ' ')}</span>
++                <span className="text-slate-400">→</span>
++                <span className="font-medium text-emerald-700">{String(df.value)}</span>
+               </div>
++              <ConfidenceTag status={df.verification_status} />
+             </div>
+           );
+         })}
+diff --git a/frontend/src/components/results/EvidenceDrawer.tsx b/frontend/src/components/results/EvidenceDrawer.tsx
+index 4c25231..4bfe858 100644
+--- a/frontend/src/components/results/EvidenceDrawer.tsx
++++ b/frontend/src/components/results/EvidenceDrawer.tsx
+@@ -1,199 +1,136 @@
+ import React from 'react';
+-import {
+-  ShieldCheck,
+-  ShieldAlert,
+-  ExternalLink,
+-  BookOpen,
+-  Scale,
+-  Calendar,
+-  CheckCircle2,
+-  XCircle,
+-  HelpCircle,
+-  Clock,
+-  ArrowRight,
+-} from 'lucide-react';
+-import { Requirement, EvidenceItem } from '../../types/engine';
++import { ExternalLink, BookOpen, Calendar, CheckCircle2, XCircle, HelpCircle, ArrowRight } from 'lucide-react';
++import { Requirement } from '../../types/engine';
+ import { ConfidenceTag } from '../common/ConfidenceTag';
+ 
++const KIND_LABEL: Record<string, { text: string; icon: React.ComponentType<{ className?: string }>; classes: string }> = {
++  POSITIVE_DEFINITE: { text: 'This rule applies to you', icon: CheckCircle2, classes: 'bg-emerald-50 text-emerald-700' },
++  ACTIVE_EXCLUSION: { text: "A specific rule says this doesn't apply", icon: XCircle, classes: 'bg-slate-100 text-slate-600' },
++  ABSENCE_OF_TRIGGER: { text: 'Nothing triggered this rule', icon: XCircle, classes: 'bg-slate-100 text-slate-600' },
++  POSITIVE_INDETERMINATE: { text: 'Cannot confirm — missing information', icon: HelpCircle, classes: 'bg-amber-50 text-amber-700' },
++};
++
+ export const EvidenceDrawer: React.FC<{ requirement: Requirement }> = ({ requirement }) => {
+   return (
+-    <div className="bg-slate-50 border-t border-slate-200 p-4 text-xs space-y-4 rounded-b">
+-      {/* Evidence Items */}
++    <div className="bg-slate-50 border-t border-slate-100 p-4 sm:p-5 space-y-4">
+       {requirement.evidence && requirement.evidence.length > 0 ? (
+-        requirement.evidence.map((ev, idx) => (
+-          <div key={idx} className="bg-white border border-slate-200 rounded p-3.5 shadow-2xs space-y-3">
+-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
+-              <div className="flex items-center gap-2">
+-                <span className="font-mono font-bold text-gov-navy bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+-                  {ev.rule_id} v{ev.version}
+-                </span>
+-                <span className="font-bold text-slate-800">{ev.rule_name}</span>
+-              </div>
+-              <div className="flex items-center gap-2">
+-                <ConfidenceTag status={ev.verification_status} />
+-                {ev.last_verified && (
+-                  <span className="text-[10px] text-slate-500 flex items-center gap-1 font-mono">
+-                    <Calendar className="w-3 h-3 text-slate-400" />
+-                    Verified: {ev.last_verified}
++        requirement.evidence.map((ev, idx) => {
++          const kind = KIND_LABEL[ev.evidence_kind];
++          const KindIcon = kind?.icon;
++          return (
++            <div key={idx} className="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
++              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-100">
++                <div className="flex items-center gap-2 text-sm">
++                  <span className="font-mono text-xs font-medium text-brand bg-brand-tint px-2 py-0.5 rounded-md">
++                    {ev.rule_id}
+                   </span>
+-                )}
++                  <span className="font-medium text-ink-900">{ev.rule_name}</span>
++                </div>
++                <div className="flex items-center gap-2">
++                  <ConfidenceTag status={ev.verification_status} />
++                  {ev.last_verified && (
++                    <span className="text-xs text-slate-400 flex items-center gap-1">
++                      <Calendar className="w-3 h-3" />
++                      {ev.last_verified}
++                    </span>
++                  )}
++                </div>
+               </div>
+-            </div>
+ 
+-            {/* Evidence Kind Banner */}
+-            <div className="flex items-center gap-2 text-[11.5px]">
+-              <span className="font-semibold text-slate-600">Evaluation Outcome:</span>
+-              {ev.evidence_kind === 'POSITIVE_DEFINITE' && (
+-                <span className="inline-flex items-center gap-1 text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+-                  Condition Evaluated TRUE &rarr; Positive Requirement
+-                </span>
+-              )}
+-              {ev.evidence_kind === 'ACTIVE_EXCLUSION' && (
+-                <span className="inline-flex items-center gap-1 text-slate-800 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
+-                  <XCircle className="w-3.5 h-3.5 text-slate-500" />
+-                  Active Statutory Exclusion Rule Fired TRUE (Definitive Negative)
+-                </span>
+-              )}
+-              {ev.evidence_kind === 'ABSENCE_OF_TRIGGER' && (
+-                <span className="inline-flex items-center gap-1 text-slate-600 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+-                  Absence of Trigger &rarr; Requiring conditions did not fire
+-                </span>
+-              )}
+-              {ev.evidence_kind === 'POSITIVE_INDETERMINATE' && (
+-                <span className="inline-flex items-center gap-1 text-amber-800 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+-                  <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+-                  Condition Indeterminate due to missing fact vector input
+-                </span>
++              {kind && (
++                <div className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${kind.classes}`}>
++                  <KindIcon className="w-3.5 h-3.5" />
++                  {kind.text}
++                </div>
+               )}
+-            </div>
+ 
+-            {/* Facts Used Table */}
+-            {ev.facts_used && ev.facts_used.length > 0 && (
+-              <div>
+-                <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1">
+-                  <Scale className="w-3.5 h-3.5 text-gov-navyLight" />
+-                  Facts Consulted & Condition Sub-expressions:
+-                </div>
+-                <div className="overflow-x-auto border border-slate-200 rounded">
+-                  <table className="w-full text-left border-collapse text-[11px]">
+-                    <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
++              {ev.facts_used && ev.facts_used.length > 0 && (
++                <div className="overflow-x-auto rounded-lg border border-slate-200">
++                  <table className="w-full text-left text-xs">
++                    <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
+                       <tr>
+-                        <th className="p-2">Fact Key</th>
+-                        <th className="p-2">Applicant Declared Value</th>
+-                        <th className="p-2">Operator / Target</th>
+-                        <th className="p-2">Sub-Expression Result</th>
+-                        <th className="p-2">Origin</th>
++                        <th className="p-2 font-medium">What we checked</th>
++                        <th className="p-2 font-medium">Your value</th>
++                        <th className="p-2 font-medium">Condition</th>
++                        <th className="p-2 font-medium">Result</th>
+                       </tr>
+                     </thead>
+-                    <tbody className="divide-y divide-slate-200 font-mono">
++                    <tbody className="divide-y divide-slate-100">
+                       {ev.facts_used.map((f, fIdx) => (
+-                        <tr key={fIdx} className="hover:bg-slate-50">
+-                          <td className="p-2 font-bold text-gov-navy">{f.fact}</td>
+-                          <td className="p-2 text-slate-800">
+-                            {f.value === null ? '<MISSING>' : String(f.value)}
+-                          </td>
+-                          <td className="p-2 text-slate-600">
+-                            {f.op} {JSON.stringify(f.target)}
+-                          </td>
++                        <tr key={fIdx}>
++                          <td className="p-2 font-medium text-ink-900">{f.fact}</td>
++                          <td className="p-2 text-slate-600">{f.value === null ? '—' : String(f.value)}</td>
++                          <td className="p-2 text-slate-500">{f.op} {JSON.stringify(f.target)}</td>
+                           <td className="p-2">
+                             {f.result === 'TRUE' ? (
+-                              <span className="text-emerald-700 font-bold">TRUE</span>
++                              <span className="text-emerald-600 font-medium">Yes</span>
+                             ) : f.result === 'FALSE' ? (
+-                              <span className="text-slate-500 font-bold">FALSE</span>
++                              <span className="text-slate-400 font-medium">No</span>
+                             ) : (
+-                              <span className="text-amber-700 font-bold">UNKNOWN</span>
++                              <span className="text-amber-600 font-medium">Unknown</span>
+                             )}
+                           </td>
+-                          <td className="p-2">
+-                            <span
+-                              className={`text-[9.5px] px-1.5 py-0.5 rounded font-sans font-semibold ${
+-                                f.fact_origin === 'DERIVED'
+-                                  ? 'bg-blue-100 text-blue-800 border border-blue-200'
+-                                  : 'bg-slate-100 text-slate-700 border border-slate-200'
+-                              }`}
+-                            >
+-                              {f.fact_origin}
+-                            </span>
+-                          </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </table>
+                 </div>
+-              </div>
+-            )}
++              )}
+ 
+-            {/* Note / Legal Reasoning */}
+-            {ev.note && (
+-              <div className="bg-slate-50 p-2.5 rounded border border-slate-200 text-slate-700 text-[11px] leading-relaxed">
+-                <strong>Statutory Note:</strong> {ev.note}
+-              </div>
+-            )}
++              {ev.note && <div className="bg-slate-50 rounded-lg p-2.5 text-xs text-slate-600">{ev.note}</div>}
+ 
+-            {/* Official Source Provenance & Link */}
+-            {ev.source_detail && (
+-              <div className="bg-gov-navy/5 border border-gov-navy/15 rounded p-3 text-slate-800 space-y-1.5">
+-                <div className="flex items-center justify-between">
+-                  <div className="font-bold text-gov-navy flex items-center gap-1.5 text-xs">
+-                    <BookOpen className="w-3.5 h-3.5 text-gov-gold" />
+-                    Authoritative Gazette & Statutory Authority:
++              {ev.source_detail && (
++                <div className="bg-brand-tint rounded-lg p-3 space-y-1.5">
++                  <div className="flex items-center justify-between">
++                    <div className="font-medium text-brand-dark flex items-center gap-1.5 text-xs">
++                      <BookOpen className="w-3.5 h-3.5" />
++                      Official source
++                    </div>
++                    {ev.source_detail.source_url && (
++                      <a
++                        href={ev.source_detail.source_url}
++                        target="_blank"
++                        rel="noopener noreferrer"
++                        className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:text-brand-dark bg-white px-2 py-1 rounded-md"
++                      >
++                        View source
++                        <ExternalLink className="w-3 h-3" />
++                      </a>
++                    )}
+                   </div>
+-                  {ev.source_detail.source_url && (
+-                    <a
+-                      href={ev.source_detail.source_url}
+-                      target="_blank"
+-                      rel="noopener noreferrer"
+-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-gov-navy hover:text-gov-navyLight bg-white px-2 py-1 rounded border border-gov-navy/20 hover:border-gov-navy shadow-2xs transition"
+-                    >
+-                      View Official Source
+-                      <ExternalLink className="w-3 h-3 text-gov-gold" />
+-                    </a>
+-                  )}
+-                </div>
+-
+-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+-                  <div>
+-                    <span className="text-slate-500 block">Department / Authority:</span>
+-                    <span className="font-semibold text-slate-800">{ev.source_detail.authority}</span>
+-                  </div>
+-                  <div>
+-                    <span className="text-slate-500 block">Instrument / Gazette Order:</span>
+-                    <span className="font-semibold text-slate-800">
+-                      {ev.source_detail.document_title}{' '}
+-                      {ev.source_detail.document_number ? `(${ev.source_detail.document_number})` : ''}
+-                    </span>
++                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-ink-700">
++                    <div>
++                      <span className="text-slate-500 block">Authority</span>
++                      {ev.source_detail.authority}
++                    </div>
++                    <div>
++                      <span className="text-slate-500 block">Document</span>
++                      {ev.source_detail.document_title} {ev.source_detail.document_number ? `(${ev.source_detail.document_number})` : ''}
++                    </div>
+                   </div>
+                 </div>
+-              </div>
+-            )}
+-          </div>
+-        ))
++              )}
++            </div>
++          );
++        })
+       ) : (
+-        <div className="text-slate-500 italic p-3 bg-white rounded border border-slate-200">
+-          No rule evaluation trace recorded for this requirement.
++        <div className="text-sm text-slate-500 italic p-3 bg-white rounded-xl border border-slate-200">
++          No rule trace recorded.
+         </div>
+       )}
+ 
+-      {/* Dependency Graph Sequencing Notice */}
+       {requirement.depends_on && requirement.depends_on.length > 0 && (
+-        <div className="bg-white border border-slate-200 rounded p-3 text-[11px] space-y-1.5">
+-          <div className="font-bold text-gov-navy uppercase tracking-wider flex items-center gap-1">
+-            <Clock className="w-3.5 h-3.5 text-gov-navyLight" />
+-            Statutory Workflow Dependencies:
+-          </div>
+-          <div className="space-y-1">
+-            {requirement.depends_on.map((dep, dIdx) => (
+-              <div key={dIdx} className="flex items-start gap-2 bg-slate-50 p-2 rounded border border-slate-200">
+-                <ArrowRight className="w-3.5 h-3.5 text-gov-navy mt-0.5 shrink-0" />
+-                <div>
+-                  <span className="font-bold text-gov-navy mr-1.5">{dep.requirement_id}</span>
+-                  <span className="text-slate-700 font-medium">({dep.dependency_type} Precondition):</span>
+-                  <span className="text-slate-600 ml-1">{dep.basis}</span>
+-                </div>
+-              </div>
+-            ))}
++        <div className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-1.5">
++          <div className="text-xs font-medium text-ink-700 flex items-center gap-1.5">
++            <ArrowRight className="w-3.5 h-3.5 text-brand" />
++            Do these first
+           </div>
++          {requirement.depends_on.map((dep, dIdx) => (
++            <div key={dIdx} className="flex items-start gap-2 bg-slate-50 p-2 rounded-lg text-xs">
++              <span className="font-medium text-brand">{dep.requirement_id}</span>
++              <span className="text-slate-500">{dep.basis}</span>
++            </div>
++          ))}
+         </div>
+       )}
+     </div>
+diff --git a/frontend/src/components/results/MissingFactsBox.tsx b/frontend/src/components/results/MissingFactsBox.tsx
+index 4023be2..0103fea 100644
+--- a/frontend/src/components/results/MissingFactsBox.tsx
++++ b/frontend/src/components/results/MissingFactsBox.tsx
+@@ -1,22 +1,16 @@
+ import React, { useState } from 'react';
+-import { HelpCircle, RefreshCw, CheckCircle2, ArrowRight } from 'lucide-react';
++import { HelpCircle, RefreshCw } from 'lucide-react';
+ import { Requirement } from '../../types/engine';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+-export const MissingFactsBox: React.FC<{ unknownRequirements: Requirement[] }> = ({
+-  unknownRequirements,
+-}) => {
++export const MissingFactsBox: React.FC<{ unknownRequirements: Requirement[] }> = ({ unknownRequirements }) => {
+   const { facts, setFact, runEvaluation, isLoading } = useAssessment();
+   const [localMpcb, setLocalMpcb] = useState<string>(facts.mpcb_category || '');
+   const [localEsic, setLocalEsic] = useState<boolean | null>(facts.in_esic_implemented_area ?? null);
+ 
+   if (!unknownRequirements || unknownRequirements.length === 0) return null;
+ 
+-  // Extract unique missing facts
+-  const allMissing = Array.from(
+-    new Set(unknownRequirements.flatMap((r) => r.missing_facts || []))
+-  );
+-
++  const allMissing = Array.from(new Set(unknownRequirements.flatMap((r) => r.missing_facts || [])));
+   if (allMissing.length === 0) return null;
+ 
+   const handleUpdateAndReEvaluate = async () => {
+@@ -27,94 +21,65 @@ export const MissingFactsBox: React.FC<{ unknownRequirements: Requirement[] }> =
+     };
+     if (localMpcb) setFact('mpcb_category', localMpcb);
+     if (localEsic !== null) setFact('in_esic_implemented_area', localEsic);
+-
+     await runEvaluation(updatedFacts);
+   };
+ 
+   return (
+-    <div className="bg-amber-50/70 border border-amber-300 rounded-md p-4 mb-6 shadow-xs">
+-      <div className="flex items-start justify-between gap-3 mb-3">
+-        <div className="flex items-center gap-2">
+-          <HelpCircle className="w-5 h-5 text-amber-700 shrink-0" />
+-          <div>
+-            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900">
+-              Action Required: Missing Regulatory Facts
+-            </h3>
+-            <p className="text-[11.5px] text-amber-800 mt-0.5">
+-              The engine safely yielded <strong>UNKNOWN</strong> for {unknownRequirements.length} requirement(s) rather than guessing. Provide the missing parameters below to resolve statutory applicability.
+-            </p>
+-          </div>
++    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5">
++      <div className="flex items-start gap-2.5 mb-4">
++        <HelpCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
++        <div>
++          <h3 className="text-sm font-semibold text-amber-900">A couple more details would help</h3>
++          <p className="text-sm text-amber-800 mt-0.5">
++            {unknownRequirements.length} item{unknownRequirements.length > 1 ? 's are' : ' is'} waiting on this — we won't guess.
++          </p>
+         </div>
+       </div>
+ 
+-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-amber-200">
+-        {/* MPCB Category missing fact */}
++      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         {allMissing.includes('mpcb_category') && (
+-          <div className="bg-white p-3 rounded border border-amber-200">
+-            <label className="block text-xs font-bold text-slate-800 mb-1">
+-              Pollution Control Category (Affects Consent to Establish & Operate)
+-            </label>
+-            <p className="text-[10.5px] text-slate-500 mb-2">
+-              Required by MPCB under Water Act 1974 s.25 & Air Act 1981 s.21.
+-            </p>
++          <div className="bg-white p-3.5 rounded-xl border border-amber-100">
++            <label className="field-label">Pollution control category</label>
+             <select
+               value={localMpcb}
+               onChange={(e) => setLocalMpcb(e.target.value)}
+-              className="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-gov-navy font-medium"
++              className="field-input"
+             >
+-              <option value="">-- Still Unspecified (Remain UNKNOWN) --</option>
+-              <option value="Orange">Orange Category (Fruit/Food Processing Typical)</option>
+-              <option value="Red">Red Category (Heavy discharge / High BOD)</option>
+-              <option value="Green">Green Category (Low pollution / Bakery)</option>
+-              <option value="White">White Category (Non-polluting / Intimation only)</option>
++              <option value="">Still not sure</option>
++              <option value="Orange">Orange (typical for food processing)</option>
++              <option value="Red">Red (heavy discharge)</option>
++              <option value="Green">Green (low pollution)</option>
++              <option value="White">White (non-polluting)</option>
+             </select>
+           </div>
+         )}
+ 
+-        {/* ESIC Implemented Area missing fact */}
+         {allMissing.includes('in_esic_implemented_area') && (
+-          <div className="bg-white p-3 rounded border border-amber-200">
+-            <label className="block text-xs font-bold text-slate-800 mb-1">
+-              ESIC Notified District Status (Affects ESIC Registration)
+-            </label>
+-            <p className="text-[10.5px] text-slate-500 mb-2">
+-              Maharashtra is a partially implemented state under ESI Act 1948 s.1(5).
+-            </p>
++          <div className="bg-white p-3.5 rounded-xl border border-amber-100">
++            <label className="field-label">Is your area ESIC-notified?</label>
+             <div className="flex gap-4 mt-2">
+-              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700">
+-                <input
+-                  type="radio"
+-                  name="esic_area"
+-                  checked={localEsic === true}
+-                  onChange={() => setLocalEsic(true)}
+-                  className="text-gov-navy focus:ring-gov-navy"
+-                />
+-                Unit is in ESIC Notified Area
++              <label className="flex items-center gap-2 cursor-pointer text-sm text-ink-700">
++                <input type="radio" name="esic_area" checked={localEsic === true} onChange={() => setLocalEsic(true)} className="text-brand focus:ring-brand" />
++                Yes
+               </label>
+-              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-slate-700">
+-                <input
+-                  type="radio"
+-                  name="esic_area"
+-                  checked={localEsic === false}
+-                  onChange={() => setLocalEsic(false)}
+-                  className="text-gov-navy focus:ring-gov-navy"
+-                />
+-                Non-Notified Rural Area
++              <label className="flex items-center gap-2 cursor-pointer text-sm text-ink-700">
++                <input type="radio" name="esic_area" checked={localEsic === false} onChange={() => setLocalEsic(false)} className="text-brand focus:ring-brand" />
++                No
+               </label>
+             </div>
+           </div>
+         )}
+       </div>
+ 
+-      <div className="mt-3.5 pt-2 flex justify-end">
++      <div className="mt-4 flex justify-end">
+         <button
+           type="button"
+           disabled={isLoading}
+           onClick={handleUpdateAndReEvaluate}
+-          className="px-4 py-2 bg-gov-navy text-white hover:bg-gov-navyLight rounded text-xs font-bold flex items-center gap-2 transition shadow-xs disabled:opacity-50"
++          className="px-4 py-2 bg-brand text-white hover:bg-brand-dark rounded-full text-sm font-medium flex items-center gap-2 transition disabled:opacity-50"
+         >
+           <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+-          {isLoading ? 'Re-evaluating...' : 'Supply Missing Facts & Re-evaluate'}
++          {isLoading ? 'Updating…' : 'Update and re-check'}
+         </button>
+       </div>
+     </div>
+diff --git a/frontend/src/components/results/RequirementCard.tsx b/frontend/src/components/results/RequirementCard.tsx
+index de3caf5..61f6975 100644
+--- a/frontend/src/components/results/RequirementCard.tsx
++++ b/frontend/src/components/results/RequirementCard.tsx
+@@ -1,137 +1,75 @@
+ import React, { useState } from 'react';
+-import {
+-  ChevronDown,
+-  ChevronUp,
+-  Clock,
+-  Landmark,
+-  FileText,
+-  HelpCircle,
+-  Calculator,
+-  ShieldCheck,
+-} from 'lucide-react';
++import { ChevronDown, ChevronUp, Landmark, FileText, Clock, HelpCircle, Calculator } from 'lucide-react';
+ import { Requirement } from '../../types/engine';
+ import { StatusBadge } from '../common/StatusBadge';
+ import { ConfidenceTag } from '../common/ConfidenceTag';
+ import { EvidenceDrawer } from './EvidenceDrawer';
+ 
+-export const RequirementCard: React.FC<{
+-  requirement: Requirement;
+-  defaultExpanded?: boolean;
+-}> = ({ requirement, defaultExpanded = false }) => {
+-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
++const ACCENT: Record<string, string> = {
++  APPLICABLE: 'border-l-emerald-400',
++  UNKNOWN: 'border-l-amber-400',
++  NOT_APPLICABLE: 'border-l-slate-200',
++  CONFLICT: 'border-l-red-400',
++};
+ 
+-  const getBorderColor = () => {
+-    switch (requirement.state) {
+-      case 'APPLICABLE':
+-        return 'border-l-4 border-l-emerald-600 border-slate-300';
+-      case 'UNKNOWN':
+-        return 'border-l-4 border-l-amber-600 border-slate-300';
+-      case 'NOT_APPLICABLE':
+-        return 'border-l-4 border-l-slate-400 border-slate-200 opacity-90';
+-      case 'CONFLICT':
+-        return 'border-l-4 border-l-rose-600 border-slate-300';
+-      default:
+-        return 'border-slate-300';
+-    }
+-  };
++export const RequirementCard: React.FC<{ requirement: Requirement; defaultExpanded?: boolean }> = ({
++  requirement,
++  defaultExpanded = false,
++}) => {
++  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+ 
+   return (
+-    <div className={`bg-white rounded border shadow-2xs transition ${getBorderColor()}`}>
+-      <div className="p-4">
+-        {/* Top Meta Row */}
+-        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+-          <div className="flex items-center gap-2">
+-            <span className="font-mono text-xs font-bold text-gov-navy bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+-              {requirement.requirement_id}
+-            </span>
+-            <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
+-              {requirement.requirement_type}
+-            </span>
+-            {requirement.quantity && requirement.quantity.value !== null && (
+-              <span className="text-[11px] font-bold text-gov-navy bg-gov-gold/15 text-gov-navy px-2 py-0.5 rounded border border-gov-gold/40 flex items-center gap-1">
+-                <Calculator className="w-3 h-3 text-gov-gold" />
+-                Required Quantity: {requirement.quantity.value}
+-              </span>
+-            )}
+-          </div>
+-
+-          <div className="flex items-center gap-2">
+-            <ConfidenceTag confidence={requirement.confidence} />
++    <div className={`bg-white rounded-2xl border border-slate-200 border-l-4 ${ACCENT[requirement.state] || 'border-l-slate-200'} overflow-hidden`}>
++      <div className="p-4 sm:p-5">
++        <div className="flex flex-wrap items-start justify-between gap-2 mb-1.5">
++          <h4 className="text-sm font-semibold text-ink-900 leading-snug pr-4">{requirement.name}</h4>
++          <div className="flex items-center gap-2 shrink-0">
+             <StatusBadge state={requirement.state} size="sm" />
+           </div>
+         </div>
+ 
+-        {/* Title */}
+-        <h4 className="text-sm font-bold text-gov-navy leading-snug">
+-          {requirement.name}
+-        </h4>
+-
+-        {/* Details Grid */}
+-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2.5 text-xs text-slate-600">
+-          <div className="flex items-center gap-1.5">
+-            <Landmark className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+-            <span className="truncate" title={requirement.authority}>
+-              {requirement.authority || 'Competent Authority'}
+-            </span>
+-          </div>
+-
+-          <div className="flex items-center gap-1.5">
+-            <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+-            <span className="truncate" title={requirement.statute}>
+-              {requirement.statute || 'Statute / Rules'}
++        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 mt-2">
++          <span className="flex items-center gap-1.5">
++            <Landmark className="w-3.5 h-3.5 text-slate-400" />
++            {requirement.authority || 'Competent authority'}
++          </span>
++          <span className="flex items-center gap-1.5">
++            <FileText className="w-3.5 h-3.5 text-slate-400" />
++            {requirement.statute || 'Statute'}
++          </span>
++          <span className="flex items-center gap-1.5">
++            <Clock className="w-3.5 h-3.5 text-slate-400" />
++            {requirement.sla_days ? `${requirement.sla_days} day turnaround` : 'No fixed turnaround'}
++          </span>
++          {requirement.quantity && requirement.quantity.value !== null && (
++            <span className="flex items-center gap-1.5 font-medium text-brand">
++              <Calculator className="w-3.5 h-3.5" />
++              Quantity needed: {requirement.quantity.value}
+             </span>
+-          </div>
+-
+-          <div className="flex items-center gap-1.5">
+-            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+-            <span>Statutory SLA: {requirement.sla_days ? `${requirement.sla_days} Days` : 'Immediate'}</span>
+-          </div>
++          )}
+         </div>
+ 
+-        {/* Missing Facts Notice for UNKNOWN */}
+         {requirement.state === 'UNKNOWN' && requirement.missing_facts && requirement.missing_facts.length > 0 && (
+-          <div className="mt-3 bg-amber-50 p-2.5 rounded border border-amber-200 text-xs text-amber-900 flex items-start gap-2">
+-            <HelpCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+-            <div>
+-              <span className="font-bold">Missing Input Facts: </span>
+-              <span className="font-mono font-medium">{requirement.missing_facts.join(', ')}</span>
+-              <span className="block text-[11px] text-amber-800 mt-0.5">
+-                The engine cannot deterministically confirm applicability without these parameters.
+-              </span>
+-            </div>
++          <div className="mt-3 flex items-start gap-2 bg-amber-50 rounded-lg p-2.5 text-xs text-amber-800">
++            <HelpCircle className="w-4 h-4 shrink-0 mt-0.5" />
++            <span>
++              Still need: <span className="font-medium">{requirement.missing_facts.join(', ')}</span>
++            </span>
+           </div>
+         )}
+ 
+-        {/* Action Expand Bar */}
+-        <div className="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between">
++        <div className="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between">
+           <button
+             onClick={() => setIsExpanded(!isExpanded)}
+-            className="text-xs font-bold text-gov-navy hover:text-gov-navyLight flex items-center gap-1 transition"
++            className="text-xs font-medium text-brand hover:text-brand-dark flex items-center gap-1 transition"
+           >
+-            {isExpanded ? (
+-              <>
+-                <ChevronUp className="w-4 h-4" />
+-                Hide Statutory Trace & Evidence
+-              </>
+-            ) : (
+-              <>
+-                <ChevronDown className="w-4 h-4" />
+-                {requirement.state === 'APPLICABLE'
+-                  ? 'Why is this required? (View Legal Evidence)'
+-                  : requirement.state === 'NOT_APPLICABLE'
+-                  ? 'Why is this not applicable? (View Exclusion Trace)'
+-                  : 'View Rule Provenance & Evidence'}
+-              </>
+-            )}
++            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
++            {isExpanded ? 'Hide details' : 'Why? See the rule and source'}
+           </button>
+-
+-          <span className="text-[11px] text-slate-400 font-mono">
+-            {requirement.evidence?.length || 0} rule(s) evaluated
+-          </span>
++          <ConfidenceTag confidence={requirement.confidence} />
+         </div>
+       </div>
+ 
+-      {/* Expandable Evidence Drawer */}
+       {isExpanded && <EvidenceDrawer requirement={requirement} />}
+     </div>
+   );
+diff --git a/frontend/src/components/results/SummaryCards.tsx b/frontend/src/components/results/SummaryCards.tsx
+index e084e3f..10d4359 100644
+--- a/frontend/src/components/results/SummaryCards.tsx
++++ b/frontend/src/components/results/SummaryCards.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { CheckCircle2, XCircle, HelpCircle, AlertTriangle, Cpu, ArrowRight } from 'lucide-react';
++import { CheckCircle2, HelpCircle, XCircle, AlertTriangle } from 'lucide-react';
+ import { EvaluationSummary } from '../../types/engine';
+ 
+ interface SummaryCardsProps {
+@@ -9,101 +9,42 @@ interface SummaryCardsProps {
+ }
+ 
+ export const SummaryCards: React.FC<SummaryCardsProps> = ({ summary, activeTab, onSelectTab }) => {
+-  return (
+-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-6">
+-      {/* Applicable */}
+-      <div
+-        onClick={() => onSelectTab('APPLICABLE')}
+-        className={`p-3.5 rounded border transition cursor-pointer ${
+-          activeTab === 'APPLICABLE'
+-            ? 'bg-emerald-50 border-emerald-500 shadow-sm ring-1 ring-emerald-500'
+-            : 'bg-white border-slate-300 hover:border-emerald-400 hover:bg-emerald-50/40'
+-        }`}
+-      >
+-        <div className="flex items-center justify-between">
+-          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+-            Applicable
+-          </span>
+-          <span className="text-xl font-bold text-emerald-900 font-mono">
+-            {summary.applicable}
+-          </span>
+-        </div>
+-        <div className="text-[11px] text-emerald-700 mt-1">
+-          Statutory clearances required to establish & operate
+-        </div>
+-      </div>
+-
+-      {/* Needs Information */}
+-      <div
+-        onClick={() => onSelectTab('UNKNOWN')}
+-        className={`p-3.5 rounded border transition cursor-pointer ${
+-          activeTab === 'UNKNOWN'
+-            ? 'bg-amber-50 border-amber-500 shadow-sm ring-1 ring-amber-500'
+-            : 'bg-white border-slate-300 hover:border-amber-400 hover:bg-amber-50/40'
+-        }`}
+-      >
+-        <div className="flex items-center justify-between">
+-          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+-            <HelpCircle className="w-4 h-4 text-amber-600" />
+-            Needs Info
+-          </span>
+-          <span className="text-xl font-bold text-amber-900 font-mono">
+-            {summary.unknown}
+-          </span>
+-        </div>
+-        <div className="text-[11px] text-amber-700 mt-1">
+-          Missing facts require applicant clarification
+-        </div>
+-      </div>
++  const cards = [
++    { key: 'APPLICABLE', label: 'Required', count: summary.applicable, icon: CheckCircle2, color: 'emerald' },
++    { key: 'UNKNOWN', label: 'Need info', count: summary.unknown, icon: HelpCircle, color: 'amber' },
++    { key: 'NOT_APPLICABLE', label: 'Not needed', count: summary.not_applicable, icon: XCircle, color: 'slate' },
++    { key: 'CONFLICT', label: 'Conflicts', count: summary.conflict, icon: AlertTriangle, color: 'red' },
++  ];
+ 
+-      {/* Not Applicable */}
+-      <div
+-        onClick={() => onSelectTab('NOT_APPLICABLE')}
+-        className={`p-3.5 rounded border transition cursor-pointer ${
+-          activeTab === 'NOT_APPLICABLE'
+-            ? 'bg-slate-100 border-slate-500 shadow-sm ring-1 ring-slate-500'
+-            : 'bg-white border-slate-300 hover:border-slate-400 hover:bg-slate-50'
+-        }`}
+-      >
+-        <div className="flex items-center justify-between">
+-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+-            <XCircle className="w-4 h-4 text-slate-500" />
+-            Excluded
+-          </span>
+-          <span className="text-xl font-bold text-slate-800 font-mono">
+-            {summary.not_applicable}
+-          </span>
+-        </div>
+-        <div className="text-[11px] text-slate-600 mt-1">
+-          Active statutory exclusions or un-triggered items
+-        </div>
+-      </div>
++  const colorMap: Record<string, { bg: string; ring: string; text: string; iconText: string }> = {
++    emerald: { bg: 'bg-emerald-50', ring: 'ring-emerald-400', text: 'text-emerald-800', iconText: 'text-emerald-600' },
++    amber: { bg: 'bg-amber-50', ring: 'ring-amber-400', text: 'text-amber-800', iconText: 'text-amber-600' },
++    slate: { bg: 'bg-slate-100', ring: 'ring-slate-400', text: 'text-slate-700', iconText: 'text-slate-500' },
++    red: { bg: 'bg-red-50', ring: 'ring-red-400', text: 'text-red-800', iconText: 'text-red-600' },
++  };
+ 
+-      {/* Conflict */}
+-      <div
+-        onClick={() => onSelectTab('CONFLICT')}
+-        className={`p-3.5 rounded border transition cursor-pointer ${
+-          activeTab === 'CONFLICT'
+-            ? 'bg-rose-50 border-rose-500 shadow-sm ring-1 ring-rose-500'
+-            : summary.conflict > 0
+-            ? 'bg-rose-50/50 border-rose-300'
+-            : 'bg-white border-slate-300 hover:border-slate-400'
+-        }`}
+-      >
+-        <div className="flex items-center justify-between">
+-          <span className="text-[11px] font-bold uppercase tracking-wider text-rose-800 flex items-center gap-1.5">
+-            <AlertTriangle className="w-4 h-4 text-rose-600" />
+-            Conflict
+-          </span>
+-          <span className="text-xl font-bold text-rose-900 font-mono">
+-            {summary.conflict}
+-          </span>
+-        </div>
+-        <div className="text-[11px] text-rose-700 mt-1">
+-          {summary.conflict === 0 ? 'No regulatory contradictions' : 'Rule contradiction detected'}
+-        </div>
+-      </div>
++  return (
++    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
++      {cards.map((c) => {
++        const Icon = c.icon;
++        const active = activeTab === c.key;
++        const col = colorMap[c.color];
++        return (
++          <button
++            key={c.key}
++            onClick={() => onSelectTab(c.key)}
++            className={`text-left p-4 rounded-xl border transition ${
++              active ? `${col.bg} border-transparent ring-2 ${col.ring}` : 'bg-white border-slate-200 hover:border-slate-300'
++            }`}
++          >
++            <div className="flex items-center justify-between">
++              <Icon className={`w-4 h-4 ${col.iconText}`} />
++              <span className="text-2xl font-semibold text-ink-900">{c.count}</span>
++            </div>
++            <div className="text-sm font-medium text-ink-700 mt-1.5">{c.label}</div>
++          </button>
++        );
++      })}
+     </div>
+   );
+ };
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index 2b8ed1f..08b943e 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -4,17 +4,39 @@
+ 
+ @layer base {
+   body {
+-    @apply bg-slate-50 text-slate-900;
++    @apply bg-slate-50 text-ink-900;
++    -webkit-font-smoothing: antialiased;
++  }
++
++  /* Visible, consistent keyboard focus everywhere */
++  :focus-visible {
++    outline: 2px solid #0B5FA5;
++    outline-offset: 2px;
++    border-radius: 4px;
++  }
++}
++
++@layer utilities {
++  .field-input {
++    @apply w-full text-sm px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white text-ink-900
++      placeholder:text-slate-400 transition
++      focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand;
++  }
++  .field-label {
++    @apply block text-sm font-medium text-ink-700 mb-1.5;
++  }
++  .field-help {
++    @apply text-xs text-slate-500 mt-1.5 leading-relaxed;
+   }
+ }
+ 
+-/* Institutional custom scrollbars */
++/* Slim, quiet scrollbars */
+ ::-webkit-scrollbar {
+   width: 6px;
+   height: 6px;
+ }
+ ::-webkit-scrollbar-track {
+-  background: #f1f5f9;
++  background: transparent;
+ }
+ ::-webkit-scrollbar-thumb {
+   background: #cbd5e1;
+@@ -23,3 +45,11 @@
+ ::-webkit-scrollbar-thumb:hover {
+   background: #94a3b8;
+ }
++
++@media (prefers-reduced-motion: reduce) {
++  *, *::before, *::after {
++    animation-duration: 0.01ms !important;
++    animation-iteration-count: 1 !important;
++    transition-duration: 0.01ms !important;
++  }
++}
+diff --git a/frontend/src/pages/HomePage.tsx b/frontend/src/pages/HomePage.tsx
+index 9225d9d..2a55758 100644
+--- a/frontend/src/pages/HomePage.tsx
++++ b/frontend/src/pages/HomePage.tsx
+@@ -1,15 +1,5 @@
+ import React from 'react';
+-import {
+-  ShieldCheck,
+-  Building2,
+-  FileCheck2,
+-  GitFork,
+-  ArrowRight,
+-  Landmark,
+-  Scale,
+-  Sparkles,
+-  BookOpen,
+-} from 'lucide-react';
++import { ArrowRight, ShieldCheck, BookOpen, GitFork } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { PersonaSelector } from '../components/intake/PersonaSelector';
+ 
+@@ -17,80 +7,55 @@ export const HomePage: React.FC = () => {
+   const { goToStep, resetAssessment } = useAssessment();
+ 
+   return (
+-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+-      {/* Hero Institutional Card */}
+-      <div className="bg-gov-navy text-white rounded-lg p-6 sm:p-8 border-l-8 border-gov-gold shadow-md">
+-        <div className="max-w-3xl space-y-4">
+-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-gov-navyLight text-gov-gold border border-gov-gold/30">
+-            <Landmark className="w-3.5 h-3.5 text-gov-gold" />
+-            Smart India Hackathon 2026 · Problem Statement 26130
+-          </div>
+-
+-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+-            Intelligent Statutory Approval Discovery & Compliance Pre-Scrutiny Platform
+-          </h1>
+-
+-          <p className="text-sm text-slate-200 leading-relaxed">
+-            Eliminates regulatory ambiguity for food processing and industrial units in Maharashtra. 
+-            Deterministically derives the exact set of registrations, licences, permissions, NOCs, 
+-            and safety compliances required under state and central statutes—complete with legal provenance and official gazette citations.
+-          </p>
+-
+-          <div className="pt-2 flex flex-wrap items-center gap-3">
+-            <button
+-              onClick={() => {
+-                resetAssessment();
+-                goToStep(1);
+-              }}
+-              className="px-5 py-2.5 rounded bg-gov-gold text-gov-navy font-bold text-xs uppercase tracking-wider hover:bg-gov-goldLight transition shadow flex items-center gap-2"
+-            >
+-              Start New Compliance Assessment
+-              <ArrowRight className="w-4 h-4" />
+-            </button>
+-          </div>
++    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
++      <div className="text-center space-y-4">
++        <span className="inline-block text-xs font-medium text-brand bg-brand-tint px-3 py-1 rounded-full">
++          Smart India Hackathon 2026 · PS 26130
++        </span>
++        <h1 className="text-3xl sm:text-4xl font-semibold text-ink-900 tracking-tight leading-tight">
++          Know exactly which approvals your business needs
++        </h1>
++        <p className="text-base text-slate-500 max-w-xl mx-auto leading-relaxed">
++          Answer a few questions about your food business in Maharashtra. We'll tell you which
++          registrations and licences apply — and show the exact law behind each one.
++        </p>
++        <div className="pt-2">
++          <button
++            onClick={() => {
++              resetAssessment();
++              goToStep(1);
++            }}
++            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-brand text-white text-sm font-medium hover:bg-brand-dark transition shadow-card"
++          >
++            Start your check
++            <ArrowRight className="w-4 h-4" />
++          </button>
+         </div>
+       </div>
+ 
+-      {/* Preset Persona Quick-Load Component */}
+       <PersonaSelector />
+ 
+-      {/* Core Architectural Pillars */}
+-      <div>
+-        <h2 className="text-sm font-bold uppercase tracking-wider text-gov-navy mb-4 flex items-center gap-2">
+-          <Scale className="w-4 h-4 text-gov-navyLight" />
+-          Statutory Derivation Architecture & Standards
+-        </h2>
+-
+-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+-          <div className="bg-white p-4 rounded border border-slate-300 shadow-2xs space-y-2">
+-            <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-gov-navy font-bold">
+-              <ShieldCheck className="w-4 h-4 text-emerald-700" />
+-            </div>
+-            <h3 className="font-bold text-gov-navy text-sm">Deterministic Kleene Engine</h3>
+-            <p className="text-slate-600 leading-relaxed">
+-              Powered by three-valued logic. Missing facts evaluate strictly as <strong>UNKNOWN</strong> rather than collapsing to false, preventing silent loss of regulatory obligations.
+-            </p>
+-          </div>
+-
+-          <div className="bg-white p-4 rounded border border-slate-300 shadow-2xs space-y-2">
+-            <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-gov-navy font-bold">
+-              <BookOpen className="w-4 h-4 text-gov-navy" />
+-            </div>
+-            <h3 className="font-bold text-gov-navy text-sm">Auditable Gazette Provenance</h3>
+-            <p className="text-slate-600 leading-relaxed">
+-              Every requirement resolution provides complete evidence tracing to specific notifications from DISH, FSSAI, MPCB, Boilers Directorate, and MSME Ministry.
+-            </p>
+-          </div>
+-
+-          <div className="bg-white p-4 rounded border border-slate-300 shadow-2xs space-y-2">
+-            <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center text-gov-navy font-bold">
+-              <GitFork className="w-4 h-4 text-gov-navy" />
+-            </div>
+-            <h3 className="font-bold text-gov-navy text-sm">Parallel Workflow Sequencing</h3>
+-            <p className="text-slate-600 leading-relaxed">
+-              Models legal and operational dependencies as a directed acyclic graph (DAG), identifying parallel tracks and reducing end-to-end journey duration.
+-            </p>
+-          </div>
++      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
++        <div className="space-y-1.5">
++          <ShieldCheck className="w-5 h-5 text-brand" />
++          <h3 className="text-sm font-semibold text-ink-900">Never guesses</h3>
++          <p className="text-sm text-slate-500 leading-relaxed">
++            If we don't have enough information, we say so — instead of assuming an answer.
++          </p>
++        </div>
++        <div className="space-y-1.5">
++          <BookOpen className="w-5 h-5 text-brand" />
++          <h3 className="text-sm font-semibold text-ink-900">Shows its sources</h3>
++          <p className="text-sm text-slate-500 leading-relaxed">
++            Every answer links to the actual law, notification, or department behind it.
++          </p>
++        </div>
++        <div className="space-y-1.5">
++          <GitFork className="w-5 h-5 text-brand" />
++          <h3 className="text-sm font-semibold text-ink-900">Plans the order</h3>
++          <p className="text-sm text-slate-500 leading-relaxed">
++            Understands which approvals depend on others, so you know where to start.
++          </p>
+         </div>
+       </div>
+     </div>
+diff --git a/frontend/src/pages/IntakeWizardPage.tsx b/frontend/src/pages/IntakeWizardPage.tsx
+index 2e00cd7..71a283e 100644
+--- a/frontend/src/pages/IntakeWizardPage.tsx
++++ b/frontend/src/pages/IntakeWizardPage.tsx
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { ArrowLeft, ArrowRight, Check, Building, MapPin, Utensils, Flame, Sparkles } from 'lucide-react';
++import { ArrowLeft, ArrowRight, Check, Building2, MapPin, Utensils, Flame } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { Step1Business } from '../components/intake/Step1Business';
+ import { Step2Location } from '../components/intake/Step2Location';
+@@ -9,108 +9,78 @@ import { ConstraintAlert } from '../components/intake/ConstraintAlert';
+ import { Breadcrumb } from '../components/common/Breadcrumb';
+ 
+ const STEPS = [
+-  { id: 1, title: 'Enterprise Profile', icon: Building },
+-  { id: 2, title: 'Location & Land', icon: MapPin },
+-  { id: 3, title: 'Operations & Labour', icon: Utensils },
+-  { id: 4, title: 'Equipment & Boilers', icon: Flame },
++  { id: 1, title: 'Business', icon: Building2 },
++  { id: 2, title: 'Location', icon: MapPin },
++  { id: 3, title: 'Operations', icon: Utensils },
++  { id: 4, title: 'Equipment', icon: Flame },
+ ];
+ 
+ export const IntakeWizardPage: React.FC = () => {
+   const { currentStep, goToStep, facts } = useAssessment();
+ 
+-  const handleNext = () => {
+-    if (currentStep < 4) {
+-      goToStep(currentStep + 1);
+-    } else {
+-      goToStep(5); // Proceed to review
+-    }
+-  };
+-
+-  const handleBack = () => {
+-    if (currentStep > 1) {
+-      goToStep(currentStep - 1);
+-    } else {
+-      goToStep(0); // Return home
+-    }
+-  };
++  const handleNext = () => goToStep(currentStep < 4 ? currentStep + 1 : 5);
++  const handleBack = () => goToStep(currentStep > 1 ? currentStep - 1 : 0);
+ 
+   return (
+     <div>
+-      <Breadcrumb
+-        items={[
+-          { label: 'Intake Assessment', step: 1 },
+-          { label: STEPS[currentStep - 1]?.title || 'Step' },
+-        ]}
+-      />
+-
+-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+-        {/* Step Indicator Bar */}
+-        <div className="mb-8">
+-          <div className="flex items-center justify-between relative">
+-            <div className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-slate-200 w-full -z-0"></div>
++      <Breadcrumb items={[{ label: 'Compliance check', step: 1 }, { label: STEPS[currentStep - 1]?.title || 'Step' }]} />
+ 
+-            {STEPS.map((step) => {
+-              const isCompleted = currentStep > step.id;
+-              const isCurrent = currentStep === step.id;
+-              const Icon = step.icon;
++      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
++        <div className="flex items-center justify-between mb-10 relative">
++          <div className="absolute left-0 right-0 top-4 h-0.5 bg-slate-200" />
++          {STEPS.map((step) => {
++            const isCompleted = currentStep > step.id;
++            const isCurrent = currentStep === step.id;
++            const Icon = step.icon;
+ 
+-              return (
++            return (
++              <button
++                key={step.id}
++                onClick={() => goToStep(step.id)}
++                className="flex flex-col items-center gap-2 relative z-10 bg-slate-50 px-1"
++              >
+                 <div
+-                  key={step.id}
+-                  onClick={() => goToStep(step.id)}
+-                  className="flex flex-col items-center cursor-pointer relative z-10 group"
++                  className={`w-8 h-8 rounded-full flex items-center justify-center transition ${
++                    isCurrent
++                      ? 'bg-brand text-white'
++                      : isCompleted
++                      ? 'bg-emerald-500 text-white'
++                      : 'bg-white text-slate-400 border border-slate-300'
++                  }`}
+                 >
+-                  <div
+-                    className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition border-2 ${
+-                      isCurrent
+-                        ? 'bg-gov-navy text-white border-gov-gold ring-4 ring-gov-gold/20'
+-                        : isCompleted
+-                        ? 'bg-emerald-600 text-white border-emerald-600'
+-                        : 'bg-white text-slate-500 border-slate-300 group-hover:border-gov-navy'
+-                    }`}
+-                  >
+-                    {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+-                  </div>
+-                  <span
+-                    className={`text-[11px] mt-1.5 font-bold uppercase tracking-wider hidden sm:block ${
+-                      isCurrent ? 'text-gov-navy' : isCompleted ? 'text-emerald-700' : 'text-slate-400'
+-                    }`}
+-                  >
+-                    {step.title}
+-                  </span>
++                  {isCompleted ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                 </div>
+-              );
+-            })}
+-          </div>
++                <span className={`text-xs font-medium hidden sm:block ${isCurrent ? 'text-brand' : isCompleted ? 'text-emerald-600' : 'text-slate-400'}`}>
++                  {step.title}
++                </span>
++              </button>
++            );
++          })}
+         </div>
+ 
+-        {/* Live Constraint Guard */}
+         <ConstraintAlert facts={facts} />
+ 
+-        {/* Wizard Form Card */}
+-        <div className="bg-white rounded-lg border border-slate-300 shadow-sm p-6 sm:p-8">
++        <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 sm:p-8">
+           {currentStep === 1 && <Step1Business />}
+           {currentStep === 2 && <Step2Location />}
+           {currentStep === 3 && <Step3Operations />}
+           {currentStep === 4 && <Step4Equipment />}
+ 
+-          {/* Navigation Controls */}
+-          <div className="mt-8 pt-5 border-t border-slate-200 flex items-center justify-between">
++          <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+             <button
+               type="button"
+               onClick={handleBack}
+-              className="px-4 py-2 rounded text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition flex items-center gap-1.5"
++              className="px-4 py-2 rounded-full text-sm font-medium text-ink-700 hover:bg-slate-100 transition flex items-center gap-1.5"
+             >
+               <ArrowLeft className="w-4 h-4" />
+-              {currentStep === 1 ? 'Back to Gateway' : 'Previous Section'}
++              Back
+             </button>
+-
+             <button
+               type="button"
+               onClick={handleNext}
+-              className="px-5 py-2 rounded text-xs font-bold text-white bg-gov-navy hover:bg-gov-navyLight transition shadow flex items-center gap-1.5"
++              className="px-5 py-2.5 rounded-full text-sm font-medium text-white bg-brand hover:bg-brand-dark transition shadow-card flex items-center gap-1.5"
+             >
+-              {currentStep === 4 ? 'Review Declared Profile' : 'Next Section'}
++              {currentStep === 4 ? 'Review answers' : 'Continue'}
+               <ArrowRight className="w-4 h-4" />
+             </button>
+           </div>
+diff --git a/frontend/src/pages/ResultsPage.tsx b/frontend/src/pages/ResultsPage.tsx
+index c8d221a..96177fb 100644
+--- a/frontend/src/pages/ResultsPage.tsx
++++ b/frontend/src/pages/ResultsPage.tsx
+@@ -1,19 +1,5 @@
+ import React, { useState } from 'react';
+-import {
+-  CheckCircle2,
+-  XCircle,
+-  HelpCircle,
+-  AlertTriangle,
+-  FileCheck2,
+-  Calendar,
+-  Layers,
+-  ArrowLeft,
+-  RotateCcw,
+-  Sliders,
+-  Sparkles,
+-  Printer,
+-  ShieldAlert,
+-} from 'lucide-react';
++import { CheckCircle2, XCircle, HelpCircle, AlertTriangle, RotateCcw, Printer, Sliders } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { Breadcrumb } from '../components/common/Breadcrumb';
+ import { SummaryCards } from '../components/results/SummaryCards';
+@@ -25,282 +11,162 @@ import { PersonaSelector } from '../components/intake/PersonaSelector';
+ export const ResultsPage: React.FC = () => {
+   const { evaluationResult, facts, setFact, runEvaluation, goToStep, isLoading } = useAssessment();
+   const [activeTab, setActiveTab] = useState<string>('APPLICABLE');
+-  const [showLiveDemoPanel, setShowLiveDemoPanel] = useState<boolean>(true);
++  const [showDemoPanel, setShowDemoPanel] = useState<boolean>(true);
+ 
+   if (!evaluationResult) {
+     return (
+-      <div className="max-w-5xl mx-auto px-4 py-16 text-center">
+-        <h3 className="text-sm font-bold text-gov-navy mb-2">No Active Assessment Found</h3>
+-        <p className="text-xs text-slate-500 mb-4">Please complete the intake wizard to generate compliance results.</p>
+-        <button
+-          onClick={() => goToStep(1)}
+-          className="px-4 py-2 bg-gov-navy text-white rounded text-xs font-bold"
+-        >
+-          Start New Assessment
++      <div className="max-w-lg mx-auto px-4 py-20 text-center">
++        <h3 className="text-base font-semibold text-ink-900 mb-2">No results yet</h3>
++        <p className="text-sm text-slate-500 mb-5">Complete the questions first to see what applies to your business.</p>
++        <button onClick={() => goToStep(1)} className="px-5 py-2.5 bg-brand text-white rounded-full text-sm font-medium">
++          Start check
+         </button>
+       </div>
+     );
+   }
+ 
+-  const { summary, applicable, not_applicable, unknown, conflict, derived_facts, derivation_diagnostics, warnings } =
+-    evaluationResult;
++  const { summary, applicable, not_applicable, unknown, conflict, derived_facts, warnings } = evaluationResult;
+ 
+-  // Live variable change helper
+   const handleTurnoverShift = async (newTurnover: number) => {
+     setFact('annual_turnover', newTurnover);
+-    const updatedFacts = { ...facts, annual_turnover: newTurnover };
+-    await runEvaluation(updatedFacts);
++    await runEvaluation({ ...facts, annual_turnover: newTurnover });
++  };
++
++  const TABS = [
++    { key: 'APPLICABLE', label: 'Required', count: applicable.length, icon: CheckCircle2, color: 'text-emerald-600 border-emerald-500' },
++    { key: 'UNKNOWN', label: 'Need info', count: unknown.length, icon: HelpCircle, color: 'text-amber-600 border-amber-500' },
++    { key: 'NOT_APPLICABLE', label: 'Not needed', count: not_applicable.length, icon: XCircle, color: 'text-slate-500 border-slate-500' },
++    ...(conflict.length > 0
++      ? [{ key: 'CONFLICT', label: 'Conflicts', count: conflict.length, icon: AlertTriangle, color: 'text-red-600 border-red-500' }]
++      : []),
++  ];
++
++  const listsByTab: Record<string, typeof applicable> = {
++    APPLICABLE: applicable,
++    UNKNOWN: unknown,
++    NOT_APPLICABLE: not_applicable,
++    CONFLICT: conflict,
++  };
++
++  const emptyCopy: Record<string, string> = {
++    APPLICABLE: 'Nothing required based on what you told us.',
++    UNKNOWN: "Nothing is unresolved — we have everything we need.",
++    NOT_APPLICABLE: 'Nothing has been excluded.',
++    CONFLICT: 'No contradictions found.',
+   };
+ 
+   return (
+     <div>
+-      <Breadcrumb
+-        items={[
+-          { label: 'Intake Assessment', step: 1 },
+-          { label: 'Regulatory Compliance Matrix' },
+-        ]}
+-      />
++      <Breadcrumb items={[{ label: 'Compliance check', step: 1 }, { label: 'Results' }]} />
+ 
+-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+-        {/* Title & Metadata Bar */}
+-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-300">
++      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
++        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+           <div>
+-            <div className="flex items-center gap-2">
+-              <span className="text-xs font-bold uppercase tracking-wider text-gov-gold bg-gov-navy px-2 py-0.5 rounded">
+-                Statutory Assessment Report
+-              </span>
+-              <span className="text-xs font-mono text-slate-500">
+-                Evaluation Date: {evaluationResult.as_of}
+-              </span>
+-            </div>
+-            <h1 className="text-xl font-bold text-gov-navy mt-1">
+-              Regulatory Approval & Compliance Assessment Matrix
+-            </h1>
+-            <p className="text-xs text-slate-600">
+-              Unit: <strong className="text-slate-800">{facts._name || facts.entity_name || 'Declared Entity'}</strong> &bull; Location:{' '}
+-              <strong className="text-slate-800">{facts.location_authority} ({facts.land_classification})</strong>
++            <h1 className="text-xl font-semibold text-ink-900">Your compliance results</h1>
++            <p className="text-sm text-slate-500 mt-0.5">
++              {facts._name || facts.entity_name || 'Your business'} · as of {evaluationResult.as_of}
+             </p>
+           </div>
+-
+           <div className="flex items-center gap-2">
+             <button
+               onClick={() => goToStep(1)}
+-              className="px-3.5 py-1.5 rounded text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 transition shadow-2xs flex items-center gap-1.5"
++              className="px-3.5 py-2 rounded-full text-sm font-medium text-ink-700 bg-white border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1.5"
+             >
+-              <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+-              Edit Profile
++              <RotateCcw className="w-3.5 h-3.5" />
++              Edit answers
+             </button>
+             <button
+               onClick={() => window.print()}
+-              className="px-3.5 py-1.5 rounded text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 transition shadow-2xs flex items-center gap-1.5"
++              className="px-3.5 py-2 rounded-full text-sm font-medium text-ink-700 bg-white border border-slate-200 hover:bg-slate-50 transition flex items-center gap-1.5"
+             >
+-              <Printer className="w-3.5 h-3.5 text-slate-500" />
+-              Print / Save
++              <Printer className="w-3.5 h-3.5" />
++              Print
+             </button>
+           </div>
+         </div>
+ 
+-        {/* Persona Selector Bar for Quick Switching */}
+         <PersonaSelector />
+ 
+-        {/* Live Variable Mutation Interactive Demonstration */}
+-        {showLiveDemoPanel && (
+-          <div className="bg-gradient-to-r from-gov-navy to-gov-navyLight text-white rounded-md p-4 shadow-sm">
++        {showDemoPanel && (
++          <div className="bg-brand rounded-2xl p-4 sm:p-5">
+             <div className="flex items-center justify-between mb-2">
+-              <div className="flex items-center gap-2">
+-                <Sliders className="w-4 h-4 text-gov-gold" />
+-                <h3 className="text-xs font-bold uppercase tracking-wider text-gov-gold">
+-                  Live Regulatory Demonstration · FSSAI Turnover Threshold Mutation
+-                </h3>
++              <div className="flex items-center gap-2 text-white text-sm font-medium">
++                <Sliders className="w-4 h-4" />
++                See it react to turnover changes
+               </div>
+-              <button
+-                onClick={() => setShowLiveDemoPanel(false)}
+-                className="text-[11px] text-slate-300 hover:text-white underline"
+-              >
++              <button onClick={() => setShowDemoPanel(false)} className="text-xs text-white/70 hover:text-white underline">
+                 Hide
+               </button>
+             </div>
+-            <p className="text-xs text-slate-200 mb-3 leading-relaxed">
+-              Demonstrates real-time statutory rule re-firing under the <strong>FSSAI 2026 Regulations (effective 1 April 2026)</strong>. 
+-              Click below to toggle annual turnover across statutory thresholds:
+-            </p>
+-            <div className="flex flex-wrap items-center gap-2.5">
+-              <button
+-                disabled={isLoading}
+-                onClick={() => handleTurnoverShift(12000000)}
+-                className={`px-3 py-1.5 rounded text-xs font-bold transition border ${
+-                  facts.annual_turnover === 12000000
+-                    ? 'bg-gov-gold text-gov-navy border-gov-gold ring-2 ring-white/40 font-extrabold'
+-                    : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+-                }`}
+-              >
+-                Set ₹1.20 Cr &rarr; Basic Registration (F-01)
+-              </button>
+-
+-              <button
+-                disabled={isLoading}
+-                onClick={() => handleTurnoverShift(80000000)}
+-                className={`px-3 py-1.5 rounded text-xs font-bold transition border ${
+-                  facts.annual_turnover === 80000000
+-                    ? 'bg-gov-gold text-gov-navy border-gov-gold ring-2 ring-white/40 font-extrabold'
+-                    : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+-                }`}
+-              >
+-                Set ₹8.00 Cr &rarr; State Licence (F-02)
+-              </button>
+-
+-              <button
+-                disabled={isLoading}
+-                onClick={() => handleTurnoverShift(600000000)}
+-                className={`px-3 py-1.5 rounded text-xs font-bold transition border ${
+-                  facts.annual_turnover === 600000000
+-                    ? 'bg-gov-gold text-gov-navy border-gov-gold ring-2 ring-white/40 font-extrabold'
+-                    : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+-                }`}
+-              >
+-                Set ₹60.00 Cr &rarr; Central Licence (F-03)
+-              </button>
++            <p className="text-sm text-white/80 mb-3">Try different turnover levels and watch which FSSAI licence applies.</p>
++            <div className="flex flex-wrap gap-2">
++              {[
++                { v: 12000000, label: '₹1.2Cr → Registration' },
++                { v: 80000000, label: '₹8Cr → State Licence' },
++                { v: 600000000, label: '₹60Cr → Central Licence' },
++              ].map((opt) => (
++                <button
++                  key={opt.v}
++                  disabled={isLoading}
++                  onClick={() => handleTurnoverShift(opt.v)}
++                  className={`px-3.5 py-2 rounded-full text-xs font-medium transition ${
++                    facts.annual_turnover === opt.v ? 'bg-white text-brand-dark' : 'bg-white/10 hover:bg-white/20 text-white'
++                  }`}
++                >
++                  {opt.label}
++                </button>
++              ))}
+             </div>
+           </div>
+         )}
+ 
+-        {/* 4-State Summary Metric Cards */}
+-        <SummaryCards
+-          summary={summary}
+-          activeTab={activeTab}
+-          onSelectTab={setActiveTab}
+-        />
+-
+-        {/* Derived Facts Box (e.g. MSME Eligible = True) */}
+-        <DerivedFactsBox
+-          derivedFacts={derived_facts}
+-          diagnostics={derivation_diagnostics}
+-        />
+-
+-        {/* Actionable Missing Facts Box for UNKNOWN items */}
++        <SummaryCards summary={summary} activeTab={activeTab} onSelectTab={setActiveTab} />
++        <DerivedFactsBox derivedFacts={derived_facts} />
+         <MissingFactsBox unknownRequirements={unknown} />
+ 
+-        {/* Rule Warnings (if any) */}
+         {warnings && warnings.length > 0 && (
+-          <div className="bg-slate-50 border border-slate-300 rounded p-3 text-xs space-y-1.5">
+-            <div className="font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+-              <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
+-              Engine Verification Notices & Warnings ({warnings.length})
+-            </div>
+-            <div className="space-y-1 font-mono text-[11px] text-slate-600">
++          <details className="bg-white border border-slate-200 rounded-2xl p-4 text-sm">
++            <summary className="font-medium text-ink-700 cursor-pointer">
++              {warnings.length} system note{warnings.length > 1 ? 's' : ''}
++            </summary>
++            <div className="mt-2 space-y-1 text-xs text-slate-500">
+               {warnings.map((w, idx) => (
+-                <div key={idx} className="flex items-start gap-2">
+-                  <span className="text-amber-600 font-bold">[{w.severity}]</span>
+-                  <span>
+-                    <strong className="text-slate-800">{w.type}:</strong> {w.message}
+-                  </span>
++                <div key={idx}>
++                  <span className="font-medium text-ink-700">{w.type}:</span> {w.message}
+                 </div>
+               ))}
+             </div>
+-          </div>
++          </details>
+         )}
+ 
+-        {/* Requirement Tab Navigation */}
+-        <div className="border-b border-slate-300 flex items-center space-x-2">
+-          <button
+-            onClick={() => setActiveTab('APPLICABLE')}
+-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition flex items-center gap-1.5 ${
+-              activeTab === 'APPLICABLE'
+-                ? 'border-emerald-600 text-emerald-900'
+-                : 'border-transparent text-slate-500 hover:text-slate-700'
+-            }`}
+-          >
+-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+-            Applicable Approvals ({applicable.length})
+-          </button>
+-
+-          <button
+-            onClick={() => setActiveTab('UNKNOWN')}
+-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition flex items-center gap-1.5 ${
+-              activeTab === 'UNKNOWN'
+-                ? 'border-amber-600 text-amber-900'
+-                : 'border-transparent text-slate-500 hover:text-slate-700'
+-            }`}
+-          >
+-            <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
+-            Needs Information ({unknown.length})
+-          </button>
+-
+-          <button
+-            onClick={() => setActiveTab('NOT_APPLICABLE')}
+-            className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition flex items-center gap-1.5 ${
+-              activeTab === 'NOT_APPLICABLE'
+-                ? 'border-slate-600 text-slate-900'
+-                : 'border-transparent text-slate-500 hover:text-slate-700'
+-            }`}
+-          >
+-            <XCircle className="w-3.5 h-3.5 text-slate-500" />
+-            Not Applicable / Excluded ({not_applicable.length})
+-          </button>
+-
+-          {conflict.length > 0 && (
+-            <button
+-              onClick={() => setActiveTab('CONFLICT')}
+-              className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition flex items-center gap-1.5 ${
+-                activeTab === 'CONFLICT'
+-                  ? 'border-rose-600 text-rose-900'
+-                  : 'border-transparent text-rose-600'
+-              }`}
+-            >
+-              <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
+-              Conflicts ({conflict.length})
+-            </button>
+-          )}
++        <div className="border-b border-slate-200 flex items-center gap-1 overflow-x-auto">
++          {TABS.map((tab) => {
++            const Icon = tab.icon;
++            const active = activeTab === tab.key;
++            return (
++              <button
++                key={tab.key}
++                onClick={() => setActiveTab(tab.key)}
++                className={`pb-2.5 px-3 text-sm font-medium border-b-2 transition flex items-center gap-1.5 whitespace-nowrap ${
++                  active ? tab.color : 'border-transparent text-slate-400 hover:text-slate-600'
++                }`}
++              >
++                <Icon className="w-3.5 h-3.5" />
++                {tab.label} ({tab.count})
++              </button>
++            );
++          })}
+         </div>
+ 
+-        {/* Tab Content List */}
+-        <div className="space-y-3.5">
+-          {activeTab === 'APPLICABLE' && (
+-            <>
+-              {applicable.length > 0 ? (
+-                applicable.map((req) => <RequirementCard key={req.requirement_id} requirement={req} />)
+-              ) : (
+-                <div className="p-8 text-center bg-white rounded border border-slate-200 text-xs text-slate-500">
+-                  No statutory requirements applicable for this fact vector.
+-                </div>
+-              )}
+-            </>
+-          )}
+-
+-          {activeTab === 'UNKNOWN' && (
+-            <>
+-              {unknown.length > 0 ? (
+-                unknown.map((req) => <RequirementCard key={req.requirement_id} requirement={req} defaultExpanded />)
+-              ) : (
+-                <div className="p-8 text-center bg-white rounded border border-slate-200 text-xs text-slate-500">
+-                  All requirements resolved deterministically. Zero indeterminate items.
+-                </div>
+-              )}
+-            </>
+-          )}
+-
+-          {activeTab === 'NOT_APPLICABLE' && (
+-            <>
+-              {not_applicable.length > 0 ? (
+-                not_applicable.map((req) => <RequirementCard key={req.requirement_id} requirement={req} />)
+-              ) : (
+-                <div className="p-8 text-center bg-white rounded border border-slate-200 text-xs text-slate-500">
+-                  No excluded requirements recorded.
+-                </div>
+-              )}
+-            </>
+-          )}
+-
+-          {activeTab === 'CONFLICT' && (
+-            <>
+-              {conflict.length > 0 ? (
+-                conflict.map((req) => <RequirementCard key={req.requirement_id} requirement={req} defaultExpanded />)
+-              ) : (
+-                <div className="p-8 text-center bg-white rounded border border-slate-200 text-xs text-slate-500">
+-                  No contradictory rule conflicts detected.
+-                </div>
+-              )}
+-            </>
++        <div className="space-y-3">
++          {listsByTab[activeTab]?.length > 0 ? (
++            listsByTab[activeTab].map((req) => (
++              <RequirementCard key={req.requirement_id} requirement={req} defaultExpanded={activeTab === 'UNKNOWN' || activeTab === 'CONFLICT'} />
++            ))
++          ) : (
++            <div className="p-10 text-center bg-white rounded-2xl border border-slate-200 text-sm text-slate-500">
++              {emptyCopy[activeTab]}
++            </div>
+           )}
+         </div>
+       </div>
+diff --git a/frontend/src/pages/ReviewFactsPage.tsx b/frontend/src/pages/ReviewFactsPage.tsx
+index 8d68b2f..c8abb79 100644
+--- a/frontend/src/pages/ReviewFactsPage.tsx
++++ b/frontend/src/pages/ReviewFactsPage.tsx
+@@ -1,250 +1,133 @@
+ import React from 'react';
+-import {
+-  FileCheck2,
+-  ArrowLeft,
+-  ArrowRight,
+-  Edit2,
+-  Calendar,
+-  Sparkles,
+-  RefreshCw,
+-  Landmark,
+-} from 'lucide-react';
++import { ArrowLeft, ArrowRight, Pencil, Calendar, Sparkles, RefreshCw } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { Breadcrumb } from '../components/common/Breadcrumb';
+ import { ConstraintAlert } from '../components/intake/ConstraintAlert';
+ 
++const Row: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
++  <div className="flex justify-between py-2 text-sm">
++    <span className="text-slate-500">{label}</span>
++    <span className="font-medium text-ink-900 text-right">{value}</span>
++  </div>
++);
++
++const Section: React.FC<{ title: string; step: number; onEdit: (s: number) => void; children: React.ReactNode }> = ({
++  title,
++  step,
++  onEdit,
++  children,
++}) => (
++  <div className="bg-white rounded-2xl border border-slate-200 p-5">
++    <div className="flex items-center justify-between pb-2.5 mb-1 border-b border-slate-100">
++      <h3 className="text-sm font-semibold text-ink-900">{title}</h3>
++      <button onClick={() => onEdit(step)} className="text-xs text-brand hover:underline flex items-center gap-1 font-medium">
++        <Pencil className="w-3 h-3" /> Edit
++      </button>
++    </div>
++    <dl className="divide-y divide-slate-50">{children}</dl>
++  </div>
++);
++
+ export const ReviewFactsPage: React.FC = () => {
+   const { facts, asOfDate, setAsOfDate, goToStep, runEvaluation, isLoading } = useAssessment();
+ 
+-  const handleSubmit = async () => {
+-    await runEvaluation();
+-  };
+-
+   return (
+     <div>
+-      <Breadcrumb
+-        items={[
+-          { label: 'Intake Assessment', step: 1 },
+-          { label: 'Review Declared Profile' },
+-        ]}
+-      />
++      <Breadcrumb items={[{ label: 'Compliance check', step: 1 }, { label: 'Review' }]} />
+ 
+-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
++      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+           <div>
+-            <h2 className="text-lg font-bold text-gov-navy flex items-center gap-2">
+-              <FileCheck2 className="w-5 h-5 text-gov-navyLight" />
+-              Pre-Assessment Profile Verification
+-            </h2>
+-            <p className="text-xs text-slate-600">
+-              Verify all declared enterprise attributes before executing the deterministic regulatory reasoning engine.
+-            </p>
++            <h2 className="text-lg font-semibold text-ink-900">Review your answers</h2>
++            <p className="text-sm text-slate-500">Make sure everything below is correct before we check the rules.</p>
+           </div>
+-
+-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded border border-slate-300 text-xs">
+-            <Calendar className="w-4 h-4 text-gov-navy" />
+-            <label className="font-bold text-slate-700">Evaluation Date:</label>
++          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 text-sm">
++            <Calendar className="w-4 h-4 text-slate-400" />
+             <input
+               type="date"
+               value={asOfDate}
+               onChange={(e) => setAsOfDate(e.target.value)}
+-              className="text-xs font-mono font-medium border-0 focus:ring-0 p-0 text-gov-navy cursor-pointer"
++              className="text-sm font-medium border-0 focus:ring-0 p-0 text-ink-900 bg-transparent cursor-pointer"
+             />
+           </div>
+         </div>
+ 
+-        {/* Live Constraint Guard */}
+         <ConstraintAlert facts={facts} />
+ 
+-        {/* Facts Summary Tables */}
+-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+-          {/* Section 1: Business */}
+-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
+-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-                1. Enterprise Legal Profile
+-              </h3>
+-              <button
+-                onClick={() => goToStep(1)}
+-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
+-              >
+-                <Edit2 className="w-3 h-3" /> Edit
+-              </button>
+-            </div>
+-            <dl className="text-xs divide-y divide-slate-100">
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Unit Name:</dt>
+-                <dd className="font-semibold text-slate-800">{facts._name || facts.entity_name || 'Not Declared'}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Stage:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.stage}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Legal Constitution:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.entity_type}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Plant & Machinery Investment:</dt>
+-                <dd className="font-mono font-bold text-gov-navy">
+-                  {facts.investment_plant_machinery !== null && facts.investment_plant_machinery !== undefined
+-                    ? `₹${Number(facts.investment_plant_machinery).toLocaleString('en-IN')}`
+-                    : '<MISSING>'}
+-                </dd>
+-              </div>
+-            </dl>
+-          </div>
++        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
++          <Section title="Business" step={1} onEdit={goToStep}>
++            <Row label="Name" value={facts._name || facts.entity_name || 'Not entered'} />
++            <Row label="Stage" value={facts.stage} />
++            <Row label="Structure" value={facts.entity_type} />
++            <Row
++              label="Investment"
++              value={
++                facts.investment_plant_machinery != null
++                  ? `₹${Number(facts.investment_plant_machinery).toLocaleString('en-IN')}`
++                  : 'Not entered'
++              }
++            />
++          </Section>
+ 
+-          {/* Section 2: Location */}
+-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
+-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-                2. Location & Planning
+-              </h3>
+-              <button
+-                onClick={() => goToStep(2)}
+-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
+-              >
+-                <Edit2 className="w-3 h-3" /> Edit
+-              </button>
+-            </div>
+-            <dl className="text-xs divide-y divide-slate-100">
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Planning Authority:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.location_authority}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Land Classification:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.land_classification}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Built-up Area:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">
+-                  {facts.builtup_area_sqm ? `${facts.builtup_area_sqm} sq.m` : 'Unspecified'}
+-                </dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Estate / Cluster:</dt>
+-                <dd className="font-semibold text-slate-800">{facts.midc_estate || 'N/A'}</dd>
+-              </div>
+-            </dl>
+-          </div>
++          <Section title="Location" step={2} onEdit={goToStep}>
++            <Row label="Authority" value={facts.location_authority} />
++            <Row label="Land type" value={facts.land_classification} />
++            <Row label="Built-up area" value={facts.builtup_area_sqm ? `${facts.builtup_area_sqm} sq.m` : 'Not entered'} />
++            <Row label="Estate" value={facts.midc_estate || 'Not entered'} />
++          </Section>
+ 
+-          {/* Section 3: Operations */}
+-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
+-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-                3. Operations & Workforce
+-              </h3>
+-              <button
+-                onClick={() => goToStep(3)}
+-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
+-              >
+-                <Edit2 className="w-3 h-3" /> Edit
+-              </button>
+-            </div>
+-            <dl className="text-xs divide-y divide-slate-100">
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Annual Turnover:</dt>
+-                <dd className="font-mono font-bold text-gov-navy">
+-                  {facts.annual_turnover !== null && facts.annual_turnover !== undefined
+-                    ? `₹${Number(facts.annual_turnover).toLocaleString('en-IN')}`
+-                    : '<MISSING>'}
+-                </dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Total Workforce / Factory Workers:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">
+-                  {facts.employees_total ?? 0} employees / {facts.workers_for_threshold ?? 0} workers
+-                </dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Contract Labourers:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.contract_labourers ?? 0}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Food Handlers:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.food_handlers ?? 0}</dd>
+-              </div>
+-            </dl>
+-          </div>
++          <Section title="Operations" step={3} onEdit={goToStep}>
++            <Row
++              label="Turnover"
++              value={facts.annual_turnover != null ? `₹${Number(facts.annual_turnover).toLocaleString('en-IN')}` : 'Not entered'}
++            />
++            <Row label="Employees / workers" value={`${facts.employees_total ?? 0} / ${facts.workers_for_threshold ?? 0}`} />
++            <Row label="Contract labour" value={facts.contract_labourers ?? 0} />
++            <Row label="Food handlers" value={facts.food_handlers ?? 0} />
++          </Section>
+ 
+-          {/* Section 4: Equipment */}
+-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
+-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
+-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
+-                4. Equipment & Utilities
+-              </h3>
+-              <button
+-                onClick={() => goToStep(4)}
+-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
+-              >
+-                <Edit2 className="w-3 h-3" /> Edit
+-              </button>
+-            </div>
+-            <dl className="text-xs divide-y divide-slate-100">
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Electrical Power Usage:</dt>
+-                <dd className="font-semibold text-slate-800">{facts.uses_power ? 'Yes (Power-operated)' : 'No Power'}</dd>
+-              </div>
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">Boiler Operated:</dt>
+-                <dd className="font-semibold text-slate-800">{facts.boiler_operates ? 'Yes' : 'No Boiler'}</dd>
+-              </div>
+-              {facts.boiler_operates && (
+-                <>
+-                  <div className="py-1.5 flex justify-between">
+-                    <dt className="text-slate-500">Boiler Specs (Cap / Press / Temp):</dt>
+-                    <dd className="font-mono font-bold text-gov-navy">
+-                      {facts.boiler_capacity_litres}L &bull; {facts.boiler_pressure_kg_cm2} kg/cm&sup2; &bull; {facts.boiler_water_temp_c}&deg;C
+-                    </dd>
+-                  </div>
+-                </>
+-              )}
+-              <div className="py-1.5 flex justify-between">
+-                <dt className="text-slate-500">MPCB Category:</dt>
+-                <dd className="font-mono font-semibold text-slate-800">{facts.mpcb_category || 'Unspecified (UNKNOWN)'}</dd>
+-              </div>
+-            </dl>
+-          </div>
++          <Section title="Equipment" step={4} onEdit={goToStep}>
++            <Row label="Uses power" value={facts.uses_power ? 'Yes' : 'No'} />
++            <Row label="Boiler" value={facts.boiler_operates ? 'Yes' : 'No'} />
++            {facts.boiler_operates && (
++              <Row
++                label="Boiler specs"
++                value={`${facts.boiler_capacity_litres}L · ${facts.boiler_pressure_kg_cm2}kg/cm² · ${facts.boiler_water_temp_c}°C`}
++              />
++            )}
++            <Row label="Pollution category" value={facts.mpcb_category || 'Not specified'} />
++          </Section>
+         </div>
+ 
+-        {/* Submit Execution Card */}
+-        <div className="bg-gov-navy text-white p-6 rounded-lg shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
++        <div className="bg-brand rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+           <div>
+-            <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
+-              <Sparkles className="w-4 h-4 text-gov-gold" />
+-              Execute Deterministic Regulatory Derivation
++            <h3 className="text-white font-semibold flex items-center gap-2">
++              <Sparkles className="w-4 h-4" />
++              Ready to check
+             </h3>
+-            <p className="text-xs text-slate-300 mt-1">
+-              Dispatches the fact vector to the backend <code>/api/evaluate</code> endpoint. Resolves requirements, exclusions, quantities, and statutory citations.
+-            </p>
++            <p className="text-sm text-white/80 mt-0.5">We'll match these details against every applicable rule.</p>
+           </div>
+-
+-          <div className="flex items-center gap-3">
++          <div className="flex items-center gap-2">
+             <button
+-              type="button"
+               onClick={() => goToStep(4)}
+-              className="px-4 py-2 rounded text-xs font-semibold text-slate-300 bg-gov-navyLight/60 hover:bg-gov-navyLight border border-slate-600 transition"
++              className="px-4 py-2.5 rounded-full text-sm font-medium text-white/90 hover:bg-white/10 transition"
+             >
+               <ArrowLeft className="w-4 h-4 inline mr-1" />
+               Back
+             </button>
+-
+             <button
+-              type="button"
+               disabled={isLoading}
+-              onClick={handleSubmit}
+-              className="px-6 py-2.5 rounded text-xs font-bold text-gov-navy bg-gov-gold hover:bg-gov-goldLight transition shadow flex items-center gap-2 uppercase tracking-wider disabled:opacity-50"
++              onClick={() => runEvaluation()}
++              className="px-6 py-2.5 rounded-full text-sm font-semibold text-brand-dark bg-white hover:bg-slate-50 transition shadow-card flex items-center gap-2 disabled:opacity-60"
+             >
+               {isLoading ? (
+                 <>
+                   <RefreshCw className="w-4 h-4 animate-spin" />
+-                  Deriving Requirements...
++                  Checking…
+                 </>
+               ) : (
+                 <>
+-                  Run Assessment
++                  Run check
+                   <ArrowRight className="w-4 h-4" />
+                 </>
+               )}
+diff --git a/frontend/tailwind.config.js b/frontend/tailwind.config.js
+index 0756048..5e566c5 100644
+--- a/frontend/tailwind.config.js
++++ b/frontend/tailwind.config.js
+@@ -7,39 +7,31 @@ export default {
+   theme: {
+     extend: {
+       colors: {
+-        gov: {
+-          navy: '#0B2545',
+-          navyLight: '#134074',
+-          gold: '#C59B27',
+-          goldLight: '#E8CA65',
+-          slate: '#0F172A',
+-          slateLight: '#334155',
+-          muted: '#64748B',
+-          surface: '#FFFFFF',
+-          canvas: '#F8FAFC',
+-          border: '#CBD5E1',
+-          borderLight: '#E2E8F0',
++        brand: {
++          DEFAULT: '#0B5FA5',   // primary action / links
++          dark: '#083E6E',      // headers, active states
++          darker: '#062B4D',
++          tint: '#EAF3FC',      // light background wash
++          border: '#CFE0F2',
++        },
++        ink: {
++          900: '#111827',
++          700: '#374151',
++          500: '#6B7280',
++          300: '#D1D5DB',
+         },
+-        status: {
+-          applicable: '#166534',
+-          applicableBg: '#DCFCE7',
+-          applicableBorder: '#86EFAC',
+-          notApplicable: '#475569',
+-          notApplicableBg: '#F1F5F9',
+-          notApplicableBorder: '#CBD5E1',
+-          unknown: '#9A3412',
+-          unknownBg: '#FFEDD5',
+-          unknownBorder: '#FDBA74',
+-          conflict: '#991B1B',
+-          conflictBg: '#FEE2E2',
+-          conflictBorder: '#FCA5A5',
+-        }
+       },
+       fontFamily: {
+         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+-        serif: ['Merriweather', 'Georgia', 'serif'],
+-        mono: ['Consolas', 'Courier New', 'monospace'],
+-      }
++        mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
++      },
++      boxShadow: {
++        card: '0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04)',
++        cardHover: '0 4px 12px rgba(15, 23, 42, 0.08)',
++      },
++      borderRadius: {
++        xl: '0.875rem',
++      },
+     },
+   },
+   plugins: [],

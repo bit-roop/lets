@@ -1,0 +1,400 @@
+diff --git a/frontend/src/components/intake/Step1Business.tsx b/frontend/src/components/intake/Step1Business.tsx
+index a955305..4830c31 100644
+--- a/frontend/src/components/intake/Step1Business.tsx
++++ b/frontend/src/components/intake/Step1Business.tsx
+@@ -2,8 +2,10 @@ import React from 'react';
+ import { Building2 } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+-export const Step1Business: React.FC = () => {
++export const Step1Business: React.FC<{ invalidFields?: string[] }> = ({ invalidFields = [] }) => {
+   const { facts, setFact } = useAssessment();
++  const isInvalid = (field: string) => invalidFields.includes(field);
++  const errClass = (field: string) => (isInvalid(field) ? 'border-red-400 ring-2 ring-red-100' : '');
+ 
+   return (
+     <div className="space-y-6">
+@@ -19,7 +21,9 @@ export const Step1Business: React.FC = () => {
+ 
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+         <div>
+-          <label className="field-label">Business name</label>
++          <label className="field-label">
++            Business name <span className="text-red-500">*</span>
++          </label>
+           <input
+             type="text"
+             value={facts._name || facts.entity_name || ''}
+@@ -28,7 +32,7 @@ export const Step1Business: React.FC = () => {
+               setFact('entity_name', e.target.value);
+             }}
+             placeholder="e.g. Sahyadri Foods Private Limited"
+-            className="field-input"
++            className={`field-input ${errClass('entity_name')}`}
+           />
+         </div>
+ 
+@@ -61,7 +65,9 @@ export const Step1Business: React.FC = () => {
+         </div>
+ 
+         <div>
+-          <label className="field-label">Investment in plant & machinery</label>
++          <label className="field-label">
++            Investment in plant & machinery <span className="text-red-500">*</span>
++          </label>
+           <div className="relative">
+             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">₹</span>
+             <input
+@@ -69,7 +75,7 @@ export const Step1Business: React.FC = () => {
+               value={facts.investment_plant_machinery ?? ''}
+               onChange={(e) => setFact('investment_plant_machinery', e.target.value === '' ? null : Number(e.target.value))}
+               placeholder="e.g. 60000000"
+-              className="field-input pl-7"
++              className={`field-input pl-7 ${errClass('investment_plant_machinery')}`}
+             />
+           </div>
+           <p className="field-help">Used to check MSME eligibility (limit: ₹125 crore).</p>
+diff --git a/frontend/src/components/intake/Step3Operations.tsx b/frontend/src/components/intake/Step3Operations.tsx
+index 08b0fc2..2eec88d 100644
+--- a/frontend/src/components/intake/Step3Operations.tsx
++++ b/frontend/src/components/intake/Step3Operations.tsx
+@@ -2,8 +2,10 @@ import React from 'react';
+ import { Utensils } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+-export const Step3Operations: React.FC = () => {
++export const Step3Operations: React.FC<{ invalidFields?: string[] }> = ({ invalidFields = [] }) => {
+   const { facts, setFact } = useAssessment();
++  const isInvalid = (field: string) => invalidFields.includes(field);
++  const errClass = (field: string) => (isInvalid(field) ? 'border-red-400 ring-2 ring-red-100' : '');
+ 
+   return (
+     <div className="space-y-6">
+@@ -32,7 +34,7 @@ export const Step3Operations: React.FC = () => {
+ 
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+         <div>
+-          <label className="field-label">Annual turnover</label>
++          <label className="field-label">Annual turnover <span className="text-red-500">*</span></label>
+           <div className="relative">
+             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm">₹</span>
+             <input
+@@ -40,32 +42,32 @@ export const Step3Operations: React.FC = () => {
+               value={facts.annual_turnover ?? ''}
+               onChange={(e) => setFact('annual_turnover', e.target.value === '' ? null : Number(e.target.value))}
+               placeholder="e.g. 80000000"
+-              className="field-input pl-7"
++              className={`field-input pl-7 ${errClass('annual_turnover')}`}
+             />
+           </div>
+           <p className="field-help">Up to ₹1.5Cr: Registration · ₹1.5Cr–₹50Cr: State Licence · above ₹50Cr: Central Licence.</p>
+         </div>
+ 
+         <div>
+-          <label className="field-label">Total employees</label>
++          <label className="field-label">Total employees <span className="text-red-500">*</span></label>
+           <input
+             type="number"
+             value={facts.employees_total ?? ''}
+             onChange={(e) => setFact('employees_total', e.target.value === '' ? null : Number(e.target.value))}
+             placeholder="e.g. 45"
+-            className="field-input"
++            className={`field-input ${errClass('employees_total')}`}
+           />
+           <p className="field-help">10+ needs a POSH committee, 20+ needs EPFO registration.</p>
+         </div>
+ 
+         <div>
+-          <label className="field-label">Factory floor workers</label>
++          <label className="field-label">Factory floor workers <span className="text-red-500">*</span></label>
+           <input
+             type="number"
+             value={facts.workers_for_threshold ?? ''}
+             onChange={(e) => setFact('workers_for_threshold', e.target.value === '' ? null : Number(e.target.value))}
+             placeholder="e.g. 67"
+-            className="field-input"
++            className={`field-input ${errClass('workers_for_threshold')}`}
+           />
+           <p className="field-help">Factory licence applies at 20+ workers with power, or 40+ without.</p>
+         </div>
+diff --git a/frontend/src/components/intake/Step4Equipment.tsx b/frontend/src/components/intake/Step4Equipment.tsx
+index d7796b8..4d5f72b 100644
+--- a/frontend/src/components/intake/Step4Equipment.tsx
++++ b/frontend/src/components/intake/Step4Equipment.tsx
+@@ -2,8 +2,10 @@ import React from 'react';
+ import { Flame, Zap, Gauge } from 'lucide-react';
+ import { useAssessment } from '../../context/AssessmentContext';
+ 
+-export const Step4Equipment: React.FC = () => {
++export const Step4Equipment: React.FC<{ invalidFields?: string[] }> = ({ invalidFields = [] }) => {
+   const { facts, setFact } = useAssessment();
++  const isInvalid = (field: string) => invalidFields.includes(field);
++  const errClass = (field: string) => (isInvalid(field) ? 'border-red-400 ring-2 ring-red-100' : '');
+ 
+   return (
+     <div className="space-y-6">
+@@ -68,36 +70,36 @@ export const Step4Equipment: React.FC = () => {
+           <h4 className="text-sm font-medium text-amber-900">Boiler details</h4>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+             <div>
+-              <label className="field-label">Capacity (litres)</label>
++              <label className="field-label">Capacity (litres) <span className="text-red-500">*</span></label>
+               <input
+                 type="number"
+                 value={facts.boiler_capacity_litres ?? ''}
+                 onChange={(e) => setFact('boiler_capacity_litres', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 500"
+-                className="field-input"
++                className={`field-input ${errClass('boiler_capacity_litres')}`}
+               />
+               <p className="field-help">Threshold: 25L</p>
+             </div>
+             <div>
+-              <label className="field-label">Pressure (kg/cm²)</label>
++              <label className="field-label">Pressure (kg/cm²) <span className="text-red-500">*</span></label>
+               <input
+                 type="number"
+                 step="0.1"
+                 value={facts.boiler_pressure_kg_cm2 ?? ''}
+                 onChange={(e) => setFact('boiler_pressure_kg_cm2', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 7"
+-                className="field-input"
++                className={`field-input ${errClass('boiler_pressure_kg_cm2')}`}
+               />
+               <p className="field-help">Threshold: 1.0 kg/cm²</p>
+             </div>
+             <div>
+-              <label className="field-label">Water temperature (°C)</label>
++              <label className="field-label">Water temperature (°C) <span className="text-red-500">*</span></label>
+               <input
+                 type="number"
+                 value={facts.boiler_water_temp_c ?? ''}
+                 onChange={(e) => setFact('boiler_water_temp_c', e.target.value === '' ? null : Number(e.target.value))}
+                 placeholder="e.g. 170"
+-                className="field-input"
++                className={`field-input ${errClass('boiler_water_temp_c')}`}
+               />
+               <p className="field-help">Below 100°C = hot-water generator (exempt)</p>
+             </div>
+diff --git a/frontend/src/pages/IntakeWizardPage.tsx b/frontend/src/pages/IntakeWizardPage.tsx
+index 71a283e..7a2d13d 100644
+--- a/frontend/src/pages/IntakeWizardPage.tsx
++++ b/frontend/src/pages/IntakeWizardPage.tsx
+@@ -1,5 +1,5 @@
+-import React from 'react';
+-import { ArrowLeft, ArrowRight, Check, Building2, MapPin, Utensils, Flame } from 'lucide-react';
++import React, { useEffect, useState } from 'react';
++import { ArrowLeft, ArrowRight, Check, Building2, MapPin, Utensils, Flame, AlertCircle } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { Step1Business } from '../components/intake/Step1Business';
+ import { Step2Location } from '../components/intake/Step2Location';
+@@ -7,6 +7,7 @@ import { Step3Operations } from '../components/intake/Step3Operations';
+ import { Step4Equipment } from '../components/intake/Step4Equipment';
+ import { ConstraintAlert } from '../components/intake/ConstraintAlert';
+ import { Breadcrumb } from '../components/common/Breadcrumb';
++import { getStepErrors, StepError } from '../utils/validation';
+ 
+ const STEPS = [
+   { id: 1, title: 'Business', icon: Building2 },
+@@ -17,10 +18,26 @@ const STEPS = [
+ 
+ export const IntakeWizardPage: React.FC = () => {
+   const { currentStep, goToStep, facts } = useAssessment();
++  const [errors, setErrors] = useState<StepError[]>([]);
++
++  // Clear stale errors whenever the visible step changes (including via the step dots).
++  useEffect(() => {
++    setErrors([]);
++  }, [currentStep]);
++
++  const handleNext = () => {
++    const stepErrors = getStepErrors(currentStep, facts);
++    if (stepErrors.length > 0) {
++      setErrors(stepErrors);
++      return;
++    }
++    goToStep(currentStep < 4 ? currentStep + 1 : 5);
++  };
+ 
+-  const handleNext = () => goToStep(currentStep < 4 ? currentStep + 1 : 5);
+   const handleBack = () => goToStep(currentStep > 1 ? currentStep - 1 : 0);
+ 
++  const invalidFields = errors.map((e) => e.field);
++
+   return (
+     <div>
+       <Breadcrumb items={[{ label: 'Compliance check', step: 1 }, { label: STEPS[currentStep - 1]?.title || 'Step' }]} />
+@@ -61,10 +78,24 @@ export const IntakeWizardPage: React.FC = () => {
+         <ConstraintAlert facts={facts} />
+ 
+         <div className="bg-white rounded-2xl border border-slate-200 shadow-card p-6 sm:p-8">
+-          {currentStep === 1 && <Step1Business />}
++          {errors.length > 0 && (
++            <div className="mb-6 flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl p-3.5 text-sm text-red-700">
++              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
++              <div>
++                <div className="font-medium">Please fill in the highlighted field{errors.length > 1 ? 's' : ''} before continuing:</div>
++                <ul className="list-disc list-inside mt-1 space-y-0.5">
++                  {errors.map((e) => (
++                    <li key={e.field}>{e.label}</li>
++                  ))}
++                </ul>
++              </div>
++            </div>
++          )}
++
++          {currentStep === 1 && <Step1Business invalidFields={invalidFields} />}
+           {currentStep === 2 && <Step2Location />}
+-          {currentStep === 3 && <Step3Operations />}
+-          {currentStep === 4 && <Step4Equipment />}
++          {currentStep === 3 && <Step3Operations invalidFields={invalidFields} />}
++          {currentStep === 4 && <Step4Equipment invalidFields={invalidFields} />}
+ 
+           <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+             <button
+diff --git a/frontend/src/pages/ReviewFactsPage.tsx b/frontend/src/pages/ReviewFactsPage.tsx
+index c8abb79..94d0923 100644
+--- a/frontend/src/pages/ReviewFactsPage.tsx
++++ b/frontend/src/pages/ReviewFactsPage.tsx
+@@ -1,8 +1,9 @@
+ import React from 'react';
+-import { ArrowLeft, ArrowRight, Pencil, Calendar, Sparkles, RefreshCw } from 'lucide-react';
++import { ArrowLeft, ArrowRight, Pencil, Calendar, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+ import { useAssessment } from '../context/AssessmentContext';
+ import { Breadcrumb } from '../components/common/Breadcrumb';
+ import { ConstraintAlert } from '../components/intake/ConstraintAlert';
++import { getAllErrors, STEP_TITLES } from '../utils/validation';
+ 
+ const Row: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+   <div className="flex justify-between py-2 text-sm">
+@@ -30,6 +31,8 @@ const Section: React.FC<{ title: string; step: number; onEdit: (s: number) => vo
+ 
+ export const ReviewFactsPage: React.FC = () => {
+   const { facts, asOfDate, setAsOfDate, goToStep, runEvaluation, isLoading } = useAssessment();
++  const allErrors = getAllErrors(facts);
++  const hasErrors = allErrors.length > 0;
+ 
+   return (
+     <div>
+@@ -54,6 +57,24 @@ export const ReviewFactsPage: React.FC = () => {
+ 
+         <ConstraintAlert facts={facts} />
+ 
++        {hasErrors && (
++          <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl p-3.5 text-sm text-red-700">
++            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
++            <div className="space-y-1">
++              <div className="font-medium">A few required details are still missing:</div>
++              {allErrors.map(({ step, errors }) => (
++                <div key={step}>
++                  <button onClick={() => goToStep(step)} className="underline font-medium">
++                    {STEP_TITLES[step]}
++                  </button>
++                  {': '}
++                  {errors.map((e) => e.label).join(', ')}
++                </div>
++              ))}
++            </div>
++          </div>
++        )}
++
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           <Section title="Business" step={1} onEdit={goToStep}>
+             <Row label="Name" value={facts._name || facts.entity_name || 'Not entered'} />
+@@ -103,9 +124,11 @@ export const ReviewFactsPage: React.FC = () => {
+           <div>
+             <h3 className="text-white font-semibold flex items-center gap-2">
+               <Sparkles className="w-4 h-4" />
+-              Ready to check
++              {hasErrors ? 'Almost there' : 'Ready to check'}
+             </h3>
+-            <p className="text-sm text-white/80 mt-0.5">We'll match these details against every applicable rule.</p>
++            <p className="text-sm text-white/80 mt-0.5">
++              {hasErrors ? 'Fill in the missing details above to continue.' : "We'll match these details against every applicable rule."}
++            </p>
+           </div>
+           <div className="flex items-center gap-2">
+             <button
+@@ -116,9 +139,9 @@ export const ReviewFactsPage: React.FC = () => {
+               Back
+             </button>
+             <button
+-              disabled={isLoading}
++              disabled={isLoading || hasErrors}
+               onClick={() => runEvaluation()}
+-              className="px-6 py-2.5 rounded-full text-sm font-semibold text-brand-dark bg-white hover:bg-slate-50 transition shadow-card flex items-center gap-2 disabled:opacity-60"
++              className="px-6 py-2.5 rounded-full text-sm font-semibold text-brand-dark bg-white hover:bg-slate-50 transition shadow-card flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+             >
+               {isLoading ? (
+                 <>
+diff --git a/frontend/src/utils/validation.ts b/frontend/src/utils/validation.ts
+new file mode 100644
+index 0000000..e09859b
+--- /dev/null
++++ b/frontend/src/utils/validation.ts
+@@ -0,0 +1,65 @@
++import { ApplicantFacts } from '../types/facts';
++
++export interface StepError {
++  field: string;
++  label: string;
++}
++
++export const STEP_TITLES: Record<number, string> = {
++  1: 'Business',
++  2: 'Location',
++  3: 'Operations',
++  4: 'Equipment',
++};
++
++const isEmpty = (v: any) => v === null || v === undefined || v === '';
++
++export function getStep1Errors(facts: ApplicantFacts): StepError[] {
++  const errors: StepError[] = [];
++  if (isEmpty(facts._name) && isEmpty(facts.entity_name)) {
++    errors.push({ field: 'entity_name', label: 'Business name' });
++  }
++  if (isEmpty(facts.investment_plant_machinery)) {
++    errors.push({ field: 'investment_plant_machinery', label: 'Investment in plant & machinery' });
++  }
++  return errors;
++}
++
++export function getStep2Errors(_facts: ApplicantFacts): StepError[] {
++  // Location fields all have sensible defaults pre-selected — nothing can be left blank.
++  return [];
++}
++
++export function getStep3Errors(facts: ApplicantFacts): StepError[] {
++  const errors: StepError[] = [];
++  if (isEmpty(facts.annual_turnover)) errors.push({ field: 'annual_turnover', label: 'Annual turnover' });
++  if (isEmpty(facts.employees_total)) errors.push({ field: 'employees_total', label: 'Total employees' });
++  if (isEmpty(facts.workers_for_threshold)) errors.push({ field: 'workers_for_threshold', label: 'Factory floor workers' });
++  return errors;
++}
++
++export function getStep4Errors(facts: ApplicantFacts): StepError[] {
++  const errors: StepError[] = [];
++  if (facts.boiler_operates) {
++    if (isEmpty(facts.boiler_capacity_litres)) errors.push({ field: 'boiler_capacity_litres', label: 'Boiler capacity' });
++    if (isEmpty(facts.boiler_pressure_kg_cm2)) errors.push({ field: 'boiler_pressure_kg_cm2', label: 'Boiler pressure' });
++    if (isEmpty(facts.boiler_water_temp_c)) errors.push({ field: 'boiler_water_temp_c', label: 'Boiler water temperature' });
++  }
++  return errors;
++}
++
++export function getStepErrors(step: number, facts: ApplicantFacts): StepError[] {
++  switch (step) {
++    case 1: return getStep1Errors(facts);
++    case 2: return getStep2Errors(facts);
++    case 3: return getStep3Errors(facts);
++    case 4: return getStep4Errors(facts);
++    default: return [];
++  }
++}
++
++export function getAllErrors(facts: ApplicantFacts): { step: number; errors: StepError[] }[] {
++  return [1, 2, 3, 4]
++    .map((step) => ({ step, errors: getStepErrors(step, facts) }))
++    .filter((s) => s.errors.length > 0);
++}

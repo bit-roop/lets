@@ -8,19 +8,14 @@ export const ErrorBanner: React.FC = () => {
   if (!error) return null;
 
   return (
-    <div className="bg-rose-50 border-l-4 border-rose-600 p-4 mb-6 rounded-r shadow-sm">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start">
-          <AlertCircle className="w-5 h-5 text-rose-600 mr-3 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-sm font-bold text-rose-900">System Notification</h4>
-            <p className="text-xs text-rose-800 mt-0.5">{error}</p>
-          </div>
-        </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+        <AlertCircle className="w-4.5 h-4.5 text-red-500 shrink-0 mt-0.5" />
+        <p className="text-sm text-red-800 flex-1">{error}</p>
         <button
           onClick={clearError}
-          className="text-rose-400 hover:text-rose-700 transition ml-4"
-          aria-label="Dismiss error"
+          className="text-red-400 hover:text-red-700 transition"
+          aria-label="Dismiss"
         >
           <X className="w-4 h-4" />
         </button>

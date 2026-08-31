@@ -1,250 +1,156 @@
 import React from 'react';
-import {
-  FileCheck2,
-  ArrowLeft,
-  ArrowRight,
-  Edit2,
-  Calendar,
-  Sparkles,
-  RefreshCw,
-  Landmark,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Pencil, Calendar, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
 import { useAssessment } from '../context/AssessmentContext';
 import { Breadcrumb } from '../components/common/Breadcrumb';
 import { ConstraintAlert } from '../components/intake/ConstraintAlert';
+import { getAllErrors, STEP_TITLES } from '../utils/validation';
+
+const Row: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+  <div className="flex justify-between py-2 text-sm">
+    <span className="text-slate-500">{label}</span>
+    <span className="font-medium text-ink-900 text-right">{value}</span>
+  </div>
+);
+
+const Section: React.FC<{ title: string; step: number; onEdit: (s: number) => void; children: React.ReactNode }> = ({
+  title,
+  step,
+  onEdit,
+  children,
+}) => (
+  <div className="bg-white rounded-2xl border border-slate-200 p-5">
+    <div className="flex items-center justify-between pb-2.5 mb-1 border-b border-slate-100">
+      <h3 className="text-sm font-semibold text-ink-900">{title}</h3>
+      <button onClick={() => onEdit(step)} className="text-xs text-brand hover:underline flex items-center gap-1 font-medium">
+        <Pencil className="w-3 h-3" /> Edit
+      </button>
+    </div>
+    <dl className="divide-y divide-slate-50">{children}</dl>
+  </div>
+);
 
 export const ReviewFactsPage: React.FC = () => {
   const { facts, asOfDate, setAsOfDate, goToStep, runEvaluation, isLoading } = useAssessment();
-
-  const handleSubmit = async () => {
-    await runEvaluation();
-  };
+  const allErrors = getAllErrors(facts);
+  const hasErrors = allErrors.length > 0;
 
   return (
     <div>
-      <Breadcrumb
-        items={[
-          { label: 'Intake Assessment', step: 1 },
-          { label: 'Review Declared Profile' },
-        ]}
-      />
+      <Breadcrumb items={[{ label: 'Compliance check', step: 1 }, { label: 'Review' }]} />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-gov-navy flex items-center gap-2">
-              <FileCheck2 className="w-5 h-5 text-gov-navyLight" />
-              Pre-Assessment Profile Verification
-            </h2>
-            <p className="text-xs text-slate-600">
-              Verify all declared enterprise attributes before executing the deterministic regulatory reasoning engine.
-            </p>
+            <h2 className="text-lg font-semibold text-ink-900">Review your answers</h2>
+            <p className="text-sm text-slate-500">Make sure everything below is correct before we check the rules.</p>
           </div>
-
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded border border-slate-300 text-xs">
-            <Calendar className="w-4 h-4 text-gov-navy" />
-            <label className="font-bold text-slate-700">Evaluation Date:</label>
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-slate-200 text-sm">
+            <Calendar className="w-4 h-4 text-slate-400" />
             <input
               type="date"
               value={asOfDate}
               onChange={(e) => setAsOfDate(e.target.value)}
-              className="text-xs font-mono font-medium border-0 focus:ring-0 p-0 text-gov-navy cursor-pointer"
+              className="text-sm font-medium border-0 focus:ring-0 p-0 text-ink-900 bg-transparent cursor-pointer"
             />
           </div>
         </div>
 
-        {/* Live Constraint Guard */}
         <ConstraintAlert facts={facts} />
 
-        {/* Facts Summary Tables */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Section 1: Business */}
-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                1. Enterprise Legal Profile
-              </h3>
-              <button
-                onClick={() => goToStep(1)}
-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
-              >
-                <Edit2 className="w-3 h-3" /> Edit
-              </button>
+        {hasErrors && (
+          <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl p-3.5 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+            <div className="space-y-1">
+              <div className="font-medium">A few required details are still missing:</div>
+              {allErrors.map(({ step, errors }) => (
+                <div key={step}>
+                  <button onClick={() => goToStep(step)} className="underline font-medium">
+                    {STEP_TITLES[step]}
+                  </button>
+                  {': '}
+                  {errors.map((e) => e.label).join(', ')}
+                </div>
+              ))}
             </div>
-            <dl className="text-xs divide-y divide-slate-100">
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Unit Name:</dt>
-                <dd className="font-semibold text-slate-800">{facts._name || facts.entity_name || 'Not Declared'}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Stage:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.stage}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Legal Constitution:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.entity_type}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Plant & Machinery Investment:</dt>
-                <dd className="font-mono font-bold text-gov-navy">
-                  {facts.investment_plant_machinery !== null && facts.investment_plant_machinery !== undefined
-                    ? `₹${Number(facts.investment_plant_machinery).toLocaleString('en-IN')}`
-                    : '<MISSING>'}
-                </dd>
-              </div>
-            </dl>
           </div>
+        )}
 
-          {/* Section 2: Location */}
-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                2. Location & Planning
-              </h3>
-              <button
-                onClick={() => goToStep(2)}
-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
-              >
-                <Edit2 className="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <dl className="text-xs divide-y divide-slate-100">
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Planning Authority:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.location_authority}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Land Classification:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.land_classification}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Built-up Area:</dt>
-                <dd className="font-mono font-semibold text-slate-800">
-                  {facts.builtup_area_sqm ? `${facts.builtup_area_sqm} sq.m` : 'Unspecified'}
-                </dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Estate / Cluster:</dt>
-                <dd className="font-semibold text-slate-800">{facts.midc_estate || 'N/A'}</dd>
-              </div>
-            </dl>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Section title="Business" step={1} onEdit={goToStep}>
+            <Row label="Name" value={facts._name || facts.entity_name || 'Not entered'} />
+            <Row label="Stage" value={facts.stage} />
+            <Row label="Structure" value={facts.entity_type} />
+            <Row
+              label="Investment"
+              value={
+                facts.investment_plant_machinery != null
+                  ? `₹${Number(facts.investment_plant_machinery).toLocaleString('en-IN')}`
+                  : 'Not entered'
+              }
+            />
+          </Section>
 
-          {/* Section 3: Operations */}
-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                3. Operations & Workforce
-              </h3>
-              <button
-                onClick={() => goToStep(3)}
-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
-              >
-                <Edit2 className="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <dl className="text-xs divide-y divide-slate-100">
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Annual Turnover:</dt>
-                <dd className="font-mono font-bold text-gov-navy">
-                  {facts.annual_turnover !== null && facts.annual_turnover !== undefined
-                    ? `₹${Number(facts.annual_turnover).toLocaleString('en-IN')}`
-                    : '<MISSING>'}
-                </dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Total Workforce / Factory Workers:</dt>
-                <dd className="font-mono font-semibold text-slate-800">
-                  {facts.employees_total ?? 0} employees / {facts.workers_for_threshold ?? 0} workers
-                </dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Contract Labourers:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.contract_labourers ?? 0}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Food Handlers:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.food_handlers ?? 0}</dd>
-              </div>
-            </dl>
-          </div>
+          <Section title="Location" step={2} onEdit={goToStep}>
+            <Row label="Authority" value={facts.location_authority} />
+            <Row label="Land type" value={facts.land_classification} />
+            <Row label="Built-up area" value={facts.builtup_area_sqm ? `${facts.builtup_area_sqm} sq.m` : 'Not entered'} />
+            <Row label="Estate" value={facts.midc_estate || 'Not entered'} />
+          </Section>
 
-          {/* Section 4: Equipment */}
-          <div className="bg-white rounded-lg border border-slate-300 p-4 shadow-2xs">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-200 mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                4. Equipment & Utilities
-              </h3>
-              <button
-                onClick={() => goToStep(4)}
-                className="text-[11px] text-gov-navy hover:underline flex items-center gap-1 font-semibold"
-              >
-                <Edit2 className="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <dl className="text-xs divide-y divide-slate-100">
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Electrical Power Usage:</dt>
-                <dd className="font-semibold text-slate-800">{facts.uses_power ? 'Yes (Power-operated)' : 'No Power'}</dd>
-              </div>
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">Boiler Operated:</dt>
-                <dd className="font-semibold text-slate-800">{facts.boiler_operates ? 'Yes' : 'No Boiler'}</dd>
-              </div>
-              {facts.boiler_operates && (
-                <>
-                  <div className="py-1.5 flex justify-between">
-                    <dt className="text-slate-500">Boiler Specs (Cap / Press / Temp):</dt>
-                    <dd className="font-mono font-bold text-gov-navy">
-                      {facts.boiler_capacity_litres}L &bull; {facts.boiler_pressure_kg_cm2} kg/cm&sup2; &bull; {facts.boiler_water_temp_c}&deg;C
-                    </dd>
-                  </div>
-                </>
-              )}
-              <div className="py-1.5 flex justify-between">
-                <dt className="text-slate-500">MPCB Category:</dt>
-                <dd className="font-mono font-semibold text-slate-800">{facts.mpcb_category || 'Unspecified (UNKNOWN)'}</dd>
-              </div>
-            </dl>
-          </div>
+          <Section title="Operations" step={3} onEdit={goToStep}>
+            <Row
+              label="Turnover"
+              value={facts.annual_turnover != null ? `₹${Number(facts.annual_turnover).toLocaleString('en-IN')}` : 'Not entered'}
+            />
+            <Row label="Employees / workers" value={`${facts.employees_total ?? 0} / ${facts.workers_for_threshold ?? 0}`} />
+            <Row label="Contract labour" value={facts.contract_labourers ?? 0} />
+            <Row label="Food handlers" value={facts.food_handlers ?? 0} />
+          </Section>
+
+          <Section title="Equipment" step={4} onEdit={goToStep}>
+            <Row label="Uses power" value={facts.uses_power ? 'Yes' : 'No'} />
+            <Row label="Boiler" value={facts.boiler_operates ? 'Yes' : 'No'} />
+            {facts.boiler_operates && (
+              <Row
+                label="Boiler specs"
+                value={`${facts.boiler_capacity_litres}L · ${facts.boiler_pressure_kg_cm2}kg/cm² · ${facts.boiler_water_temp_c}°C`}
+              />
+            )}
+            <Row label="Pollution category" value={facts.mpcb_category || 'Not specified'} />
+          </Section>
         </div>
 
-        {/* Submit Execution Card */}
-        <div className="bg-gov-navy text-white p-6 rounded-lg shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-brand rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-gov-gold" />
-              Execute Deterministic Regulatory Derivation
+            <h3 className="text-white font-semibold flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              {hasErrors ? 'Almost there' : 'Ready to check'}
             </h3>
-            <p className="text-xs text-slate-300 mt-1">
-              Dispatches the fact vector to the backend <code>/api/evaluate</code> endpoint. Resolves requirements, exclusions, quantities, and statutory citations.
+            <p className="text-sm text-white/80 mt-0.5">
+              {hasErrors ? 'Fill in the missing details above to continue.' : "We'll match these details against every applicable rule."}
             </p>
           </div>
-
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
-              type="button"
               onClick={() => goToStep(4)}
-              className="px-4 py-2 rounded text-xs font-semibold text-slate-300 bg-gov-navyLight/60 hover:bg-gov-navyLight border border-slate-600 transition"
+              className="px-4 py-2.5 rounded-full text-sm font-medium text-white/90 hover:bg-white/10 transition"
             >
               <ArrowLeft className="w-4 h-4 inline mr-1" />
               Back
             </button>
-
             <button
-              type="button"
-              disabled={isLoading}
-              onClick={handleSubmit}
-              className="px-6 py-2.5 rounded text-xs font-bold text-gov-navy bg-gov-gold hover:bg-gov-goldLight transition shadow flex items-center gap-2 uppercase tracking-wider disabled:opacity-50"
+              disabled={isLoading || hasErrors}
+              onClick={() => runEvaluation()}
+              className="px-6 py-2.5 rounded-full text-sm font-semibold text-brand-dark bg-white hover:bg-slate-50 transition shadow-card flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin" />
-                  Deriving Requirements...
+                  Checking…
                 </>
               ) : (
                 <>
-                  Run Assessment
+                  Run check
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
