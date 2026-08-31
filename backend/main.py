@@ -25,6 +25,10 @@ from backend.documents.validators import validate_structured_fields
 from backend.verification.api import router as verification_router
 from backend.verification.cors import VerificationCorsMiddleware
 from backend.applications.api import router as applications_router
+from backend.applications.lifecycle_api import (
+    department_router as departments_router,
+    lifecycle_router as application_lifecycle_router,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("regulatory-engine-api")
@@ -56,6 +60,10 @@ app.add_middleware(
 # configuration above is deliberately left unchanged.
 app.include_router(verification_router)
 app.include_router(applications_router)
+# Slice 4 (additive). The department portal and the application lifecycle
+# actions sit above the established M1-M5 results and never re-evaluate them.
+app.include_router(application_lifecycle_router)
+app.include_router(departments_router)
 app.add_middleware(VerificationCorsMiddleware)
 
 
@@ -231,8 +239,6 @@ async def submit_document(request: Request):
         return response
     except (ValueError, json.JSONDecodeError) as exc:
         raise HTTPException(status_code=422, detail=str(exc))
-
-
 @app.get("/api/documents/readiness", tags=["Documents"], summary="Get M4 document readiness")
 def get_document_readiness(application_id: str, facts: Optional[str] = None, approval_id: Optional[str] = None, workflow_aware: bool = False):
     try:

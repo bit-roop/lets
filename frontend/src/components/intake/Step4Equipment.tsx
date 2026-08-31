@@ -92,7 +92,10 @@ export const Step4Equipment: React.FC = () => {
                 Volumetric Capacity (Litres) <span className="text-rose-500">*</span>
               </label>
               <input
+                id="boiler-capacity-litres"
+                data-field-label="Volumetric Capacity"
                 type="number"
+                required
                 value={facts.boiler_capacity_litres ?? ''}
                 onChange={(e) => {
                   const v = e.target.value === '' ? null : Number(e.target.value);
@@ -111,8 +114,11 @@ export const Step4Equipment: React.FC = () => {
                 Operating Steam Pressure (kg/cm&sup2;) <span className="text-rose-500">*</span>
               </label>
               <input
+                id="boiler-pressure"
+                data-field-label="Operating Steam Pressure"
                 type="number"
                 step="0.1"
+                required
                 value={facts.boiler_pressure_kg_cm2 ?? ''}
                 onChange={(e) => {
                   const v = e.target.value === '' ? null : Number(e.target.value);
@@ -131,7 +137,10 @@ export const Step4Equipment: React.FC = () => {
                 Working Water Temperature (&deg;C) <span className="text-rose-500">*</span>
               </label>
               <input
+                id="boiler-water-temperature"
+                data-field-label="Working Water Temperature"
                 type="number"
+                required
                 value={facts.boiler_water_temp_c ?? ''}
                 onChange={(e) => {
                   const v = e.target.value === '' ? null : Number(e.target.value);

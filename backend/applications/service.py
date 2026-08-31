@@ -183,7 +183,17 @@ def create_application_case(request: ApplicationCreateRequest) -> ApplicationRec
 
 
 def get_application_case(application_id: str) -> Optional[ApplicationRecord]:
-    return get_application_store().get(application_id)
+    record = get_application_store().get(application_id)
+    if record is None:
+        return None
+    # Slice 4: attach the persisted department lifecycle so the applicant
+    # dashboard sees review progress and open queries in one read. This reads
+    # lifecycle tables only; no upstream evaluation is triggered and nothing
+    # the engine, M3, M4, or M5 established is altered.
+    from .lifecycle_service import build_lifecycle_view
+
+    record.lifecycle = build_lifecycle_view(record)
+    return record
 
 
 def list_application_cases() -> List[ApplicationSummary]:

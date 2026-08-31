@@ -102,6 +102,18 @@ export const Header: React.FC = () => {
           </button>
 
           <button
+            onClick={() => goToStep(8)}
+            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+              currentStep === 8
+                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+            }`}
+            title="Officer view over cases filed in this prototype"
+          >
+            Department Review
+          </button>
+
+          <button
             onClick={resetAssessment}
             className="p-1.5 rounded bg-gov-navyLight/40 hover:bg-gov-navyLight text-slate-300 hover:text-white border border-slate-700 transition"
             title="Reset Form"

@@ -12,5 +12,13 @@ venv/
 node_modules/
 dist/
 
-# Milestone 5 verification record store (local, regenerable)
+# Milestone 5 verification and application stores (local runtime, regenerable)
 .m5-data/
+.applications.db
+.applications.db-*
+.verification_records.db
+.verification_records.db-*
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

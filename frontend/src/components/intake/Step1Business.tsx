@@ -24,7 +24,10 @@ export const Step1Business: React.FC = () => {
             Enterprise / Unit Legal Name <span className="text-rose-500">*</span>
           </label>
           <input
+            id="entity-name"
+            data-field-label="Enterprise / Unit Legal Name"
             type="text"
+            required
             value={facts._name || facts.entity_name || ''}
             onChange={(e) => {
               setFact('_name', e.target.value);
@@ -44,10 +47,14 @@ export const Step1Business: React.FC = () => {
             Project Lifecycle Stage <span className="text-rose-500">*</span>
           </label>
           <select
-            value={facts.stage || 'new_setup'}
+            id="project-stage"
+            data-field-label="Project Lifecycle Stage"
+            value={facts.stage || ''}
+            required
             onChange={(e) => setFact('stage', e.target.value)}
             className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
           >
+            <option value="">-- Select project stage --</option>
             <option value="new_setup">New Greenfield Industrial Setup</option>
             <option value="expansion">Brownfield Expansion / Capacity Addition</option>
             <option value="renewal">Periodic Licence & Consent Renewal</option>
@@ -63,10 +70,14 @@ export const Step1Business: React.FC = () => {
             Legal Form of Entity <span className="text-rose-500">*</span>
           </label>
           <select
-            value={facts.entity_type || 'private_limited'}
+            id="entity-type"
+            data-field-label="Legal Form of Entity"
+            value={facts.entity_type || ''}
+            required
             onChange={(e) => setFact('entity_type', e.target.value)}
             className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
           >
+            <option value="">-- Select legal form --</option>
             <option value="private_limited">Private Limited Company (MCA Incorporated)</option>
             <option value="proprietorship">Sole Proprietorship</option>
             <option value="partnership">Registered Partnership Firm</option>
@@ -88,7 +99,10 @@ export const Step1Business: React.FC = () => {
               ₹
             </div>
             <input
+              id="investment-plant-machinery"
+              data-field-label="Investment in Plant & Machinery"
               type="number"
+              required
               value={facts.investment_plant_machinery ?? ''}
               onChange={(e) => {
                 const v = e.target.value === '' ? null : Number(e.target.value);

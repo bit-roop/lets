@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, Building, MapPin, Utensils, Flame, Sparkles } from 'lucide-react';
 import { useAssessment } from '../context/AssessmentContext';
 import { Step1Business } from '../components/intake/Step1Business';
@@ -17,8 +17,25 @@ const STEPS = [
 
 export const IntakeWizardPage: React.FC = () => {
   const { currentStep, goToStep, facts } = useAssessment();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleNext = () => {
+  const handleNext = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = formRef.current;
+    if (!form || !form.checkValidity()) {
+      const invalidFields = Array.from(form?.querySelectorAll<HTMLElement>(':invalid') || [])
+        .map((field) => field.dataset.fieldLabel)
+        .filter((label): label is string => Boolean(label));
+      setValidationError(
+        invalidFields.length > 0
+          ? `Please complete the required field${invalidFields.length === 1 ? '' : 's'}: ${invalidFields.join(', ')}.`
+          : 'Please complete the required fields before continuing.',
+      );
+      form?.querySelector<HTMLElement>(':invalid')?.focus();
+      return;
+    }
+    setValidationError(null);
     if (currentStep < 4) {
       goToStep(currentStep + 1);
     } else {
@@ -57,7 +74,13 @@ export const IntakeWizardPage: React.FC = () => {
               return (
                 <div
                   key={step.id}
-                  onClick={() => goToStep(step.id)}
+                  onClick={() => {
+                    // Backward navigation remains available, but future sections
+                    // can only be reached through the validated Next action.
+                    if (step.id <= currentStep) goToStep(step.id);
+                  }}
+                  role="button"
+                  tabIndex={step.id <= currentStep ? 0 : -1}
                   className="flex flex-col items-center cursor-pointer relative z-10 group"
                 >
                   <div
@@ -88,11 +111,17 @@ export const IntakeWizardPage: React.FC = () => {
         <ConstraintAlert facts={facts} />
 
         {/* Wizard Form Card */}
-        <div className="bg-white rounded-lg border border-slate-300 shadow-sm p-6 sm:p-8">
+        <form ref={formRef} onSubmit={handleNext} className="bg-white rounded-lg border border-slate-300 shadow-sm p-6 sm:p-8" noValidate={false}>
           {currentStep === 1 && <Step1Business />}
           {currentStep === 2 && <Step2Location />}
           {currentStep === 3 && <Step3Operations />}
           {currentStep === 4 && <Step4Equipment />}
+
+          {validationError && (
+            <p role="alert" className="mt-6 rounded border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-800">
+              {validationError}
+            </p>
+          )}
 
           {/* Navigation Controls */}
           <div className="mt-8 pt-5 border-t border-slate-200 flex items-center justify-between">
@@ -106,15 +135,14 @@ export const IntakeWizardPage: React.FC = () => {
             </button>
 
             <button
-              type="button"
-              onClick={handleNext}
+              type="submit"
               className="px-5 py-2 rounded text-xs font-bold text-white bg-gov-navy hover:bg-gov-navyLight transition shadow flex items-center gap-1.5"
             >
               {currentStep === 4 ? 'Review Declared Profile' : 'Next Section'}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

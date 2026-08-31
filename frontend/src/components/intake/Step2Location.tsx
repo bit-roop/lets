@@ -24,10 +24,14 @@ export const Step2Location: React.FC = () => {
             Planning & Location Authority <span className="text-rose-500">*</span>
           </label>
           <select
-            value={facts.location_authority || 'MIDC'}
+            id="location-authority"
+            data-field-label="Planning & Location Authority"
+            value={facts.location_authority || ''}
+            required
             onChange={(e) => setFact('location_authority', e.target.value)}
             className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
           >
+            <option value="">-- Select planning authority --</option>
             <option value="MIDC">MIDC (Maharashtra Industrial Development Corporation)</option>
             <option value="Municipal_Corporation">Municipal Corporation (PMC / PCMC / MCGM / etc.)</option>
             <option value="Grampanchayat">Grampanchayat / PMRDA / Rural Collectorate</option>
@@ -43,10 +47,14 @@ export const Step2Location: React.FC = () => {
             Land Classification & Zoning <span className="text-rose-500">*</span>
           </label>
           <select
-            value={facts.land_classification || 'midc_industrial'}
+            id="land-classification"
+            data-field-label="Land Classification & Zoning"
+            value={facts.land_classification || ''}
+            required
             onChange={(e) => setFact('land_classification', e.target.value)}
             className="w-full text-xs px-3 py-2 border border-slate-300 rounded focus:ring-1 focus:ring-gov-navy focus:border-gov-navy bg-white"
           >
+            <option value="">-- Select land classification --</option>
             <option value="midc_industrial">MIDC Industrial Allotted Plot</option>
             <option value="non_agricultural">Non-Agricultural (NA Converted) Private Plot</option>
             <option value="agricultural">Agricultural Land (Requires NA Permission)</option>

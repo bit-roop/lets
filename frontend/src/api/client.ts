@@ -147,7 +147,198 @@ export const api = {
     fetchJson<ApplicationListResponse>('/api/applications'),
   getApplication: (applicationId: string) =>
     fetchJson<ApplicationRecord>(`/api/applications/${encodeURIComponent(applicationId)}`),
+
+  // --- Slice 4: prototype department review simulation ---
+  // These endpoints act on the persisted case only. None of them re-runs the
+  // engine, the workflow builder, or M4/M5 evaluation.
+  listDepartments: () => fetchJson<{ departments: DepartmentInfo[] }>('/api/departments'),
+  listDepartmentCases: (department: string) =>
+    fetchJson<DepartmentCaseListResponse>(
+      `/api/departments/${encodeURIComponent(department)}/applications`
+    ),
+  getDepartmentCase: (department: string, applicationId: string) =>
+    fetchJson<DepartmentCaseDetail>(
+      `/api/departments/${encodeURIComponent(department)}/applications/${encodeURIComponent(applicationId)}`
+    ),
+  startReview: (applicationId: string, approvalId: string, department: string) =>
+    fetchJson<ApprovalLifecycleView>(
+      `/api/applications/${encodeURIComponent(applicationId)}/approvals/${encodeURIComponent(approvalId)}/start-review`,
+      { method: 'POST', body: JSON.stringify({ department }) }
+    ),
+  grantApproval: (applicationId: string, approvalId: string, department: string, decisionNote?: string) =>
+    fetchJson<ApprovalLifecycleView>(
+      `/api/applications/${encodeURIComponent(applicationId)}/approvals/${encodeURIComponent(approvalId)}/grant`,
+      { method: 'POST', body: JSON.stringify({ department, decision_note: decisionNote || null }) }
+    ),
+  rejectApproval: (applicationId: string, approvalId: string, department: string, decisionNote?: string) =>
+    fetchJson<ApprovalLifecycleView>(
+      `/api/applications/${encodeURIComponent(applicationId)}/approvals/${encodeURIComponent(approvalId)}/reject`,
+      { method: 'POST', body: JSON.stringify({ department, decision_note: decisionNote || null }) }
+    ),
+  raiseQuery: (applicationId: string, payload: RaiseQueryPayload) =>
+    fetchJson<QueryView>(`/api/applications/${encodeURIComponent(applicationId)}/queries`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listQueries: (applicationId: string, department?: string) =>
+    fetchJson<QueryListResponse>(
+      `/api/applications/${encodeURIComponent(applicationId)}/queries${
+        department ? `?department=${encodeURIComponent(department)}` : ''
+      }`
+    ),
+  respondToQuery: (applicationId: string, queryId: string, payload: RespondToQueryPayload) =>
+    fetchJson<QueryView>(
+      `/api/applications/${encodeURIComponent(applicationId)}/queries/${encodeURIComponent(queryId)}/respond`,
+      { method: 'POST', body: JSON.stringify(payload) }
+    ),
+  resolveQuery: (applicationId: string, queryId: string, department: string, resolutionNote?: string) =>
+    fetchJson<QueryView>(
+      `/api/applications/${encodeURIComponent(applicationId)}/queries/${encodeURIComponent(queryId)}/resolve`,
+      { method: 'POST', body: JSON.stringify({ department, resolution_note: resolutionNote || null }) }
+    ),
 };
+
+// --- Slice 4 types ----------------------------------------------------------
+
+export type ApprovalLifecycleStatus =
+  | 'SUBMITTED'
+  | 'IN_SCRUTINY'
+  | 'QUERY_PENDING'
+  | 'GRANTED'
+  | 'REJECTED';
+
+export type ApplicationLifecycleStatus =
+  | 'SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'QUERY_RAISED'
+  | 'RESPONDED'
+  | 'GRANTED'
+  | 'REJECTED';
+
+export type QueryStatus = 'OPEN' | 'RESPONDED' | 'RESOLVED';
+
+export interface DepartmentInfo {
+  department: string;
+  label: string;
+}
+
+export interface ApprovalLifecycleView {
+  approval_id: string;
+  name?: string | null;
+  department: string;
+  status: ApprovalLifecycleStatus;
+  decision_note?: string | null;
+  decided_at?: string | null;
+  readiness_status?: string | null;
+  sla_days?: number | null;
+  statute?: string | null;
+  updated_at?: string | null;
+}
+
+export interface QueryView {
+  query_id: string;
+  application_id: string;
+  approval_id: string;
+  approval_name?: string | null;
+  department: string;
+  query_text: string;
+  deadline: string;
+  status: QueryStatus;
+  response_text?: string | null;
+  response_document_id?: string | null;
+  response_submission_id?: string | null;
+  responded_at?: string | null;
+  resolution_note?: string | null;
+  resolved_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LifecycleEventView {
+  event_id: string;
+  approval_id?: string | null;
+  department?: string | null;
+  actor: string;
+  event_type: string;
+  detail?: string | null;
+  created_at: string;
+}
+
+export interface ApplicationLifecycleView {
+  application_status: ApplicationLifecycleStatus;
+  reviewable_departments: string[];
+  approvals: ApprovalLifecycleView[];
+  queries: QueryView[];
+  open_queries: QueryView[];
+  events: LifecycleEventView[];
+  simulation_notice: string;
+}
+
+export interface DepartmentCaseSummary {
+  application_id: string;
+  tracking_reference: string;
+  entity_name: string;
+  application_status: ApplicationLifecycleStatus;
+  department: string;
+  approvals: ApprovalLifecycleView[];
+  open_query_count: number;
+  responded_query_count: number;
+  submissions_count: number;
+  last_activity_at?: string | null;
+  created_at: string;
+}
+
+export interface DepartmentEvidenceItem {
+  document_id: string;
+  submission_reference: string;
+  evidence_state?: string | null;
+  automated_check_outcome?: string | null;
+  automated_check_consistency?: string | null;
+}
+
+export interface DepartmentCaseDetail {
+  application_id: string;
+  tracking_reference: string;
+  entity_name: string;
+  application_status: ApplicationLifecycleStatus;
+  department: string;
+  as_of: string;
+  approvals: ApprovalLifecycleView[];
+  evidence: DepartmentEvidenceItem[];
+  queries: QueryView[];
+  timeline: ApplicationRecord['timeline'] | Record<string, never>;
+  events: LifecycleEventView[];
+  created_at: string;
+  updated_at: string;
+  evidence_notice: string;
+  simulation_notice: string;
+}
+
+export interface DepartmentCaseListResponse {
+  department: string;
+  label: string;
+  cases: DepartmentCaseSummary[];
+  total_count: number;
+}
+
+export interface QueryListResponse {
+  application_id: string;
+  queries: QueryView[];
+  total_count: number;
+}
+
+export interface RaiseQueryPayload {
+  approval_id: string;
+  department: string;
+  query_text: string;
+  deadline: string;
+}
+
+export interface RespondToQueryPayload {
+  response_text: string;
+  response_document_id?: string | null;
+  response_submission_id?: string | null;
+}
 
 export interface ApplicationCreateRequest {
   application_id?: string;
@@ -258,6 +449,8 @@ export interface ApplicationRecord {
   };
   created_at: string;
   updated_at: string;
+  // Slice 4. Present once the department lifecycle layer is available.
+  lifecycle?: ApplicationLifecycleView | null;
 }
 
 export interface DocumentRequirementRow {

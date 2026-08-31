@@ -1,426 +1,497 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Building2,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
-  FileCheck,
-  FileText,
-  HelpCircle,
-  Landmark,
-  Layers,
-  RefreshCw,
-  RotateCcw,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Timer,
-  TrendingUp,
-  XCircle,
-} from 'lucide-react';
-import { api, ApplicationRecord, ApplicationSummary } from '../api/client';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MessageSquareWarning, RefreshCw, RotateCcw } from 'lucide-react';
+import { api, ApplicationRecord, ApplicationSummary, QueryView } from '../api/client';
 import { useAssessment } from '../context/AssessmentContext';
 import { Breadcrumb } from '../components/common/Breadcrumb';
+import {
+  ApplicationStatusBadge,
+  ApprovalStatusBadge,
+  Expandable,
+  JourneyRail,
+  QueryStatusBadge,
+  ReadinessBadge,
+} from '../components/lifecycle/LifecycleStatus';
 
 interface Props {
   initialApplicationId?: string | null;
+}
+
+/** Where the case sits on the journey rail shown at the top of the page. */
+function journeyIndex(status?: string): number {
+  switch (status) {
+    case 'GRANTED':
+    case 'REJECTED':
+      return 6;
+    case 'UNDER_REVIEW':
+    case 'QUERY_RAISED':
+    case 'RESPONDED':
+      return 5;
+    default:
+      return 4;
+  }
 }
 
 export const ApplicantDashboardPage: React.FC<Props> = ({ initialApplicationId }) => {
   const { goToStep, resetAssessment } = useAssessment();
   const [applications, setApplications] = useState<ApplicationSummary[]>([]);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(initialApplicationId || null);
-  const [activeApplication, setActiveApplication] = useState<ApplicationRecord | null>(null);
+  const [application, setApplication] = useState<ApplicationRecord | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const fetchApplicationsList = async () => {
+  const fetchList = async () => {
     try {
       const res = await api.listApplications();
-      setApplications(res.applications || []);
-      if (res.applications.length > 0 && !selectedAppId) {
-        setSelectedAppId(res.applications[0].application_id);
+      const list = res.applications || [];
+      setApplications(list);
+      if (list.length > 0) {
+        if (!selectedAppId) {
+          setSelectedAppId(list[0].application_id);
+        }
+      } else if (!selectedAppId) {
+        setLoading(false);
+        setApplication(null);
       }
     } catch (err: any) {
-      console.warn('Could not load applications list:', err?.message);
+      if (!selectedAppId) {
+        setError(err?.message || 'Could not load application cases.');
+        setLoading(false);
+      }
     }
   };
 
-  const fetchApplicationDetails = async (appId: string) => {
+  const fetchDetail = async (appId: string) => {
     setLoading(true);
     setError(null);
     try {
-      const record = await api.getApplication(appId);
-      setActiveApplication(record);
+      setApplication(await api.getApplication(appId));
     } catch (err: any) {
-      setError(err?.message || 'Could not load application case details.');
-      setActiveApplication(null);
+      setError(err?.message || 'Could not load this application case.');
+      setApplication(null);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchApplicationsList();
+    fetchList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (selectedAppId) {
-      fetchApplicationDetails(selectedAppId);
+      fetchDetail(selectedAppId);
+    } else {
+      setApplication(null);
     }
   }, [selectedAppId]);
 
+  const lifecycle = application?.lifecycle || null;
+  const status = lifecycle?.application_status || (application?.status as any) || 'SUBMITTED';
+  const openQueries = useMemo(
+    () => (lifecycle?.open_queries || []).filter((q) => q.status === 'OPEN'),
+    [lifecycle]
+  );
+  const grantedCount = (lifecycle?.approvals || []).filter((a) => a.status === 'GRANTED').length;
+  const reviewableCount = lifecycle?.approvals.length || 0;
+
   return (
     <div>
-      <Breadcrumb
-        items={[
-          { label: 'Portal Gateway', step: 0 },
-          { label: 'Applicant Dashboard & Case Tracking' },
-        ]}
-      />
+      <Breadcrumb items={[{ label: 'Portal Gateway', step: 0 }, { label: 'Application tracking' }]} />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-300">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-300">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-gov-gold bg-gov-navy px-2.5 py-0.5 rounded">
-                Prototype Case Tracking & Milestone Monitor
-              </span>
-              <span className="text-xs font-mono text-slate-500">
-                Slice 3 Persistent Case Storage
-              </span>
-            </div>
-            <h1 className="text-xl font-bold text-gov-navy mt-1">
-              Application Case Tracking
-            </h1>
-            <p className="text-xs text-slate-600">
-              Monitoring of statutory approvals, document readiness milestones, and sequential clearance deadlines in the prototype workflow.
+            <h1 className="text-xl font-bold text-gov-navy">Prototype case tracking</h1>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Your assessment, evidence, and simulated department progress in one place.
             </p>
           </div>
-
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                if (selectedAppId) fetchApplicationDetails(selectedAppId);
-                fetchApplicationsList();
+                setLoading(true);
+                if (selectedAppId) fetchDetail(selectedAppId);
+                fetchList();
               }}
               disabled={loading}
-              className="px-3.5 py-1.5 rounded text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 transition shadow-2xs flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded text-xs font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 flex items-center gap-1.5"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </button>
-
             <button
               onClick={() => {
                 resetAssessment();
                 goToStep(1);
               }}
-              className="px-3.5 py-1.5 rounded text-xs font-bold text-white bg-gov-navy hover:bg-gov-navyLight transition shadow-2xs flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded text-xs font-bold text-white bg-gov-navy hover:bg-gov-navyLight flex items-center gap-1.5"
             >
               <RotateCcw className="w-3.5 h-3.5 text-gov-gold" />
-              New Assessment
+              New assessment
             </button>
           </div>
         </div>
 
-        {/* Applications Selector Tabs if multiple */}
         {applications.length > 1 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wide shrink-0">
-              Filed Cases:
-            </span>
-            {applications.map((app) => (
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <span className="text-[11px] font-semibold text-slate-500 shrink-0">Your cases</span>
+            {applications.map((item) => (
               <button
-                key={app.application_id}
-                onClick={() => setSelectedAppId(app.application_id)}
-                className={`px-3 py-1 rounded text-xs font-mono font-bold transition shrink-0 ${
-                  selectedAppId === app.application_id
-                    ? 'bg-gov-navy text-gov-gold shadow-xs'
-                    : 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50'
+                key={item.application_id}
+                onClick={() => setSelectedAppId(item.application_id)}
+                className={`px-2.5 py-1 rounded text-[11px] font-mono font-bold shrink-0 border ${
+                  selectedAppId === item.application_id
+                    ? 'bg-gov-navy text-white border-gov-navy'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                {app.tracking_reference} ({app.entity_name})
+                {item.tracking_reference}
               </button>
             ))}
           </div>
         )}
 
-        {/* Loading State */}
-        {loading && !activeApplication && (
-          <div className="bg-white border border-slate-300 rounded p-12 text-center">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-gov-navy mb-2" />
-            <div className="text-xs font-bold text-slate-700">Loading persistent application case...</div>
-          </div>
-        )}
-
-        {/* Error State */}
         {error && (
-          <div className="bg-rose-50 border border-rose-200 rounded p-4 text-xs text-rose-900">
+          <div role="alert" className="text-xs text-rose-900 bg-rose-50 border border-rose-200 rounded p-3">
             {error}
           </div>
         )}
+        {notice && (
+          <div className="text-xs text-emerald-900 bg-emerald-50 border border-emerald-200 rounded p-3">
+            {notice}
+          </div>
+        )}
 
-        {/* Active Application View */}
-        {activeApplication && (
-          <div className="space-y-6">
-            {/* Tracking Reference & Status Hero Card */}
-            <div className="bg-white border-l-4 border-l-gov-gold border border-slate-300 rounded-lg p-5 shadow-xs">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-mono font-extrabold text-gov-navy bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                      Tracking No: {activeApplication.tracking_reference}
-                    </span>
-                    <span className="inline-flex items-center gap-1 font-bold text-[11px] px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      STATUS: {activeApplication.status}
-                    </span>
-                  </div>
-                  <h2 className="text-base font-bold text-gov-navy">
-                    {activeApplication.entity_name}
-                  </h2>
-                  <p className="text-xs text-slate-600 mt-0.5">
-                    Location: <strong>{activeApplication.facts.location_authority} ({activeApplication.facts.land_classification})</strong> &bull; Submitted:{' '}
-                    <span className="font-mono">{new Date(activeApplication.created_at).toLocaleString()}</span>
-                  </p>
-                </div>
+        {loading && !application && (
+          <div className="bg-white border border-slate-200 rounded p-10 text-center text-xs text-slate-600">
+            <RefreshCw className="w-5 h-5 animate-spin mx-auto text-gov-navy mb-2" />
+            Loading your case.
+          </div>
+        )}
 
-                <div className="text-right sm:border-l sm:border-slate-200 sm:pl-5">
-                  <div className="text-[11px] text-slate-500 uppercase font-bold tracking-wide">
-                    Statutory Clearances
-                  </div>
-                  <div className="text-lg font-bold font-mono text-gov-navy mt-0.5">
-                    {activeApplication.approvals.length} Approvals Tracked
-                  </div>
-                  <div className="text-[11px] text-emerald-700 font-semibold mt-0.5">
-                    {activeApplication.submissions.length} Evidence Items Attached
-                  </div>
-                </div>
-              </div>
+        {!loading && !application && !error && (
+          <div className="bg-white border border-slate-200 rounded-lg p-10 text-center space-y-3 shadow-2xs">
+            <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 mx-auto flex items-center justify-center font-bold text-sm">
+              0
             </div>
-
-            {/* M3 Parallel & Sequential Timeline Card */}
-            <div className="bg-white border border-slate-300 rounded-lg p-5 shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-gov-navy" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                    M3 Sequential & Parallel Approval Timeline
-                  </h3>
-                </div>
-                <span className="text-[11px] text-slate-500 font-medium">
-                  Derived from statutory dependency graph & SLAs
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Phase 1: Immediate Parallel */}
-                <div className="bg-emerald-50/40 border border-emerald-200 rounded p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-emerald-900 uppercase tracking-wide flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-700" />
-                      Phase 1: Immediate (Can Start Now)
-                    </span>
-                    <span className="text-[11px] font-mono font-bold bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
-                      {activeApplication.timeline.phase_1_immediate.count} Approvals
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-emerald-800">
-                    Statutory registrations and permissions that can be initiated in parallel immediately.
-                  </p>
-
-                  <div className="space-y-2 pt-1">
-                    {activeApplication.timeline.phase_1_immediate.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-white p-2.5 rounded border border-emerald-200 text-xs flex items-center justify-between gap-2 shadow-2xs"
-                      >
-                        <div>
-                          <span className="font-mono font-bold text-gov-navy mr-1.5">
-                            {item.approval_id}
-                          </span>
-                          <span className="font-semibold text-slate-800">{item.name}</span>
-                          <div className="text-[10.5px] text-slate-500 mt-0.5">
-                            {item.department} &bull; SLA: {item.sla_days ? `${item.sla_days} Days` : 'Standard'}
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
-                          {item.readiness_status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Phase 2: Sequential Post-Condition */}
-                <div className="bg-slate-50 border border-slate-300 rounded p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wide flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-slate-600" />
-                      Phase 2: Sequential (After Preconditions)
-                    </span>
-                    <span className="text-[11px] font-mono font-bold bg-white text-slate-700 px-2 py-0.5 rounded border border-slate-300">
-                      {activeApplication.timeline.phase_2_sequential.count} Approvals
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-600">
-                    Operating licences gated by site plan approvals or prior statutory consents.
-                  </p>
-
-                  <div className="space-y-2 pt-1">
-                    {activeApplication.timeline.phase_2_sequential.items.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="bg-white p-2.5 rounded border border-slate-300 text-xs flex items-center justify-between gap-2 shadow-2xs"
-                      >
-                        <div>
-                          <span className="font-mono font-bold text-gov-navy mr-1.5">
-                            {item.approval_id}
-                          </span>
-                          <span className="font-semibold text-slate-800">{item.name}</span>
-                          <div className="text-[10.5px] text-amber-800 font-medium mt-0.5">
-                            {item.precondition_note}
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-300 shrink-0">
-                          {item.readiness_status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Approvals Detailed Tracking Table */}
-            <div className="bg-white border border-slate-300 rounded-lg p-5 shadow-xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <Landmark className="w-4 h-4 text-gov-navy" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                    Statutory Approval Milestones
-                  </h3>
-                </div>
-                <span className="text-[11px] text-slate-500 font-mono">
-                  Total: {activeApplication.approvals.length} Clearances
-                </span>
-              </div>
-
-              <div className="overflow-x-auto border border-slate-200 rounded">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
-                    <tr>
-                      <th className="p-2.5">Approval ID</th>
-                      <th className="p-2.5">Name / Purpose</th>
-                      <th className="p-2.5">Department</th>
-                      <th className="p-2.5">Statutory SLA</th>
-                      <th className="p-2.5">Evidence Readiness</th>
-                      <th className="p-2.5">Review Milestone</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200">
-                    {activeApplication.approvals.map((appr, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="p-2.5 font-mono font-bold text-gov-navy">
-                          {appr.approval_id}
-                        </td>
-                        <td className="p-2.5 font-medium text-slate-800">
-                          {appr.name || appr.approval_id}
-                          {appr.statute && (
-                            <div className="text-[10px] text-slate-500 font-mono">{appr.statute}</div>
-                          )}
-                        </td>
-                        <td className="p-2.5 text-slate-600">
-                          {appr.department || 'Competent Authority'}
-                        </td>
-                        <td className="p-2.5 font-mono text-slate-700">
-                          {appr.sla_days ? `${appr.sla_days} Days` : 'Immediate'}
-                        </td>
-                        <td className="p-2.5">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                              appr.readiness_status === 'READY'
-                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                                : 'bg-slate-100 text-slate-700 border-slate-300'
-                            }`}
-                          >
-                            {appr.readiness_status || 'PENDING'}
-                          </span>
-                        </td>
-                        <td className="p-2.5">
-                          <span className="text-[11px] font-semibold text-sky-900 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                            Submitted · Pending Review Simulation
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Attached Evidence & Submissions Card */}
-            <div className="bg-white border border-slate-300 rounded-lg p-5 shadow-xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-gov-navy" />
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy">
-                    Submitted Evidence & M5 Scrutiny References
-                  </h3>
-                </div>
-                <span className="text-[11px] text-slate-500">
-                  Zero raw files duplicated in case records
-                </span>
-              </div>
-
-              {activeApplication.submissions.length > 0 ? (
-                <div className="space-y-2">
-                  {activeApplication.submissions.map((sub, sIdx) => {
-                    const ver = activeApplication.verification_records.find(
-                      (v) => v.document_id === sub.document_id
-                    );
-                    return (
-                      <div
-                        key={sIdx}
-                        className="bg-slate-50 p-3 rounded border border-slate-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2"
-                      >
-                        <div>
-                          <div className="font-bold text-slate-800">
-                            {sub.document_id}{' '}
-                            {sub.filename && <span className="font-mono text-slate-500 font-normal">({sub.filename})</span>}
-                          </div>
-                          <div className="text-[10.5px] text-slate-500 mt-0.5">
-                            Attached Evidence Item &bull; <span className="text-slate-600 font-medium">Recorded in Case Dossier</span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
-                            {sub.state || 'PROVIDED'}
-                          </span>
-                          {ver && ver.disposition && (
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
-                              M5: {ver.disposition}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-4 text-center text-xs text-slate-500 bg-slate-50 rounded">
-                  No individual file uploads attached to this application record.
-                </div>
-              )}
+            <h3 className="text-sm font-bold text-gov-navy">No application cases yet.</h3>
+            <p className="text-xs text-slate-600 max-w-md mx-auto">
+              Complete a regulatory assessment and submit an application for prototype case tracking to monitor statutory approvals, document readiness milestones, and simulated department reviews.
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => {
+                  resetAssessment();
+                  goToStep(1);
+                }}
+                className="px-4 py-2 rounded text-xs font-bold text-white bg-gov-navy hover:bg-gov-navyLight transition shadow inline-flex items-center gap-1.5"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-gov-gold" />
+                Start New Assessment
+              </button>
             </div>
           </div>
         )}
+
+        {application && (
+          <>
+            {/* Primary status card */}
+            <section className="bg-white border border-slate-300 border-l-4 border-l-gov-gold rounded-lg p-5 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div>
+                  <div className="text-[11px] font-mono font-bold text-gov-navy">
+                    {application.tracking_reference}
+                  </div>
+                  <h2 className="text-lg font-bold text-gov-navy mt-0.5">{application.entity_name}</h2>
+                  <div className="mt-2">
+                    <ApplicationStatusBadge status={status} />
+                  </div>
+                </div>
+                <div className="sm:text-right">
+                  <div className="text-2xl font-bold text-gov-navy">
+                    {grantedCount}/{reviewableCount || '—'}
+                  </div>
+                  <div className="text-[11px] text-slate-500">approvals granted in simulation</div>
+                </div>
+              </div>
+              <div className="border-t border-slate-200 pt-3">
+                <JourneyRail activeIndex={journeyIndex(status)} />
+              </div>
+            </section>
+
+            {/* Open queries lead the page when present */}
+            {openQueries.length > 0 && (
+              <section className="bg-amber-50 border-2 border-amber-300 rounded-lg p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <MessageSquareWarning className="w-4 h-4 text-amber-700" />
+                  <h2 className="text-sm font-bold text-amber-900">
+                    {openQueries.length === 1
+                      ? 'A department has asked you for something'
+                      : `${openQueries.length} departments have asked you for something`}
+                  </h2>
+                </div>
+                {openQueries.map((query) => (
+                  <QueryResponseCard
+                    key={query.query_id}
+                    applicationId={application.application_id}
+                    query={query}
+                    submissions={application.submissions}
+                    onDone={async (message) => {
+                      setNotice(message);
+                      await fetchDetail(application.application_id);
+                    }}
+                    onError={setError}
+                  />
+                ))}
+              </section>
+            )}
+
+            {/* Approval progress */}
+            <section className="bg-white border border-slate-300 rounded-lg p-4 space-y-2">
+              <h2 className="text-xs font-bold text-gov-navy">Approval progress</h2>
+              {reviewableCount === 0 ? (
+                <p className="text-xs text-slate-600">
+                  None of the approvals on this case are handled by a department simulated in this
+                  prototype, so no review progress is shown.
+                </p>
+              ) : (
+                <div className="divide-y divide-slate-100">
+                  {lifecycle!.approvals.map((approval) => (
+                    <div
+                      key={approval.approval_id}
+                      className="py-2.5 flex flex-wrap items-center justify-between gap-2"
+                    >
+                      <div>
+                        <div className="text-xs font-semibold text-slate-800">
+                          {approval.name || approval.approval_id}
+                        </div>
+                        <div className="text-[11px] text-slate-500">
+                          {approval.department}
+                          {approval.sla_days ? ` · published service timeline ${approval.sla_days} days` : ''}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <ReadinessBadge status={approval.readiness_status} />
+                        <ApprovalStatusBadge status={approval.status} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Expandable label="View all approvals on this case">
+                <div className="text-[11px] text-slate-600 space-y-1">
+                  {application.approvals.map((approval) => (
+                    <div key={approval.approval_id} className="flex justify-between gap-3">
+                      <span>
+                        {approval.name || approval.approval_id}{' '}
+                        <span className="text-slate-400">({approval.department || 'authority'})</span>
+                      </span>
+                      <span>{approval.readiness_status || 'PENDING'}</span>
+                    </div>
+                  ))}
+                  <p className="pt-1 text-slate-500">
+                    Approvals outside DISH and FSSAI have no officer view in this prototype. Their
+                    regulatory status is unchanged.
+                  </p>
+                </div>
+              </Expandable>
+            </section>
+
+            {/* Department activity */}
+            <section className="bg-white border border-slate-300 rounded-lg p-4 space-y-2">
+              <h2 className="text-xs font-bold text-gov-navy">Latest department activity</h2>
+              {(lifecycle?.events.length || 0) === 0 ? (
+                <p className="text-xs text-slate-600">
+                  No department has opened this case yet.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {[...lifecycle!.events].reverse().slice(0, 4).map((event) => (
+                    <div key={event.event_id} className="text-[11px] text-slate-700">
+                      <span className="font-mono text-slate-400">
+                        {new Date(event.created_at).toLocaleDateString()}
+                      </span>{' '}
+                      — {event.detail || event.event_type}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(lifecycle?.queries.length || 0) > 0 && (
+                <Expandable label="View all queries on this case">
+                  <div className="space-y-2">
+                    {lifecycle!.queries.map((query) => (
+                      <div key={query.query_id} className="border border-slate-200 rounded p-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-semibold text-slate-800">
+                            {query.approval_name || query.approval_id} · {query.department}
+                          </span>
+                          <QueryStatusBadge status={query.status} />
+                        </div>
+                        <p className="text-[11px] text-slate-700 mt-1">{query.query_text}</p>
+                        {query.response_text && (
+                          <p className="text-[11px] text-slate-600 mt-1">
+                            Your response: {query.response_text}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </Expandable>
+              )}
+            </section>
+
+            {/* Timeline and evidence, kept available but not in the way */}
+            <section className="bg-white border border-slate-300 rounded-lg p-4">
+              <h2 className="text-xs font-bold text-gov-navy">Sequencing and evidence</h2>
+              <p className="text-[11px] text-slate-600 mt-1">
+                {application.timeline.phase_1_immediate.count} approval
+                {application.timeline.phase_1_immediate.count === 1 ? '' : 's'} can be filed straight away;{' '}
+                {application.timeline.phase_2_sequential.count} wait on an earlier approval.{' '}
+                {application.submissions.length} evidence item
+                {application.submissions.length === 1 ? '' : 's'} attached.
+              </p>
+
+              <Expandable label="View details">
+                <div className="space-y-3 text-[11px]">
+                  <div>
+                    <div className="font-semibold text-slate-800">Can be filed immediately</div>
+                    {application.timeline.phase_1_immediate.items.map((item) => (
+                      <div key={item.approval_id} className="text-slate-600">
+                        {item.name} — {item.department}
+                      </div>
+                    ))}
+                  </div>
+                  {application.timeline.phase_2_sequential.count > 0 && (
+                    <div>
+                      <div className="font-semibold text-slate-800">Waits on an earlier approval</div>
+                      {application.timeline.phase_2_sequential.items.map((item) => (
+                        <div key={item.approval_id} className="text-slate-600">
+                          {item.name} — {item.precondition_note}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div>
+                    <div className="font-semibold text-slate-800">Evidence attached</div>
+                    {application.submissions.length === 0 ? (
+                      <div className="text-slate-600">No files attached to this case.</div>
+                    ) : (
+                      application.submissions.map((submission) => {
+                        const finding = application.verification_records.find(
+                          (record) => record.document_id === submission.document_id
+                        );
+                        return (
+                          <div key={submission.submission_id} className="text-slate-600">
+                            {submission.document_id}
+                            {finding?.disposition ? ` — automated check: ${finding.disposition}` : ''}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                  <p className="text-slate-500">
+                    Automated checks indicate whether expected evidence is present and readable. They
+                    do not establish authenticity or government approval.
+                  </p>
+                </div>
+              </Expandable>
+            </section>
+
+            <p className="text-[11px] text-slate-500">
+              {lifecycle?.simulation_notice ||
+                'Department review in this prototype is a simulation. No application has been filed with any government department.'}
+            </p>
+          </>
+        )}
       </div>
+    </div>
+  );
+};
+
+const QueryResponseCard: React.FC<{
+  applicationId: string;
+  query: QueryView;
+  submissions: ApplicationRecord['submissions'];
+  onDone: (message: string) => Promise<void>;
+  onError: (message: string) => void;
+}> = ({ applicationId, query, submissions, onDone, onError }) => {
+  const [text, setText] = useState('');
+  const [submissionId, setSubmissionId] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    setBusy(true);
+    try {
+      const chosen = submissions.find((item) => item.submission_id === submissionId);
+      await api.respondToQuery(applicationId, query.query_id, {
+        response_text: text,
+        response_document_id: chosen?.document_id || null,
+        response_submission_id: submissionId || null,
+      });
+      setText('');
+      setSubmissionId('');
+      await onDone('Your response has been sent to the department.');
+    } catch (err: any) {
+      onError(err?.message || 'Your response could not be sent.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-amber-200 rounded p-3 space-y-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-semibold text-slate-800">
+          {query.department} · {query.approval_name || query.approval_id}
+        </span>
+        <QueryStatusBadge status={query.status} />
+      </div>
+      <p className="text-xs text-slate-800">{query.query_text}</p>
+      <div className="text-[11px] text-amber-900 font-semibold">Respond by {query.deadline}</div>
+
+      <label className="block text-[11px] font-semibold text-slate-700">
+        Your response
+        <textarea
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          rows={3}
+          placeholder="Explain what you are providing or correcting."
+          className="mt-1 w-full border border-slate-300 rounded px-2 py-1.5 text-xs font-normal"
+        />
+      </label>
+
+      {submissions.length > 0 && (
+        <label className="block text-[11px] font-semibold text-slate-700">
+          Point to a document you have already uploaded (optional)
+          <select
+            value={submissionId}
+            onChange={(event) => setSubmissionId(event.target.value)}
+            className="mt-1 block w-full border border-slate-300 rounded px-2 py-1.5 text-[11px] font-normal"
+          >
+            <option value="">No document reference</option>
+            {submissions.map((item) => (
+              <option key={item.submission_id} value={item.submission_id}>
+                {item.document_id}
+              </option>
+            ))}
+          </select>
+          <span className="block text-[10px] text-slate-500 mt-1 font-normal">
+            To supply a new file, upload it on the readiness page first; only the reference is recorded here.
+          </span>
+        </label>
+      )}
+
+      <button
+        onClick={submit}
+        disabled={busy || !text.trim()}
+        className="px-4 py-1.5 rounded bg-gov-navy text-white text-[11px] font-bold disabled:opacity-50"
+      >
+        {busy ? 'Sending…' : 'Send response'}
+      </button>
     </div>
   );
 };

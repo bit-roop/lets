@@ -8,6 +8,7 @@ import { IntakeWizardPage } from './pages/IntakeWizardPage';
 import { ReviewFactsPage } from './pages/ReviewFactsPage';
 import { ResultsPage } from './pages/ResultsPage';
 import { ApplicantDashboardPage } from './pages/ApplicantDashboardPage';
+import { DepartmentPortalPage } from './pages/DepartmentPortalPage';
 
 const AppContent: React.FC = () => {
   const { currentStep, activeApplicationId } = useAssessment();
@@ -22,6 +23,7 @@ const AppContent: React.FC = () => {
         {currentStep === 5 && <ReviewFactsPage />}
         {currentStep === 6 && <ResultsPage />}
         {currentStep === 7 && <ApplicantDashboardPage initialApplicationId={activeApplicationId} />}
+        {currentStep === 8 && <DepartmentPortalPage />}
       </main>
       <Footer />
     </div>

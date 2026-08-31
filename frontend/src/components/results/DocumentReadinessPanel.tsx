@@ -6,6 +6,7 @@ import { EvaluationResponse } from '../../types/engine';
 import { VerificationRecord, M5EvidenceCounters } from '../../types/verification';
 import VerificationBlock from '../verification/VerificationBlock';
 import { useAssessment } from '../../context/AssessmentContext';
+import { Expandable } from '../lifecycle/LifecycleStatus';
 
 interface Props {
   facts: ApplicantFacts;
@@ -224,20 +225,62 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
 
   if (approvalIds.length === 0) return null;
 
+  // A short, countable answer to "are my documents ready for review?" shown
+  // above the detail. Derived purely from the M4 rows and M4 submissions
+  // already fetched; nothing is re-evaluated to produce it.
+  const uploadRequirements = requirements.flatMap((approval) =>
+    approval.coverage.status === 'UNSUPPORTED'
+      ? []
+      : approval.requirements.filter((requirement) => {
+          const spec = specs.find((item) => item.document_id === requirement.document_id);
+          return (
+            spec?.item_kind === 'UPLOAD_DOCUMENT' &&
+            requirement.condition_state !== 'FALSE' &&
+            requirement.verification_status !== 'UNSUPPORTED'
+          );
+        })
+  );
+  const requiredDocumentIds = Array.from(
+    new Set(uploadRequirements.map((requirement) => requirement.document_id))
+  );
+  const uploadedDocumentIds = requiredDocumentIds.filter((documentId) =>
+    (readiness?.submissions || []).some((submission) => submission.document_id === documentId)
+  );
+  const acceptedCount = evidenceCounters?.m5_accepted_for_review_count ?? 0;
+  const needsAttentionCount =
+    (evidenceCounters?.m5_needs_action_count ?? 0) + (evidenceCounters?.m5_human_review_count ?? 0);
+
   return (
     <section className="bg-white border border-slate-300 rounded-md shadow-sm p-4 space-y-4" aria-label="Document readiness">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
             <FileUp className="w-4 h-4 text-gov-navy" />
-            <h2 className="text-sm font-bold text-gov-navy">Evidence & Document Readiness</h2>
+            <h2 className="text-sm font-bold text-gov-navy">Documents you need</h2>
           </div>
-          <p className="text-xs text-slate-600 mt-1">M4 records required evidence and submission presence. Uploading a file does not prove authenticity.</p>
+          <p className="text-xs text-slate-600 mt-1">
+            Automated checks indicate whether expected evidence is present and readable. They do not
+            establish authenticity or government approval.
+          </p>
         </div>
         <button onClick={refresh} disabled={loading} className="text-xs font-semibold text-gov-navy flex items-center gap-1.5 disabled:opacity-50">
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
       </div>
+
+      <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 border-y border-slate-200 py-3">
+        {[
+          { label: 'Required documents', value: requiredDocumentIds.length, tone: 'text-gov-navy' },
+          { label: 'Uploaded', value: uploadedDocumentIds.length, tone: 'text-gov-navy' },
+          { label: 'Accepted for review', value: acceptedCount, tone: 'text-emerald-800' },
+          { label: 'Needs attention', value: needsAttentionCount, tone: needsAttentionCount > 0 ? 'text-amber-800' : 'text-slate-500' },
+        ].map((item) => (
+          <div key={item.label}>
+            <dd className={`text-xl font-bold ${item.tone}`}>{item.value}</dd>
+            <dt className="text-[11px] text-slate-600">{item.label}</dt>
+          </div>
+        ))}
+      </dl>
 
       {error && <div className="text-xs text-rose-800 bg-rose-50 border border-rose-200 rounded p-2">{error}</div>}
       {message && <div className="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded p-2">{message}</div>}
@@ -245,9 +288,11 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
       <div className="space-y-4">
         {workflow?.schedule?.nodes && (
           <div className="bg-slate-50 border border-slate-200 rounded p-3 text-[11px] text-slate-600">
-            <div className="font-bold text-slate-800 mb-1">M3 committed workflow scope</div>
-            <div>{(workflow.schedule.topological_order || Object.keys(workflow.schedule.nodes)).join(' → ')}</div>
-            <div className="mt-1">Document readiness below uses this committed workflow context; provisional items do not silently gate it.</div>
+            <div className="font-bold text-slate-800">Filing order used for this checklist</div>
+            <Expandable label="View details">
+              <div>{(workflow.schedule.topological_order || Object.keys(workflow.schedule.nodes)).join(' → ')}</div>
+              <div className="mt-1">Readiness below uses this committed sequencing. Provisional items do not silently gate it.</div>
+            </Expandable>
           </div>
         )}
         {requirements.map((approval) => {
@@ -285,17 +330,17 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-gov-gold bg-gov-navyLight px-2 py-0.5 rounded border border-gov-gold/30">
-                Prototype Application Filing
+                Submit for tracking
               </span>
               <span className="text-[11px] text-slate-300">
-                Persistent Application Case (Slice 3)
+                Prototype case tracking
               </span>
             </div>
             <h3 className="text-sm font-bold text-white">
-              Submit Application for Prototype Case Tracking
+              Submit this application for prototype tracking
             </h3>
             <p className="text-xs text-slate-300 mt-1 max-w-xl">
-              Saves the current assessment into a persistent tracking case with attached evidence and M5 verification references, assigning a tracking reference number.
+              Saves this assessment as a tracked case with a reference number, so you can follow it through the department review simulation. Nothing is filed with a government department.
             </p>
           </div>
 
@@ -354,7 +399,7 @@ export const DocumentReadinessPanel: React.FC<Props> = ({ facts, evaluation }) =
             className="px-5 py-2.5 rounded bg-gov-gold text-gov-navy font-bold text-xs uppercase tracking-wider hover:bg-gov-goldLight transition shadow flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
           >
             <UploadCloud className="w-4 h-4" />
-            Submit Application for Tracking
+            Submit for tracking
           </button>
         </div>
       </div>

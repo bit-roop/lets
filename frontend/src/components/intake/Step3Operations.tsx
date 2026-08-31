@@ -20,8 +20,11 @@ export const Step3Operations: React.FC = () => {
       <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-md mb-2">
         <label className="flex items-start gap-3 cursor-pointer">
           <input
+            id="food-business-confirmation"
+            data-field-label="Food Business Operator Confirmation"
             type="checkbox"
-            checked={facts.is_food_business ?? true}
+            required
+            checked={facts.is_food_business === true}
             onChange={(e) => setFact('is_food_business', e.target.checked)}
             className="mt-0.5 rounded border-slate-300 text-gov-navy focus:ring-gov-navy w-4 h-4"
           />
@@ -47,7 +50,10 @@ export const Step3Operations: React.FC = () => {
               ₹
             </div>
             <input
+              id="annual-turnover"
+              data-field-label="Annual Projected Turnover"
               type="number"
+              required
               value={facts.annual_turnover ?? ''}
               onChange={(e) => {
                 const v = e.target.value === '' ? null : Number(e.target.value);
@@ -68,7 +74,10 @@ export const Step3Operations: React.FC = () => {
             Total Headcount on Premises <span className="text-rose-500">*</span>
           </label>
           <input
+            id="employees-total"
+            data-field-label="Total Headcount on Premises"
             type="number"
+            required
             value={facts.employees_total ?? ''}
             onChange={(e) => {
               const v = e.target.value === '' ? null : Number(e.target.value);
@@ -88,7 +97,10 @@ export const Step3Operations: React.FC = () => {
             Total Manufacturing / Floor Workers <span className="text-rose-500">*</span>
           </label>
           <input
+            id="workers-for-threshold"
+            data-field-label="Total Manufacturing / Floor Workers"
             type="number"
+            required
             value={facts.workers_for_threshold ?? ''}
             onChange={(e) => {
               const v = e.target.value === '' ? null : Number(e.target.value);
