@@ -6,6 +6,7 @@ import {
   VerificationRecord,
   VerificationRecordsResponse,
 } from '../types/verification';
+import { EvaluateWithWorkflowResponse } from '../types/workflow';
 
 export type {
   VerificationCapabilities,
@@ -196,6 +197,16 @@ export const api = {
       `/api/applications/${encodeURIComponent(applicationId)}/queries/${encodeURIComponent(queryId)}/resolve`,
       { method: 'POST', body: JSON.stringify({ department, resolution_note: resolutionNote || null }) }
     ),
+  evaluateWithWorkflow: (facts: ApplicantFacts, asOf?: string) =>
+    fetchJson<EvaluateWithWorkflowResponse>('/api/evaluate-with-workflow', {
+      method: 'POST',
+      body: JSON.stringify({
+        facts,
+        as_of: asOf || new Date().toISOString().split('T')[0],
+        include_provisional: true,
+        include_candidate_edges: true,
+      }),
+    }),
 };
 
 // --- Slice 4 types ----------------------------------------------------------
