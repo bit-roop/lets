@@ -114,6 +114,30 @@ export const Header: React.FC = () => {
           </button>
 
           <button
+            onClick={() => goToStep(9)}
+            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+              currentStep === 9
+                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+            }`}
+            title="Critical-path timeline of your approvals"
+          >
+            Roadmap
+          </button>
+
+          <button
+            onClick={() => goToStep(10)}
+            className={`px-3 py-1.5 rounded font-medium text-xs transition border ${
+              currentStep === 10
+                ? 'bg-gov-gold text-gov-navy border-gov-gold font-semibold'
+                : 'bg-gov-navyLight/60 text-slate-200 border-slate-600 hover:bg-gov-navyLight'
+            }`}
+            title="Browse every approval type and its official source"
+          >
+            Library
+          </button>
+
+          <button
             onClick={resetAssessment}
             className="p-1.5 rounded bg-gov-navyLight/40 hover:bg-gov-navyLight text-slate-300 hover:text-white border border-slate-700 transition"
             title="Reset Form"

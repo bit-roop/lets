@@ -8,10 +8,10 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#0B5FA5',   // primary action / links
-          dark: '#083E6E',      // headers, active states
+          DEFAULT: '#0B5FA5',
+          dark: '#083E6E',
           darker: '#062B4D',
-          tint: '#EAF3FC',      // light background wash
+          tint: '#EAF3FC',
           border: '#CFE0F2',
         },
         ink: {
@@ -20,9 +20,37 @@ export default {
           500: '#6B7280',
           300: '#D1D5DB',
         },
+        gov: {
+          navy: '#0B2545',
+          navyLight: '#134074',
+          gold: '#C59B27',
+          goldLight: '#E8CA65',
+          slate: '#0F172A',
+          slateLight: '#334155',
+          muted: '#64748B',
+          surface: '#FFFFFF',
+          canvas: '#F8FAFC',
+          border: '#CBD5E1',
+          borderLight: '#E2E8F0',
+        },
+        status: {
+          applicable: '#166534',
+          applicableBg: '#DCFCE7',
+          applicableBorder: '#86EFAC',
+          notApplicable: '#475569',
+          notApplicableBg: '#F1F5F9',
+          notApplicableBorder: '#CBD5E1',
+          unknown: '#9A3412',
+          unknownBg: '#FFEDD5',
+          unknownBorder: '#FDBA74',
+          conflict: '#991B1B',
+          conflictBg: '#FEE2E2',
+          conflictBorder: '#FCA5A5',
+        },
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        serif: ['Merriweather', 'Georgia', 'serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],
       },
       boxShadow: {
