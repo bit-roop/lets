@@ -43,7 +43,7 @@ export const Header: React.FC = () => {
           </div>
           <div>
             <div className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              MAITRI-COMPLY
+              Niyam-SETU
               <span className="text-xs font-semibold px-2 py-0.5 rounded bg-gov-gold/20 text-gov-gold border border-gov-gold/40 uppercase">
                 Prototype v3
               </span>
