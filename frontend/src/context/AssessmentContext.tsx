@@ -96,6 +96,36 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
     }));
   };
 
+  const persistApplication = async (factsUsed: ApplicantFacts, result: EvaluationResponse) => {
+    try {
+      if (!result.applicable || result.applicable.length === 0) {
+        // Nothing applicable yet — the backend requires at least one
+        // established approval to open a case, so there's nothing to persist.
+        return;
+      }
+      const entityName = (factsUsed._name || factsUsed.entity_name || '').trim();
+      if (!entityName) return;
+
+      const record = await api.createApplication({
+        entity_name: entityName,
+        facts: factsUsed,
+        as_of: result.as_of,
+        approvals: result.applicable.map((r) => ({
+          approval_id: r.requirement_id,
+          name: r.name,
+          department: r.department,
+          statute: r.statute,
+          sla_days: r.sla_days,
+          engine_state: 'APPLICABLE',
+        })),
+      });
+      setActiveApplicationId(record.application_id);
+    } catch (err: any) {
+      // Don't let case persistence failure block showing results.
+      console.warn('Could not save this application to the case store:', err?.message || err);
+    }
+  };
+
   const loadPersona = async (personaId: string) => {
     setIsLoading(true);
     setError(null);
@@ -106,6 +136,7 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
       // Auto-evaluate loaded persona
       const result = await api.evaluate(personaFacts, asOfDate);
       setEvaluationResult(result);
+      await persistApplication(personaFacts, result);
       setCurrentStep(6); // Jump straight to results
     } catch (err: any) {
       setError(err instanceof ApiError ? err.message : 'Failed to load persona.');
@@ -121,6 +152,7 @@ export const AssessmentProvider: React.FC<{ children: ReactNode }> = ({ children
     try {
       const result = await api.evaluate(factsToEvaluate, asOfDate);
       setEvaluationResult(result);
+      await persistApplication(factsToEvaluate, result);
       setCurrentStep(6);
       return result;
     } catch (err: any) {
